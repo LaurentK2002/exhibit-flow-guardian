@@ -14,7 +14,283 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      case_activities: {
+        Row: {
+          activity_type: string
+          case_id: string | null
+          created_at: string | null
+          description: string
+          id: string
+          metadata: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          activity_type: string
+          case_id?: string | null
+          created_at?: string | null
+          description: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          activity_type?: string
+          case_id?: string | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_activities_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cases: {
+        Row: {
+          assigned_to: string | null
+          case_notes: string | null
+          case_number: string
+          closed_date: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          incident_date: string | null
+          location: string | null
+          opened_date: string | null
+          priority: Database["public"]["Enums"]["case_priority"] | null
+          status: Database["public"]["Enums"]["case_status"] | null
+          supervisor_id: string | null
+          suspect_name: string | null
+          title: string
+          updated_at: string | null
+          victim_name: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          case_notes?: string | null
+          case_number: string
+          closed_date?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          incident_date?: string | null
+          location?: string | null
+          opened_date?: string | null
+          priority?: Database["public"]["Enums"]["case_priority"] | null
+          status?: Database["public"]["Enums"]["case_status"] | null
+          supervisor_id?: string | null
+          suspect_name?: string | null
+          title: string
+          updated_at?: string | null
+          victim_name?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          case_notes?: string | null
+          case_number?: string
+          closed_date?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          incident_date?: string | null
+          location?: string | null
+          opened_date?: string | null
+          priority?: Database["public"]["Enums"]["case_priority"] | null
+          status?: Database["public"]["Enums"]["case_status"] | null
+          supervisor_id?: string | null
+          suspect_name?: string | null
+          title?: string
+          updated_at?: string | null
+          victim_name?: string | null
+        }
+        Relationships: []
+      }
+      exhibits: {
+        Row: {
+          analysis_notes: string | null
+          assigned_analyst: string | null
+          brand: string | null
+          case_id: string | null
+          chain_of_custody: Json | null
+          created_at: string | null
+          description: string | null
+          device_name: string
+          evidence_files: Json | null
+          exhibit_number: string
+          exhibit_type: Database["public"]["Enums"]["exhibit_type"]
+          id: string
+          imei: string | null
+          mac_address: string | null
+          model: string | null
+          received_by: string | null
+          received_date: string | null
+          serial_number: string | null
+          status: Database["public"]["Enums"]["exhibit_status"] | null
+          storage_location: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          analysis_notes?: string | null
+          assigned_analyst?: string | null
+          brand?: string | null
+          case_id?: string | null
+          chain_of_custody?: Json | null
+          created_at?: string | null
+          description?: string | null
+          device_name: string
+          evidence_files?: Json | null
+          exhibit_number: string
+          exhibit_type: Database["public"]["Enums"]["exhibit_type"]
+          id?: string
+          imei?: string | null
+          mac_address?: string | null
+          model?: string | null
+          received_by?: string | null
+          received_date?: string | null
+          serial_number?: string | null
+          status?: Database["public"]["Enums"]["exhibit_status"] | null
+          storage_location?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          analysis_notes?: string | null
+          assigned_analyst?: string | null
+          brand?: string | null
+          case_id?: string | null
+          chain_of_custody?: Json | null
+          created_at?: string | null
+          description?: string | null
+          device_name?: string
+          evidence_files?: Json | null
+          exhibit_number?: string
+          exhibit_type?: Database["public"]["Enums"]["exhibit_type"]
+          id?: string
+          imei?: string | null
+          mac_address?: string | null
+          model?: string | null
+          received_by?: string | null
+          received_date?: string | null
+          serial_number?: string | null
+          status?: Database["public"]["Enums"]["exhibit_status"] | null
+          storage_location?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exhibits_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          badge_number: string | null
+          created_at: string | null
+          department: string | null
+          email: string | null
+          full_name: string
+          id: string
+          is_active: boolean | null
+          phone: string | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          badge_number?: string | null
+          created_at?: string | null
+          department?: string | null
+          email?: string | null
+          full_name: string
+          id: string
+          is_active?: boolean | null
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string | null
+        }
+        Update: {
+          badge_number?: string | null
+          created_at?: string | null
+          department?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_active?: boolean | null
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          case_id: string | null
+          content: string | null
+          created_at: string | null
+          exhibit_id: string | null
+          file_path: string | null
+          generated_by: string | null
+          id: string
+          is_final: boolean | null
+          report_type: string
+          reviewed_by: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          case_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          exhibit_id?: string | null
+          file_path?: string | null
+          generated_by?: string | null
+          id?: string
+          is_final?: boolean | null
+          report_type: string
+          reviewed_by?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          case_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          exhibit_id?: string | null
+          file_path?: string | null
+          generated_by?: string | null
+          id?: string
+          is_final?: boolean | null
+          report_type?: string
+          reviewed_by?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_exhibit_id_fkey"
+            columns: ["exhibit_id"]
+            isOneToOne: false
+            referencedRelation: "exhibits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +299,32 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      case_priority: "low" | "medium" | "high" | "critical"
+      case_status:
+        | "open"
+        | "under_investigation"
+        | "pending_review"
+        | "closed"
+        | "archived"
+      exhibit_status:
+        | "received"
+        | "in_analysis"
+        | "analysis_complete"
+        | "released"
+        | "destroyed"
+        | "archived"
+      exhibit_type:
+        | "mobile_device"
+        | "computer"
+        | "storage_media"
+        | "network_device"
+        | "other"
+      user_role:
+        | "investigator"
+        | "forensic_analyst"
+        | "supervisor"
+        | "administrator"
+        | "case_officer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +451,37 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      case_priority: ["low", "medium", "high", "critical"],
+      case_status: [
+        "open",
+        "under_investigation",
+        "pending_review",
+        "closed",
+        "archived",
+      ],
+      exhibit_status: [
+        "received",
+        "in_analysis",
+        "analysis_complete",
+        "released",
+        "destroyed",
+        "archived",
+      ],
+      exhibit_type: [
+        "mobile_device",
+        "computer",
+        "storage_media",
+        "network_device",
+        "other",
+      ],
+      user_role: [
+        "investigator",
+        "forensic_analyst",
+        "supervisor",
+        "administrator",
+        "case_officer",
+      ],
+    },
   },
 } as const

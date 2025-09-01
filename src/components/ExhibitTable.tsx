@@ -1,72 +1,100 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { StatusBadge, ExhibitStatus } from "./StatusBadge";
+import { StatusBadge } from "./StatusBadge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Download } from "lucide-react";
+import { Eye, Download, Plus } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+import { Database } from "@/integrations/supabase/types";
 
-interface Exhibit {
-  id: string;
-  caseNumber: string;
-  deviceType: string;
-  serialNumber: string;
-  receivedDate: string;
-  assignedTo: string;
-  status: ExhibitStatus;
-  priority: "High" | "Medium" | "Low";
-}
+type Exhibit = Database['public']['Tables']['exhibits']['Row'] & {
+  cases?: {
+    case_number: string;
+    priority: Database['public']['Enums']['case_priority'];
+  } | null;
+  profiles?: {
+    full_name: string;
+  } | null;
+};
 
-const sampleExhibits: Exhibit[] = [
-  {
-    id: "EXH-001",
-    caseNumber: "CR-2024-0089",
-    deviceType: "iPhone 14 Pro",
-    serialNumber: "F2LX9K7H8P",
-    receivedDate: "2024-01-15",
-    assignedTo: "Det. Johnson",
-    status: "analysis",
-    priority: "High"
-  },
-  {
-    id: "EXH-002", 
-    caseNumber: "CR-2024-0087",
-    deviceType: "MacBook Air",
-    serialNumber: "C02Z1234567",
-    receivedDate: "2024-01-14",
-    assignedTo: "Tech. Smith",
-    status: "complete",
-    priority: "Medium"
-  },
-  {
-    id: "EXH-003",
-    caseNumber: "CR-2024-0091",
-    deviceType: "Samsung Galaxy S23",
-    serialNumber: "RF8N123456",
-    receivedDate: "2024-01-16",
-    assignedTo: "Det. Williams",
-    status: "received",
-    priority: "Low"
-  },
-  {
-    id: "EXH-004",
-    caseNumber: "CR-2024-0088",
-    deviceType: "External HDD 2TB",
-    serialNumber: "WX12345678",
-    receivedDate: "2024-01-13",
-    assignedTo: "Tech. Davis",
-    status: "urgent",
-    priority: "High"
-  }
-];
+const exhibitTypeMap: Record<Database['public']['Enums']['exhibit_type'], string> = {
+  mobile_device: "Mobile Device",
+  computer: "Computer",
+  storage_media: "Storage Media", 
+  network_device: "Network Device",
+  other: "Other"
+};
+
+const priorityMap: Record<Database['public']['Enums']['case_priority'], string> = {
+  low: "Low",
+  medium: "Medium", 
+  high: "High",
+  critical: "Critical"
+};
 
 export const ExhibitTable = () => {
+  const [exhibits, setExhibits] = useState<Exhibit[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchExhibits();
+  }, []);
+
+  const fetchExhibits = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('exhibits')
+        .select(`
+          *,
+          cases (
+            case_number,
+            priority
+          ),
+          profiles:assigned_analyst (
+            full_name
+          )
+        `)
+        .limit(10)
+        .order('received_date', { ascending: false });
+
+      if (error) throw error;
+      setExhibits((data as unknown) as Exhibit[] || []);
+    } catch (error) {
+      console.error('Error fetching exhibits:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Digital Exhibits</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-32">
+            <div className="text-muted-foreground">Loading exhibits...</div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>Recent Digital Exhibits</span>
-          <Button variant="outline" size="sm">
-            View All
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Exhibit
+            </Button>
+            <Button variant="outline" size="sm">
+              View All
+            </Button>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -74,56 +102,76 @@ export const ExhibitTable = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Exhibit ID</th>
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Case Number</th>
+                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Exhibit #</th>
+                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Case #</th>
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Device</th>
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Assigned To</th>
+                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Analyst</th>
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Status</th>
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Priority</th>
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {sampleExhibits.map((exhibit) => (
-                <tr key={exhibit.id} className="border-b border-border hover:bg-muted/50 transition-colors">
-                  <td className="py-3 px-2">
-                    <span className="font-mono text-sm font-medium text-foreground">{exhibit.id}</span>
-                  </td>
-                  <td className="py-3 px-2">
-                    <span className="text-sm text-foreground">{exhibit.caseNumber}</span>
-                  </td>
-                  <td className="py-3 px-2">
-                    <div>
-                      <div className="text-sm font-medium text-foreground">{exhibit.deviceType}</div>
-                      <div className="text-xs text-muted-foreground font-mono">{exhibit.serialNumber}</div>
-                    </div>
-                  </td>
-                  <td className="py-3 px-2">
-                    <span className="text-sm text-foreground">{exhibit.assignedTo}</span>
-                  </td>
-                  <td className="py-3 px-2">
-                    <StatusBadge status={exhibit.status} />
-                  </td>
-                  <td className="py-3 px-2">
-                    <Badge 
-                      variant={exhibit.priority === "High" ? "destructive" : exhibit.priority === "Medium" ? "default" : "secondary"}
-                      className="text-xs"
-                    >
-                      {exhibit.priority}
-                    </Badge>
-                  </td>
-                  <td className="py-3 px-2">
-                    <div className="flex space-x-1">
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
+              {exhibits.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="text-center py-8 text-muted-foreground">
+                    No exhibits found. <br />
+                    <span className="text-sm">Add some exhibits to get started.</span>
                   </td>
                 </tr>
-              ))}
+              ) : (
+                exhibits.map((exhibit) => (
+                  <tr key={exhibit.id} className="border-b border-border hover:bg-muted/50 transition-colors">
+                    <td className="py-3 px-2">
+                      <span className="font-mono text-sm font-medium text-foreground">{exhibit.exhibit_number}</span>
+                    </td>
+                    <td className="py-3 px-2">
+                      <span className="text-sm text-foreground">{exhibit.cases?.case_number || 'N/A'}</span>
+                    </td>
+                    <td className="py-3 px-2">
+                      <div>
+                        <div className="text-sm font-medium text-foreground">
+                          {exhibitTypeMap[exhibit.exhibit_type]} - {exhibit.device_name}
+                        </div>
+                        <div className="text-xs text-muted-foreground font-mono">
+                          {exhibit.serial_number || 'No S/N'}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-3 px-2">
+                      <span className="text-sm text-foreground">
+                        {exhibit.profiles?.full_name || 'Unassigned'}
+                      </span>
+                    </td>
+                    <td className="py-3 px-2">
+                      <StatusBadge status={exhibit.status} />
+                    </td>
+                    <td className="py-3 px-2">
+                      <Badge 
+                        variant={
+                          exhibit.cases?.priority === "critical" ? "destructive" : 
+                          exhibit.cases?.priority === "high" ? "destructive" :
+                          exhibit.cases?.priority === "medium" ? "default" : 
+                          "secondary"
+                        }
+                        className="text-xs"
+                      >
+                        {exhibit.cases?.priority ? priorityMap[exhibit.cases.priority] : 'N/A'}
+                      </Badge>
+                    </td>
+                    <td className="py-3 px-2">
+                      <div className="flex space-x-1">
+                        <Button variant="ghost" size="sm" title="View Details">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" title="Download Report">
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
-export type ExhibitStatus = "received" | "analysis" | "complete" | "released" | "urgent";
+export type ExhibitStatus = "received" | "in_analysis" | "analysis_complete" | "released" | "destroyed" | "archived";
 
 interface StatusBadgeProps {
   status: ExhibitStatus;
@@ -13,21 +13,25 @@ const statusConfig = {
     label: "Received", 
     className: "bg-status-received text-white" 
   },
-  analysis: { 
+  in_analysis: { 
     label: "In Analysis", 
     className: "bg-status-analysis text-white" 
   },
-  complete: { 
-    label: "Complete", 
+  analysis_complete: { 
+    label: "Analysis Complete", 
     className: "bg-status-complete text-white" 
   },
   released: { 
     label: "Released", 
     className: "bg-status-released text-white" 
   },
-  urgent: { 
-    label: "Urgent", 
-    className: "bg-status-urgent text-white animate-pulse" 
+  destroyed: { 
+    label: "Destroyed", 
+    className: "bg-destructive text-white" 
+  },
+  archived: { 
+    label: "Archived", 
+    className: "bg-muted text-muted-foreground" 
   }
 };
 

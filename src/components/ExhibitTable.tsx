@@ -39,13 +39,6 @@ export const ExhibitTable = () => {
   const [loading, setLoading] = useState(true);
   const [showAddExhibit, setShowAddExhibit] = useState(false);
 
-  useEffect(() => {
-    fetchExhibits();
-  }, []);
-
-  // Set up real-time updates for exhibits
-  useRealtime('exhibits', fetchExhibits);
-
   const fetchExhibits = async () => {
     try {
       const { data, error } = await supabase
@@ -71,6 +64,13 @@ export const ExhibitTable = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchExhibits();
+  }, []);
+
+  // Set up real-time updates for exhibits
+  useRealtime('exhibits', fetchExhibits);
 
   const handleExhibitAdded = () => {
     fetchExhibits();

@@ -58,13 +58,6 @@ export const RecentActivity = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchActivities();
-  }, []);
-
-  // Set up real-time updates for activities
-  useRealtime('case_activities', fetchActivities);
-
   const fetchActivities = async () => {
     try {
       const { data, error } = await supabase
@@ -85,6 +78,13 @@ export const RecentActivity = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchActivities();
+  }, []);
+
+  // Set up real-time updates for activities
+  useRealtime('case_activities', fetchActivities);
 
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);

@@ -2,6 +2,7 @@ import { Shield, Database, FileText, Settings, Search, Users, BarChart3, LogOut,
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
+import { NotificationCenter } from "./NotificationCenter";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -64,6 +65,8 @@ export const Navigation = () => {
                 className="pl-9 w-72 bg-white/10 border-white/20 text-white placeholder:text-blue-200 focus:bg-white/20 focus:border-blue-300"
               />
             </div>
+            
+            <NotificationCenter />
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

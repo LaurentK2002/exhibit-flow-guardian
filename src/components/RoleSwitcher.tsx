@@ -14,8 +14,10 @@ interface RoleSwitcherProps {
 export const RoleSwitcher = ({ currentViewRole, onRoleChange }: RoleSwitcherProps) => {
   const { profile } = useAuth();
 
-  // Only show for admins
-  if (profile?.role !== 'admin') {
+  // Show for all users during testing - you can change this later
+  const showSwitcher = true; // Changed from: profile?.role === 'admin'
+
+  if (!showSwitcher) {
     return null;
   }
 
@@ -67,16 +69,17 @@ export const RoleSwitcher = ({ currentViewRole, onRoleChange }: RoleSwitcherProp
           <Button 
             variant="outline" 
             size="sm"
-            onClick={() => onRoleChange(profile.role || 'admin')}
+            onClick={() => onRoleChange(profile?.role || 'admin')}
             className="text-xs"
           >
             Reset to My Role
           </Button>
         </div>
         
-        <p className="text-xs text-orange-600 dark:text-orange-400 mt-2">
-          Admin Mode: You can switch between different role views to test all dashboard panels.
-        </p>
+        <div className="text-xs text-orange-600 dark:text-orange-400 mt-2 space-y-1">
+          <p>Dashboard Testing Mode: Switch between different role views to test all panels.</p>
+          <p>Your actual role: <strong>{profile?.role || 'Loading...'}</strong></p>
+        </div>
       </CardContent>
     </Card>
   );

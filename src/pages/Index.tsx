@@ -2,8 +2,32 @@ import { Navigation } from "@/components/Navigation";
 import { DashboardStats } from "@/components/DashboardStats";
 import { ExhibitTable } from "@/components/ExhibitTable";
 import { RecentActivity } from "@/components/RecentActivity";
+import { AddCaseDialog } from "@/components/AddCaseDialog";
+import { AddExhibitDialog } from "@/components/AddExhibitDialog";
+import { useState } from "react";
 
 const Index = () => {
+  const [showAddCase, setShowAddCase] = useState(false);
+  const [showAddExhibit, setShowAddExhibit] = useState(false);
+
+  const handleCaseAdded = () => {
+    // Refresh dashboard stats and activities
+    window.location.reload();
+  };
+
+  const handleExhibitAdded = () => {
+    // Refresh dashboard stats and activities
+    window.location.reload();
+  };
+
+  const handleNewCase = () => {
+    setShowAddCase(true);
+  };
+
+  const handleNewExhibit = () => {
+    setShowAddExhibit(true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Navigation />
@@ -46,25 +70,31 @@ const Index = () => {
             <div className="bg-white rounded-xl shadow-sm border p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <button className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-4 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all">
+                <button 
+                  onClick={handleNewExhibit}
+                  className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-4 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all transform hover:scale-105"
+                >
                   <div className="text-center">
                     <div className="text-2xl mb-2">📱</div>
                     <div className="text-sm font-medium">New Exhibit</div>
                   </div>
                 </button>
-                <button className="bg-gradient-to-br from-green-500 to-green-600 text-white p-4 rounded-lg hover:from-green-600 hover:to-green-700 transition-all">
+                <button 
+                  onClick={handleNewCase}
+                  className="bg-gradient-to-br from-green-500 to-green-600 text-white p-4 rounded-lg hover:from-green-600 hover:to-green-700 transition-all transform hover:scale-105"
+                >
                   <div className="text-center">
                     <div className="text-2xl mb-2">📋</div>
                     <div className="text-sm font-medium">New Case</div>
                   </div>
                 </button>
-                <button className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-4 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all">
+                <button className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-4 rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all transform hover:scale-105">
                   <div className="text-center">
                     <div className="text-2xl mb-2">📊</div>
                     <div className="text-sm font-medium">Generate Report</div>
                   </div>
                 </button>
-                <button className="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-4 rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all">
+                <button className="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-4 rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all transform hover:scale-105">
                   <div className="text-center">
                     <div className="text-2xl mb-2">🔍</div>
                     <div className="text-sm font-medium">Search Archive</div>
@@ -84,7 +114,7 @@ const Index = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Forensic Tools</span>
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                     <span className="text-sm text-green-600">Online</span>
                   </div>
                 </div>
@@ -114,6 +144,18 @@ const Index = () => {
           </div>
         </div>
       </main>
+
+      <AddCaseDialog 
+        open={showAddCase}
+        onOpenChange={setShowAddCase}
+        onSuccess={handleCaseAdded}
+      />
+      
+      <AddExhibitDialog 
+        open={showAddExhibit}
+        onOpenChange={setShowAddExhibit}
+        onSuccess={handleExhibitAdded}
+      />
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Database, Clock, CheckCircle, AlertTriangle, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import { useRealtime } from "@/hooks/useRealtime";
 
 interface DashboardStats {
   totalExhibits: number;
@@ -23,27 +24,20 @@ export const DashboardStats = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
   const fetchStats = async () => {
     try {
-      // Fetch exhibit counts
       const { data: exhibits, error: exhibitsError } = await supabase
         .from('exhibits')
         .select('status');
 
       if (exhibitsError) throw exhibitsError;
 
-      // Fetch case counts  
       const { data: cases, error: casesError } = await supabase
         .from('cases')
         .select('priority, status');
 
       if (casesError) throw casesError;
 
-      // Fetch active user count
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('is_active')
@@ -51,7 +45,6 @@ export const DashboardStats = () => {
 
       if (profilesError) throw profilesError;
 
-      // Calculate statistics
       const totalExhibits = exhibits?.length || 0;
       const inAnalysis = exhibits?.filter(e => e.status === 'in_analysis').length || 0;
       const completed = exhibits?.filter(e => e.status === 'analysis_complete').length || 0;
@@ -73,6 +66,14 @@ export const DashboardStats = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  useRealtime('cases', fetchStats);
+  useRealtime('exhibits', fetchStats);
+  useRealtime('profiles', fetchStats);
 
   const statsConfig = [
     {

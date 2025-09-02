@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, Download, Plus, FolderPlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import { useRealtime } from "@/hooks/useRealtime";
 import { Database } from "@/integrations/supabase/types";
 import { AddExhibitDialog } from "./AddExhibitDialog";
 
@@ -41,6 +42,9 @@ export const ExhibitTable = () => {
   useEffect(() => {
     fetchExhibits();
   }, []);
+
+  // Set up real-time updates for exhibits
+  useRealtime('exhibits', fetchExhibits);
 
   const fetchExhibits = async () => {
     try {

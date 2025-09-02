@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, User, FileText, Database, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import { useRealtime } from "@/hooks/useRealtime";
 import { Database as DatabaseType } from "@/integrations/supabase/types";
 
 type Activity = DatabaseType['public']['Tables']['case_activities']['Row'] & {
@@ -60,6 +61,9 @@ export const RecentActivity = () => {
   useEffect(() => {
     fetchActivities();
   }, []);
+
+  // Set up real-time updates for activities
+  useRealtime('case_activities', fetchActivities);
 
   const fetchActivities = async () => {
     try {

@@ -134,8 +134,8 @@ export const UserPresence = () => {
               No active users
             </div>
           ) : (
-            users.map((activeUser) => (
-              <div key={activeUser.user_id} className="flex items-center space-x-3">
+            users.map((activeUser, index) => (
+              <div key={`${activeUser.user_id}-${index}`} className="flex items-center space-x-3">
                 <div className="relative">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className="text-xs">

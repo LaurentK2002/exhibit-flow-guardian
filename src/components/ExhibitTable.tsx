@@ -45,18 +45,31 @@ export const ExhibitTable = () => {
         .from('exhibits')
         .select(`
           *,
-          cases (
+          cases:case_id (
             case_number,
             priority
           ),
-          profiles:assigned_analyst (
+          analyst_profile:assigned_analyst (
             full_name
           )
         `)
         .limit(10)
         .order('received_date', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Exhibits query error:', error);
+        // Fallback query without relationships if they don't exist
+        const { data: simpleData, error: simpleError } = await supabase
+          .from('exhibits')
+          .select('*')
+          .limit(10)
+          .order('received_date', { ascending: false });
+        
+        if (simpleError) throw simpleError;
+        setExhibits(simpleData || []);
+        return;
+      }
+      
       setExhibits((data as unknown) as Exhibit[] || []);
     } catch (error) {
       console.error('Error fetching exhibits:', error);
@@ -156,7 +169,7 @@ export const ExhibitTable = () => {
                       </td>
                       <td className="py-3 px-2">
                         <span className="text-sm text-foreground">
-                          {exhibit.profiles?.full_name || 'Unassigned'}
+                          {exhibit.analyst_profile?.full_name || 'Unassigned'}
                         </span>
                       </td>
                       <td className="py-3 px-2">

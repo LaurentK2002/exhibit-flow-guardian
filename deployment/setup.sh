@@ -51,13 +51,13 @@ echo "⚙️  Creating environment configuration..."
 if [ ! -f .env ]; then
     cat > .env << EOF
 # Database Configuration
-DB_PASSWORD=$(openssl rand -base64 32)
+DB_PASSWORD=$(openssl rand -hex 32)
 POSTGRES_USER=forensics_admin
 POSTGRES_DB=forensics_db
 
 # Application Configuration
 NODE_ENV=production
-JWT_SECRET=$(openssl rand -base64 64)
+JWT_SECRET=$(openssl rand -hex 64)
 
 # Network Configuration
 APP_PORT=3000

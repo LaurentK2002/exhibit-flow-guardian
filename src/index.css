@@ -40,6 +40,12 @@ All colors MUST be HSL.
     --status-released: 270 65% 55%;
     --status-urgent: 0 85% 60%;
 
+    /* Case status colors */
+    --case-open: 210 85% 55%;
+    --case-investigation: 45 85% 55%;
+    --case-review: 270 65% 55%;
+    --case-closed: 135 65% 45%;
+
     --border: 220 15% 88%;
     --input: 220 15% 92%;
     --ring: 220 65% 35%;

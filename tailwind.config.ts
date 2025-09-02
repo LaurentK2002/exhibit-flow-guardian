@@ -59,6 +59,12 @@ export default {
 					released: 'hsl(var(--status-released))',
 					urgent: 'hsl(var(--status-urgent))'
 				},
+				case: {
+					open: 'hsl(var(--case-open))',
+					investigation: 'hsl(var(--case-investigation))',
+					review: 'hsl(var(--case-review))',
+					closed: 'hsl(var(--case-closed))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',

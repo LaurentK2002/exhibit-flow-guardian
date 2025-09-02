@@ -6,6 +6,7 @@ import { Eye, FileText, Users, Clock, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRealtime } from "@/hooks/useRealtime";
 import { Database } from "@/integrations/supabase/types";
+import { CaseStatusBadge, CaseStatus } from "./CaseStatusBadge";
 
 type Case = Database['public']['Tables']['cases']['Row'] & {
   profiles?: {
@@ -72,17 +73,6 @@ export const CaseTable = () => {
 
   // Real-time updates
   useRealtime('cases', fetchCases);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'open': return 'bg-blue-500 text-white';
-      case 'under_investigation': return 'bg-yellow-500 text-white';
-      case 'pending_review': return 'bg-purple-500 text-white';
-      case 'closed': return 'bg-green-500 text-white';
-      case 'archived': return 'bg-gray-500 text-white';
-      default: return 'bg-gray-500 text-white';
-    }
-  };
 
   const getPriorityVariant = (priority: string) => {
     switch (priority) {
@@ -169,11 +159,9 @@ export const CaseTable = () => {
                         {caseItem.priority?.toUpperCase() || 'MEDIUM'}
                       </Badge>
                     </td>
-                    <td className="py-3 px-2">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(caseItem.status || 'open')}`}>
-                        {caseItem.status?.replace('_', ' ') || 'Open'}
-                      </span>
-                    </td>
+                     <td className="py-3 px-2">
+                       <CaseStatusBadge status={(caseItem.status as CaseStatus) || 'open'} />
+                     </td>
                     <td className="py-3 px-2">
                       <div className="flex items-center space-x-3 text-sm text-muted-foreground">
                         <div className="flex items-center">

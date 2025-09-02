@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
 import { UserPresence } from "@/components/UserPresence";
 import { useAuth } from "@/contexts/AuthContext";
@@ -6,6 +7,7 @@ import { CommandingOfficerDashboard } from "@/components/dashboards/CommandingOf
 import { ExhibitOfficerDashboard } from "@/components/dashboards/ExhibitOfficerDashboard";
 import { AnalystDashboard } from "@/components/dashboards/AnalystDashboard";
 import { DashboardStats } from "@/components/DashboardStats";
+import { RoleSwitcher } from "@/components/RoleSwitcher";
 
 // Fallback dashboard for users without specific roles
 const DefaultDashboard = () => (
@@ -20,10 +22,14 @@ const DefaultDashboard = () => (
 
 const Index = () => {
   const { profile } = useAuth();
+  const [viewingRole, setViewingRole] = useState<string>('');
+
+  // Use viewing role for admins, otherwise use actual role
+  const effectiveRole = profile?.role === 'admin' && viewingRole ? viewingRole : profile?.role;
 
   // Route users to their role-specific dashboard
   const renderDashboard = () => {
-    const role = profile?.role;
+    const role = effectiveRole;
     
     switch (role) {
       case 'admin':
@@ -44,6 +50,10 @@ const Index = () => {
       <Navigation />
       <main className="container mx-auto px-6 py-8">
         <UserPresence />
+        <RoleSwitcher 
+          currentViewRole={effectiveRole || profile?.role || ''} 
+          onRoleChange={setViewingRole}
+        />
         {renderDashboard()}
       </main>
     </div>

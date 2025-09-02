@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Users, UserPlus, Search, Edit, Trash2 } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/components/ui/use-toast";
+import { AddUserDialog } from "@/components/AddUserDialog";
 
 interface Profile {
   id: string;
@@ -24,6 +25,7 @@ export const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
+  const [showAddDialog, setShowAddDialog] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -117,7 +119,7 @@ export const UserManagement = () => {
               <SelectItem value="analyst">Analyst</SelectItem>
             </SelectContent>
           </Select>
-          <Button>
+          <Button onClick={() => setShowAddDialog(true)}>
             <UserPlus className="h-4 w-4 mr-2" />
             Add User
           </Button>
@@ -166,6 +168,12 @@ export const UserManagement = () => {
             </TableBody>
           </Table>
         </div>
+
+        <AddUserDialog
+          open={showAddDialog}
+          onOpenChange={setShowAddDialog}
+          onUserAdded={fetchUsers}
+        />
       </CardContent>
     </Card>
   );

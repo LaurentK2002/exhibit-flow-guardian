@@ -9,11 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [badgeNumber, setBadgeNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -34,39 +31,18 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-        if (error) throw error;
+      if (error) throw error;
 
-        toast({
-          title: "Welcome back!",
-          description: "Successfully signed in to the system.",
-        });
-        navigate('/');
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/`,
-            data: {
-              full_name: fullName,
-              badge_number: badgeNumber,
-            }
-          }
-        });
-
-        if (error) throw error;
-
-        toast({
-          title: "Account created!",
-          description: "Please check your email to verify your account.",
-        });
-      }
+      toast({
+        title: "Welcome back!",
+        description: "Successfully signed in to the system.",
+      });
+      navigate('/');
     } catch (error: any) {
       toast({
         title: "Authentication Error",
@@ -95,39 +71,11 @@ const Auth = () => {
         <Card className="bg-white/10 backdrop-blur-md border-white/20 shadow-2xl">
           <CardHeader>
             <CardTitle className="text-white text-center">
-              {isLogin ? 'Sign In' : 'Create Account'}
+              Sign In to Access System
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleAuth} className="space-y-4">
-              {!isLogin && (
-                <>
-                  <div className="space-y-2">
-                    <Label htmlFor="fullName" className="text-white">Full Name</Label>
-                    <Input
-                      id="fullName"
-                      type="text"
-                      placeholder="Enter your full name"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      required={!isLogin}
-                      className="bg-white/10 border-white/20 text-white placeholder:text-blue-200"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="badgeNumber" className="text-white">Badge Number</Label>
-                    <Input
-                      id="badgeNumber"
-                      type="text"
-                      placeholder="Enter your badge number"
-                      value={badgeNumber}
-                      onChange={(e) => setBadgeNumber(e.target.value)}
-                      className="bg-white/10 border-white/20 text-white placeholder:text-blue-200"
-                    />
-                  </div>
-                </>
-              )}
-              
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-white">Email Address</Label>
                 <Input
@@ -159,17 +107,18 @@ const Auth = () => {
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition-all duration-200"
               >
-                {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
+                {loading ? 'Processing...' : 'Sign In'}
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => setIsLogin(!isLogin)}
-                className="text-blue-200 hover:text-white underline text-sm"
-              >
-                {isLogin ? "Need an account? Sign up here" : "Already have an account? Sign in"}
-              </button>
+            <div className="mt-6 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+              <div className="flex items-center space-x-2 text-blue-200">
+                <AlertCircle className="h-4 w-4" />
+                <span className="text-sm font-medium">Access Information</span>
+              </div>
+              <p className="text-xs text-blue-300 mt-1">
+                New user accounts can only be created by system administrators. Contact your administrator for access.
+              </p>
             </div>
 
             <div className="mt-6 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">

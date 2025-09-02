@@ -54,12 +54,14 @@ export type Database = {
       }
       cases: {
         Row: {
+          analyst_id: string | null
           assigned_to: string | null
           case_notes: string | null
           case_number: string
           closed_date: string | null
           created_at: string | null
           description: string | null
+          exhibit_officer_id: string | null
           id: string
           incident_date: string | null
           location: string | null
@@ -73,12 +75,14 @@ export type Database = {
           victim_name: string | null
         }
         Insert: {
+          analyst_id?: string | null
           assigned_to?: string | null
           case_notes?: string | null
           case_number: string
           closed_date?: string | null
           created_at?: string | null
           description?: string | null
+          exhibit_officer_id?: string | null
           id?: string
           incident_date?: string | null
           location?: string | null
@@ -92,12 +96,14 @@ export type Database = {
           victim_name?: string | null
         }
         Update: {
+          analyst_id?: string | null
           assigned_to?: string | null
           case_notes?: string | null
           case_number?: string
           closed_date?: string | null
           created_at?: string | null
           description?: string | null
+          exhibit_officer_id?: string | null
           id?: string
           incident_date?: string | null
           location?: string | null
@@ -291,12 +297,36 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          created_at: string | null
+          id: string
+          permission: string
+          role: Database["public"]["Enums"]["user_role"]
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          permission: string
+          role: Database["public"]["Enums"]["user_role"]
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          permission?: string
+          role?: Database["public"]["Enums"]["user_role"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      user_has_permission: {
+        Args: { permission_name: string; user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       case_priority: "low" | "medium" | "high" | "critical"

@@ -14,7 +14,7 @@ type Exhibit = Database['public']['Tables']['exhibits']['Row'] & {
     case_number: string;
     priority: Database['public']['Enums']['case_priority'];
   } | null;
-  profiles?: {
+  analyst_profile?: {
     full_name: string;
   } | null;
 };

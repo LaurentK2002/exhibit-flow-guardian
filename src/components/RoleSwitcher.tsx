@@ -14,8 +14,8 @@ interface RoleSwitcherProps {
 export const RoleSwitcher = ({ currentViewRole, onRoleChange }: RoleSwitcherProps) => {
   const { profile } = useAuth();
 
-  // Show for all users during testing - you can change this later
-  const showSwitcher = true; // Changed from: profile?.role === 'admin'
+  // Only show for admin users
+  const showSwitcher = profile?.role === 'admin';
 
   if (!showSwitcher) {
     return null;

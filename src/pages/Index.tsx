@@ -50,10 +50,12 @@ const Index = () => {
       <Navigation />
       <main className="container mx-auto px-6 py-8">
         <UserPresence />
-        <RoleSwitcher 
-          currentViewRole={effectiveRole || profile?.role || ''} 
-          onRoleChange={setViewingRole}
-        />
+        {profile?.role === 'admin' && (
+          <RoleSwitcher 
+            currentViewRole={effectiveRole || profile?.role || ''} 
+            onRoleChange={setViewingRole}
+          />
+        )}
         {renderDashboard()}
       </main>
     </div>

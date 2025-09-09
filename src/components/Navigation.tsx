@@ -65,13 +65,14 @@ export const Navigation = () => {
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-3">
-              <div className="bg-gradient-to-br from-blue-400 to-blue-600 p-2 rounded-lg shadow-md">
-                <Shield className="h-8 w-8 text-white" />
+            <div className="flex items-center space-x-4">
+              <div className="bg-gradient-to-br from-blue-400 to-blue-600 p-3 rounded-lg shadow-md">
+                <Shield className="h-10 w-10 text-white" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-white">Tanzania Police Force</h1>
-                <p className="text-sm text-blue-200">Cyber Crimes Investigation Unit</p>
+              <div className="flex items-center space-x-6">
+                <h1 className="text-2xl font-bold text-white tracking-wider">TANZANIA POLICE FORCE</h1>
+                <div className="h-8 w-px bg-blue-300 opacity-50"></div>
+                <p className="text-sm text-blue-200 font-medium">Cyber Crimes Investigation Unit</p>
               </div>
             </div>
             

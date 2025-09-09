@@ -9,6 +9,7 @@ import { Users, UserPlus, Search, Edit, Trash2 } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/components/ui/use-toast";
 import { AddUserDialog } from "@/components/AddUserDialog";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Profile {
   id: string;
@@ -27,6 +28,7 @@ export const UserManagement = () => {
   const [roleFilter, setRoleFilter] = useState('all');
   const [showAddDialog, setShowAddDialog] = useState(false);
   const { toast } = useToast();
+  const { profile } = useAuth();
 
   useEffect(() => {
     fetchUsers();
@@ -119,7 +121,10 @@ export const UserManagement = () => {
               <SelectItem value="analyst">Analyst</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={() => setShowAddDialog(true)}>
+          <Button 
+            onClick={() => setShowAddDialog(true)}
+            disabled={!profile || profile.role !== 'admin'}
+          >
             <UserPlus className="h-4 w-4 mr-2" />
             Add User
           </Button>

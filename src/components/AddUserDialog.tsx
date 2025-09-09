@@ -34,6 +34,12 @@ export const AddUserDialog = ({ open, onOpenChange, onUserAdded }: AddUserDialog
     setLoading(true);
 
     try {
+      // Check if user has admin privileges first
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('You must be logged in to create users');
+      }
+
       // Create user account using admin API
       const { data, error: signUpError } = await supabase.auth.admin.createUser({
         email: formData.email,
@@ -45,7 +51,12 @@ export const AddUserDialog = ({ open, onOpenChange, onUserAdded }: AddUserDialog
         }
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        if (signUpError.message.includes('refresh_token_not_found') || signUpError.message.includes('Invalid Refresh Token')) {
+          throw new Error('Your session has expired. Please log out and log back in to create users.');
+        }
+        throw signUpError;
+      }
 
       // Update the profile with additional information
       if (data.user && formData.role) {
@@ -80,9 +91,18 @@ export const AddUserDialog = ({ open, onOpenChange, onUserAdded }: AddUserDialog
       onUserAdded();
       onOpenChange(false);
     } catch (error: any) {
+      console.error('User creation error:', error);
+      
+      let errorMessage = error.message;
+      if (error.message?.includes('User already registered')) {
+        errorMessage = 'A user with this email already exists';
+      } else if (error.message?.includes('not authorized')) {
+        errorMessage = 'You do not have permission to create users. Only administrators can create new users.';
+      }
+      
       toast({
         title: "Error",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

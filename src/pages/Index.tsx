@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { AdminDashboard } from "@/components/dashboards/AdminDashboard";
@@ -5,6 +6,7 @@ import { CommandingOfficerDashboard } from "@/components/dashboards/CommandingOf
 import { ExhibitOfficerDashboard } from "@/components/dashboards/ExhibitOfficerDashboard";
 import { AnalystDashboard } from "@/components/dashboards/AnalystDashboard";
 import { DashboardStats } from "@/components/DashboardStats";
+import { RoleSwitcher } from "@/components/RoleSwitcher";
 
 // Fallback dashboard for users without specific roles
 const DefaultDashboard = () => (
@@ -19,10 +21,18 @@ const DefaultDashboard = () => (
 
 const Index = () => {
   const { profile } = useAuth();
+  const [currentViewRole, setCurrentViewRole] = useState<string>(profile?.role || '');
 
-  // Route users to their role-specific dashboard
-  const renderDashboard = () => {
-    switch (profile?.role) {
+  // Update currentViewRole when profile changes
+  useEffect(() => {
+    if (profile?.role && currentViewRole === '') {
+      setCurrentViewRole(profile.role);
+    }
+  }, [profile?.role, currentViewRole]);
+
+  // Route users to their role-specific dashboard based on current view role
+  const renderDashboard = (role: string = currentViewRole) => {
+    switch (role) {
       case 'admin':
         return <AdminDashboard />;
       case 'commanding_officer':
@@ -40,6 +50,11 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
       <Navigation />
       <main className="container mx-auto px-6 py-8">
+        {/* Role switcher - only visible to admin users */}
+        <RoleSwitcher 
+          currentViewRole={currentViewRole} 
+          onRoleChange={setCurrentViewRole} 
+        />
         {renderDashboard()}
       </main>
     </div>

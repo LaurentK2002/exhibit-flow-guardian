@@ -34,42 +34,27 @@ export const AddUserDialog = ({ open, onOpenChange, onUserAdded }: AddUserDialog
     setLoading(true);
 
     try {
-      // Check if user has admin privileges first
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
+      // Get current user session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
         throw new Error('You must be logged in to create users');
       }
 
-      // Create user account using admin API
-      const { data, error: signUpError } = await supabase.auth.admin.createUser({
-        email: formData.email,
-        password: formData.password,
-        email_confirm: true,
-        user_metadata: {
-          full_name: formData.fullName,
-          badge_number: formData.badgeNumber,
+      // Call the Edge Function to create user
+      const { data, error } = await supabase.functions.invoke('create-user', {
+        body: {
+          email: formData.email,
+          password: formData.password,
+          fullName: formData.fullName,
+          badgeNumber: formData.badgeNumber,
+          role: formData.role,
+          department: formData.department,
+          phone: formData.phone
         }
       });
 
-      if (signUpError) {
-        if (signUpError.message.includes('refresh_token_not_found') || signUpError.message.includes('Invalid Refresh Token')) {
-          throw new Error('Your session has expired. Please log out and log back in to create users.');
-        }
-        throw signUpError;
-      }
-
-      // Update the profile with additional information
-      if (data.user && formData.role) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({
-            role: formData.role as UserRole,
-            department: formData.department,
-            phone: formData.phone
-          })
-          .eq('id', data.user.id);
-
-        if (profileError) throw profileError;
+      if (error || !data?.success) {
+        throw new Error(data?.error || error?.message || 'Failed to create user');
       }
 
       toast({
@@ -96,7 +81,7 @@ export const AddUserDialog = ({ open, onOpenChange, onUserAdded }: AddUserDialog
       let errorMessage = error.message;
       if (error.message?.includes('User already registered')) {
         errorMessage = 'A user with this email already exists';
-      } else if (error.message?.includes('not authorized')) {
+      } else if (error.message?.includes('not authorized') || error.message?.includes('Only administrators')) {
         errorMessage = 'You do not have permission to create users. Only administrators can create new users.';
       }
       

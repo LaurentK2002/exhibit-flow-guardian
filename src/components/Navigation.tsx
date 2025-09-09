@@ -1,4 +1,4 @@
-import { Shield, Database, FileText, Settings, Search, Users, BarChart3, LogOut, User } from "lucide-react";
+import { Shield, Database, FileText, Settings, Search, Users, BarChart3, LogOut, User, Activity, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,6 +18,48 @@ export const Navigation = () => {
     await signOut();
   };
 
+  // Role-specific navigation items
+  const getNavigationItems = () => {
+    switch (profile?.role) {
+      case 'admin':
+        return [
+          { icon: Database, label: 'Digital Exhibits' },
+          { icon: FileText, label: 'Case Management' },
+          { icon: BarChart3, label: 'System Analytics' },
+          { icon: Users, label: 'User Management' },
+          { icon: Settings, label: 'System Config' },
+        ];
+      case 'commanding_officer':
+        return [
+          { icon: BarChart3, label: 'Operations Overview' },
+          { icon: Users, label: 'Team Management' },
+          { icon: AlertTriangle, label: 'Security Alerts' },
+          { icon: FileText, label: 'Case Reports' },
+        ];
+      case 'exhibit_officer':
+        return [
+          { icon: Database, label: 'Evidence Queue' },
+          { icon: Activity, label: 'Chain of Custody' },
+          { icon: FileText, label: 'Case Files' },
+          { icon: Search, label: 'Evidence Search' },
+        ];
+      case 'analyst':
+        return [
+          { icon: Activity, label: 'Analysis Workbench' },
+          { icon: Database, label: 'Data Sources' },
+          { icon: FileText, label: 'Investigation Reports' },
+          { icon: BarChart3, label: 'Case Analytics' },
+        ];
+      default:
+        return [
+          { icon: FileText, label: 'Dashboard' },
+          { icon: Search, label: 'Search' },
+        ];
+    }
+  };
+
+  const navigationItems = getNavigationItems();
+
   return (
     <header className="bg-gradient-to-r from-slate-900 to-slate-800 border-b border-border/20 sticky top-0 z-50 shadow-lg">
       <div className="container mx-auto px-6 py-4">
@@ -34,26 +76,12 @@ export const Navigation = () => {
             </div>
             
             <nav className="hidden md:flex items-center space-x-1">
-              <Button variant="ghost" className="text-blue-100 hover:text-white hover:bg-white/10 transition-colors">
-                <Database className="h-4 w-4 mr-2" />
-                Digital Exhibits
-              </Button>
-              <Button variant="ghost" className="text-blue-100 hover:text-white hover:bg-white/10 transition-colors">
-                <FileText className="h-4 w-4 mr-2" />
-                Case Files
-              </Button>
-              <Button variant="ghost" className="text-blue-100 hover:text-white hover:bg-white/10 transition-colors">
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Analytics
-              </Button>
-              <Button variant="ghost" className="text-blue-100 hover:text-white hover:bg-white/10 transition-colors">
-                <Users className="h-4 w-4 mr-2" />
-                Personnel
-              </Button>
-              <Button variant="ghost" className="text-blue-100 hover:text-white hover:bg-white/10 transition-colors">
-                <Settings className="h-4 w-4 mr-2" />
-                System Config
-              </Button>
+              {navigationItems.map((item, index) => (
+                <Button key={index} variant="ghost" className="text-blue-100 hover:text-white hover:bg-white/10 transition-colors">
+                  <item.icon className="h-4 w-4 mr-2" />
+                  {item.label}
+                </Button>
+              ))}
             </nav>
           </div>
           

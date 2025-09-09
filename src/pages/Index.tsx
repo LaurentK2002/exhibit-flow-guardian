@@ -49,7 +49,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
       <Navigation />
       <main className="container mx-auto px-6 py-8">
-        <UserPresence />
+        {profile?.role === 'admin' && <UserPresence />}
         {profile?.role === 'admin' && (
           <RoleSwitcher 
             currentViewRole={effectiveRole || profile?.role || ''} 

@@ -8,6 +8,8 @@ import { DashboardStats } from "@/components/DashboardStats";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import { UserManagement } from "@/components/UserManagement";
 import { SystemSettings } from "@/components/SystemSettings";
+import { SecurityOverview } from "@/components/role-specific/SecurityOverview";
+import { UserPresence } from "@/components/UserPresence";
 
 export const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -50,10 +52,12 @@ export const AdminDashboard = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
+          <UserPresence />
           <DashboardStats />
+          <SecurityOverview />
           
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <UserCheck className="h-5 w-5" />
@@ -62,20 +66,27 @@ export const AdminDashboard = () => {
                 <CardDescription>Latest system management activities</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <div>
-                      <p className="font-medium">User Role Updated</p>
-                      <p className="text-sm text-muted-foreground">John Doe promoted to Commanding Officer</p>
+                      <p className="font-medium text-sm">User Role Updated</p>
+                      <p className="text-xs text-muted-foreground">John Doe promoted to Commanding Officer</p>
                     </div>
-                    <Badge variant="outline">2 hours ago</Badge>
+                    <Badge variant="outline" className="text-xs">2h ago</Badge>
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <div>
-                      <p className="font-medium">System Configuration</p>
-                      <p className="text-sm text-muted-foreground">Database backup schedule updated</p>
+                      <p className="font-medium text-sm">System Configuration</p>
+                      <p className="text-xs text-muted-foreground">Database backup schedule updated</p>
                     </div>
-                    <Badge variant="outline">1 day ago</Badge>
+                    <Badge variant="outline" className="text-xs">1d ago</Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-sm">Security Alert Resolved</p>
+                      <p className="text-xs text-muted-foreground">Failed login attempts blocked</p>
+                    </div>
+                    <Badge variant="outline" className="text-xs">3h ago</Badge>
                   </div>
                 </div>
               </CardContent>
@@ -83,21 +94,25 @@ export const AdminDashboard = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>Administrative shortcuts</CardDescription>
+                <CardTitle>Administrative Actions</CardTitle>
+                <CardDescription>System management shortcuts</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button className="w-full justify-start" variant="outline">
                   <Users className="h-4 w-4 mr-2" />
-                  Manage Users
+                  Manage Users & Roles
                 </Button>
                 <Button className="w-full justify-start" variant="outline">
                   <Settings className="h-4 w-4 mr-2" />
-                  System Settings
+                  System Configuration
+                </Button>
+                <Button className="w-full justify-start" variant="outline">
+                  <Shield className="h-4 w-4 mr-2" />
+                  Security Settings
                 </Button>
                 <Button className="w-full justify-start" variant="outline">
                   <Database className="h-4 w-4 mr-2" />
-                  Database Admin
+                  Database Administration
                 </Button>
               </CardContent>
             </Card>

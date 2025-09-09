@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Package, FileText, QrCode, Truck, Archive, Plus } from "lucide-react";
 import { ExhibitTable } from "@/components/ExhibitTable";
 import { ChainOfCustody } from "@/components/ChainOfCustody";
+import { EvidenceQueue } from "@/components/role-specific/EvidenceQueue";
 
 export const ExhibitOfficerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -44,73 +45,36 @@ export const ExhibitOfficerDashboard = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <EvidenceQueue />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Exhibits</CardTitle>
-                <Package className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">247</div>
-                <p className="text-xs text-muted-foreground">+12 from last week</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">In Processing</CardTitle>
-                <Truck className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">18</div>
-                <p className="text-xs text-muted-foreground">Currently being processed</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Ready for Analysis</CardTitle>
-                <QrCode className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">34</div>
-                <p className="text-xs text-muted-foreground">Awaiting assignment</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Completed</CardTitle>
-                <Archive className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">195</div>
-                <p className="text-xs text-muted-foreground">Analysis complete</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle>Recent Exhibit Activity</CardTitle>
-                <CardDescription>Latest evidence processing activities</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Chain of Custody Alerts
+                </CardTitle>
+                <CardDescription>Items requiring custody attention</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                    <div>
-                      <p className="font-medium">Smartphone - iPhone 12 Pro</p>
-                      <p className="text-sm text-muted-foreground">Case #CC2024-015 • Received and cataloged</p>
+                <div className="space-y-3">
+                  <div className="p-3 bg-red-50 dark:bg-red-950 rounded-lg border border-red-200 dark:border-red-800">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-red-800 dark:text-red-200 text-sm">Exhibit EV-2024-004</p>
+                        <p className="text-xs text-red-600 dark:text-red-400">Chain of custody gap detected</p>
+                      </div>
+                      <Badge variant="destructive" className="text-xs">Critical</Badge>
                     </div>
-                    <Badge variant="outline">30 min ago</Badge>
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                    <div>
-                      <p className="font-medium">Laptop - Dell XPS 15</p>
-                      <p className="text-sm text-muted-foreground">Case #CC2024-012 • Ready for analysis</p>
+                  <div className="p-3 bg-orange-50 dark:bg-orange-950 rounded-lg border border-orange-200 dark:border-orange-800">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-orange-800 dark:text-orange-200 text-sm">Exhibit EV-2024-007</p>
+                        <p className="text-xs text-orange-600 dark:text-orange-400">Pending custody transfer approval</p>
+                      </div>
+                      <Badge variant="secondary" className="text-xs">Warning</Badge>
                     </div>
-                    <Badge variant="outline">2 hours ago</Badge>
                   </div>
                 </div>
               </CardContent>
@@ -118,21 +82,25 @@ export const ExhibitOfficerDashboard = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>Evidence management shortcuts</CardDescription>
+                <CardTitle>Evidence Processing Tools</CardTitle>
+                <CardDescription>Specialized exhibit management</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button className="w-full justify-start" variant="outline">
                   <Plus className="h-4 w-4 mr-2" />
-                  Receive New Exhibit
+                  Intake New Evidence
                 </Button>
                 <Button className="w-full justify-start" variant="outline">
                   <QrCode className="h-4 w-4 mr-2" />
-                  Generate Labels
+                  Generate Barcode Labels
                 </Button>
                 <Button className="w-full justify-start" variant="outline">
                   <FileText className="h-4 w-4 mr-2" />
-                  Custody Report
+                  Custody Documentation
+                </Button>
+                <Button className="w-full justify-start" variant="outline">
+                  <Archive className="h-4 w-4 mr-2" />
+                  Storage Management
                 </Button>
               </CardContent>
             </Card>

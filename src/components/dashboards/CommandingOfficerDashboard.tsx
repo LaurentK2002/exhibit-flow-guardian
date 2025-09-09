@@ -7,6 +7,7 @@ import { Users, ClipboardList, BarChart3, UserCheck, Star, CheckCircle } from "l
 import { DashboardStats } from "@/components/DashboardStats";
 import { TeamManagement } from "@/components/TeamManagement";
 import { CaseAssignment } from "@/components/CaseAssignment";
+import { StaffProductivity } from "@/components/role-specific/StaffProductivity";
 
 export const CommandingOfficerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -46,33 +47,30 @@ export const CommandingOfficerDashboard = () => {
 
         <TabsContent value="overview" className="space-y-6">
           <DashboardStats />
+          <StaffProductivity />
           
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <UserCheck className="h-5 w-5" />
-                  Team Performance Overview
+                  Strategic Command Overview
                 </CardTitle>
-                <CardDescription>Current team workload and performance metrics</CardDescription>
+                <CardDescription>High-level operational insights and decisions</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl font-bold text-primary">8</div>
-                    <div className="text-sm text-muted-foreground">Active Analysts</div>
+                <div className="space-y-4">
+                  <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <p className="font-medium text-blue-800 dark:text-blue-200">Department Goals</p>
+                    <p className="text-sm text-blue-600 dark:text-blue-400">Q1 case resolution target: 85% (Currently: 87%)</p>
                   </div>
-                  <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">24</div>
-                    <div className="text-sm text-muted-foreground">Cases Assigned</div>
+                  <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
+                    <p className="font-medium text-green-800 dark:text-green-200">Team Expansion</p>
+                    <p className="text-sm text-green-600 dark:text-green-400">3 new analysts starting next month</p>
                   </div>
-                  <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl font-bold text-orange-600">6</div>
-                    <div className="text-sm text-muted-foreground">Pending Approval</div>
-                  </div>
-                  <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">92%</div>
-                    <div className="text-sm text-muted-foreground">Team Efficiency</div>
+                  <div className="p-4 bg-orange-50 dark:bg-orange-950 rounded-lg border border-orange-200 dark:border-orange-800">
+                    <p className="font-medium text-orange-800 dark:text-orange-200">Training Initiative</p>
+                    <p className="text-sm text-orange-600 dark:text-orange-400">Mobile forensics certification program</p>
                   </div>
                 </div>
               </CardContent>
@@ -80,21 +78,25 @@ export const CommandingOfficerDashboard = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>Command shortcuts</CardDescription>
+                <CardTitle>Command Actions</CardTitle>
+                <CardDescription>Leadership and oversight tools</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button className="w-full justify-start" variant="outline">
                   <ClipboardList className="h-4 w-4 mr-2" />
-                  Assign Case
+                  Strategic Case Assignment
                 </Button>
                 <Button className="w-full justify-start" variant="outline">
                   <Users className="h-4 w-4 mr-2" />
-                  Manage Team
+                  Staff Performance Review
                 </Button>
                 <Button className="w-full justify-start" variant="outline">
                   <CheckCircle className="h-4 w-4 mr-2" />
-                  Review Reports
+                  Approve Final Reports
+                </Button>
+                <Button className="w-full justify-start" variant="outline">
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Department Analytics
                 </Button>
               </CardContent>
             </Card>

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Microscope, FileText, Clock, CheckCircle, AlertCircle, Laptop } from "lucide-react";
 import { MyAssignedCases } from "@/components/MyAssignedCases";
 import { AnalysisTools } from "@/components/AnalysisTools";
+import { AnalysisWorkbench } from "@/components/role-specific/AnalysisWorkbench";
 
 export const AnalystDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -45,104 +46,52 @@ export const AnalystDashboard = () => {
 
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card>
+            <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Assigned Cases</CardTitle>
-                <FileText className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-blue-800 dark:text-blue-200">My Cases</CardTitle>
+                <FileText className="h-4 w-4 text-blue-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">12</div>
-                <p className="text-xs text-muted-foreground">3 high priority</p>
+                <div className="text-2xl font-bold text-blue-800 dark:text-blue-200">12</div>
+                <p className="text-xs text-blue-600 dark:text-blue-400">3 high priority</p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950 dark:border-orange-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-orange-800 dark:text-orange-200">Active Analysis</CardTitle>
+                <Clock className="h-4 w-4 text-orange-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">8</div>
-                <p className="text-xs text-muted-foreground">Currently analyzing</p>
+                <div className="text-2xl font-bold text-orange-800 dark:text-orange-200">3</div>
+                <p className="text-xs text-orange-600 dark:text-orange-400">Tools running</p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Completed</CardTitle>
-                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-green-800 dark:text-green-200">Completed</CardTitle>
+                <CheckCircle className="h-4 w-4 text-green-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">47</div>
-                <p className="text-xs text-muted-foreground">This month</p>
+                <div className="text-2xl font-bold text-green-800 dark:text-green-200">47</div>
+                <p className="text-xs text-green-600 dark:text-green-400">This month</p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-red-200 bg-red-50 dark:bg-red-950 dark:border-red-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Urgent</CardTitle>
-                <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium text-red-800 dark:text-red-200">Urgent</CardTitle>
+                <AlertCircle className="h-4 w-4 text-red-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">2</div>
-                <p className="text-xs text-muted-foreground">Requires immediate attention</p>
+                <div className="text-2xl font-bold text-red-800 dark:text-red-200">2</div>
+                <p className="text-xs text-red-600 dark:text-red-400">Requires attention</p>
               </CardContent>
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle>Current Analysis Tasks</CardTitle>
-                <CardDescription>Your active forensic investigations</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <p className="font-medium">Mobile Device Analysis - iPhone 13</p>
-                      <p className="text-sm text-muted-foreground">Case #CC2024-015 • Data extraction in progress</p>
-                      <div className="w-full bg-muted h-2 rounded-full mt-2">
-                        <div className="bg-primary h-2 rounded-full" style={{width: '75%'}}></div>
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="ml-4">75%</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <p className="font-medium">Network Traffic Analysis</p>
-                      <p className="text-sm text-muted-foreground">Case #CC2024-012 • Suspicious activity detected</p>
-                      <div className="w-full bg-muted h-2 rounded-full mt-2">
-                        <div className="bg-primary h-2 rounded-full" style={{width: '30%'}}></div>
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="ml-4">30%</Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Analysis Tools</CardTitle>
-                <CardDescription>Quick access to forensic tools</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button className="w-full justify-start" variant="outline">
-                  <Laptop className="h-4 w-4 mr-2" />
-                  Mobile Forensics
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <Microscope className="h-4 w-4 mr-2" />
-                  Network Analysis
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Generate Report
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+          <AnalysisWorkbench />
         </TabsContent>
 
         <TabsContent value="cases">

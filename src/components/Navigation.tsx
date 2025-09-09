@@ -58,6 +58,22 @@ export const Navigation = () => {
     }
   };
 
+  // Role-specific search placeholders
+  const getSearchPlaceholder = () => {
+    switch (profile?.role) {
+      case 'admin':
+        return 'Search users, cases, exhibits, system analytics...';
+      case 'commanding_officer':
+        return 'Search operations, team reports, security alerts...';
+      case 'exhibit_officer':
+        return 'Search evidence, exhibits, chain of custody...';
+      case 'analyst':
+        return 'Search investigations, data sources, reports...';
+      default:
+        return 'Search system resources...';
+    }
+  };
+
   const navigationItems = getNavigationItems();
 
   return (
@@ -90,7 +106,7 @@ export const Navigation = () => {
             <div className="relative hidden sm:block">
               <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-300" />
               <Input 
-                placeholder="Search cases, exhibits, personnel..." 
+                placeholder={getSearchPlaceholder()} 
                 className="pl-9 w-72 bg-white/10 border-white/20 text-white placeholder:text-blue-200 focus:bg-white/20 focus:border-blue-300"
               />
             </div>

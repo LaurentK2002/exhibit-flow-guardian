@@ -81,15 +81,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (session?.user) {
           try {
-            console.log('Fetching profile for user:', session.user.id);
             const { data: profileData, error: profileError } = await supabase
               .from('profiles')
               .select('*')
               .eq('id', session.user.id)
               .maybeSingle();
               
-            console.log('Profile fetch result:', { profileData, profileError });
-            
             if (profileError) {
               console.error('Profile fetch error:', profileError);
               setProfile(null);

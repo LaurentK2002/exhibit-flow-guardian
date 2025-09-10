@@ -8,7 +8,7 @@ import { DashboardStats } from "@/components/DashboardStats";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import { UserManagement } from "@/components/UserManagement";
 import { SystemSettings } from "@/components/SystemSettings";
-import { SecurityOverview } from "@/components/role-specific/SecurityOverview";
+import { SecurityOverview } from "@/components/security/SecurityOverview";
 import { UserPresence } from "@/components/UserPresence";
 
 export const AdminDashboard = () => {
@@ -132,15 +132,7 @@ export const AdminDashboard = () => {
         </TabsContent>
 
         <TabsContent value="audit">
-          <Card>
-            <CardHeader>
-              <CardTitle>System Audit Log</CardTitle>
-              <CardDescription>Complete system activity tracking</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Audit log implementation coming soon...</p>
-            </CardContent>
-          </Card>
+          <SecurityOverview />
         </TabsContent>
       </Tabs>
     </div>

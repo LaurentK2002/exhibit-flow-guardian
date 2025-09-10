@@ -64,6 +64,20 @@ export const UserTable = () => {
     ).join(' ');
   };
 
+  const logProfileAccess = async () => {
+    try {
+      await supabase.rpc('log_profile_access');
+    } catch (error) {
+      console.error('Error logging profile access:', error);
+    }
+  };
+
+  const viewProfile = async (userId: string) => {
+    // Log the profile access
+    await logProfileAccess();
+    // Additional profile viewing logic can be added here
+  };
+
   if (loading) {
     return (
       <Card>
@@ -162,7 +176,12 @@ export const UserTable = () => {
                         </div>
                       </td>
                       <td className="py-3 px-2">
-                        <Button variant="ghost" size="sm" title="View Profile">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          title="View Profile"
+                          onClick={() => viewProfile(user.id)}
+                        >
                           <Eye className="h-4 w-4" />
                         </Button>
                       </td>

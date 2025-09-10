@@ -23,15 +23,21 @@ const Index = () => {
   const { profile } = useAuth();
   const [currentViewRole, setCurrentViewRole] = useState<string>(profile?.role || '');
 
+  // Debug logging
+  console.log('Profile data:', profile);
+  console.log('Current view role:', currentViewRole);
+
   // Update currentViewRole when profile changes
   useEffect(() => {
-    if (profile?.role && currentViewRole === '') {
+    if (profile?.role) {
+      console.log('Setting role from profile:', profile.role);
       setCurrentViewRole(profile.role);
     }
-  }, [profile?.role, currentViewRole]);
+  }, [profile?.role]);
 
   // Route users to their role-specific dashboard based on current view role
   const renderDashboard = (role: string = currentViewRole) => {
+    console.log('Rendering dashboard for role:', role);
     switch (role) {
       case 'admin':
         return <AdminDashboard />;
@@ -42,6 +48,7 @@ const Index = () => {
       case 'analyst':
         return <AnalystDashboard />;
       default:
+        console.log('No matching role found, showing default dashboard');
         return <DefaultDashboard />;
     }
   };

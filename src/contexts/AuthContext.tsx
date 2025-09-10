@@ -33,6 +33,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('Auth state changed:', event, !!session);
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -40,35 +41,49 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // Fetch user profile
           setTimeout(async () => {
             try {
-              const { data: profileData } = await supabase
+              const { data: profileData, error } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', session.user.id)
                 .maybeSingle();
               
-              setProfile(profileData);
+              if (error) {
+                console.error('Profile fetch error:', error);
+                setProfile(null);
+              } else {
+                setProfile(profileData);
+              }
             } catch (error) {
               console.error('Error fetching profile:', error);
               setProfile(null);
+            } finally {
+              // Always set loading to false after profile fetch attempt
+              setLoading(false);
             }
           }, 0);
         } else {
           setProfile(null);
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 
-    // Check for existing session with error handling
+    // Check for existing session
     const initializeAuth = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('Session error:', error);
-          // Clear any corrupted session data
-          localStorage.removeItem('sb-aizcvlggbqflxmkyuoho-auth-token');
+          setSession(null);
+          setUser(null);
+          setProfile(null);
+          setLoading(false);
+          return;
+        }
+
+        // If there's no session, we're done loading
+        if (!session) {
           setSession(null);
           setUser(null);
           setProfile(null);
@@ -77,35 +92,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         setSession(session);
-        setUser(session?.user ?? null);
+        setUser(session.user);
         
-        if (session?.user) {
-          try {
-            const { data: profileData, error: profileError } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .maybeSingle();
-              
-            if (profileError) {
-              console.error('Profile fetch error:', profileError);
-              setProfile(null);
-            } else {
-              setProfile(profileData);
-            }
-          } catch (profileError) {
-            console.error('Error fetching profile:', profileError);
+        // Fetch profile for existing session
+        try {
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .maybeSingle();
+            
+          if (profileError) {
+            console.error('Profile fetch error:', profileError);
             setProfile(null);
+          } else {
+            setProfile(profileData);
           }
+        } catch (profileError) {
+          console.error('Error fetching profile:', profileError);
+          setProfile(null);
+        } finally {
+          setLoading(false);
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
-        // Clear corrupted auth data
-        localStorage.removeItem('sb-aizcvlggbqflxmkyuoho-auth-token');
         setSession(null);
         setUser(null);
         setProfile(null);
-      } finally {
         setLoading(false);
       }
     };

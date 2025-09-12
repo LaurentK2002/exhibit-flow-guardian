@@ -7,6 +7,20 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Cases from "./pages/Cases";
+import Exhibits from "./pages/Exhibits";
+import Analytics from "./pages/Analytics";
+import Users from "./pages/Users";
+import Settings from "./pages/Settings";
+import Security from "./pages/Security";
+import Team from "./pages/Team";
+import Reports from "./pages/Reports";
+import EvidenceQueue from "./pages/EvidenceQueue";
+import ChainOfCustodyPage from "./pages/ChainOfCustodyPage";
+import SearchPage from "./pages/Search";
+import Workbench from "./pages/Workbench";
+import DataSources from "./pages/DataSources";
+import Operations from "./pages/Operations";
 
 // Create QueryClient outside component to avoid re-creation
 const queryClient = new QueryClient({
@@ -39,6 +53,48 @@ const AppRoutes = () => {
       } />
       <Route path="/" element={
         user ? <Index /> : <Navigate to="/auth" replace />
+      } />
+      <Route path="/cases" element={
+        user ? <Cases /> : <Navigate to="/auth" replace />
+      } />
+      <Route path="/exhibits" element={
+        user ? <Exhibits /> : <Navigate to="/auth" replace />
+      } />
+      <Route path="/analytics" element={
+        user ? <Analytics /> : <Navigate to="/auth" replace />
+      } />
+      <Route path="/users" element={
+        user ? <Users /> : <Navigate to="/auth" replace />
+      } />
+      <Route path="/settings" element={
+        user ? <Settings /> : <Navigate to="/auth" replace />
+      } />
+      <Route path="/security" element={
+        user ? <Security /> : <Navigate to="/auth" replace />
+      } />
+      <Route path="/team" element={
+        user ? <Team /> : <Navigate to="/auth" replace />
+      } />
+      <Route path="/reports" element={
+        user ? <Reports /> : <Navigate to="/auth" replace />
+      } />
+      <Route path="/evidence-queue" element={
+        user ? <EvidenceQueue /> : <Navigate to="/auth" replace />
+      } />
+      <Route path="/chain-of-custody" element={
+        user ? <ChainOfCustodyPage /> : <Navigate to="/auth" replace />
+      } />
+      <Route path="/search" element={
+        user ? <SearchPage /> : <Navigate to="/auth" replace />
+      } />
+      <Route path="/workbench" element={
+        user ? <Workbench /> : <Navigate to="/auth" replace />
+      } />
+      <Route path="/data-sources" element={
+        user ? <DataSources /> : <Navigate to="/auth" replace />
+      } />
+      <Route path="/operations" element={
+        user ? <Operations /> : <Navigate to="/auth" replace />
       } />
       <Route path="*" element={<NotFound />} />
     </Routes>

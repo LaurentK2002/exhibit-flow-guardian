@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Link } from "react-router-dom";
 
 export const Navigation = () => {
   const { profile, signOut } = useAuth();
@@ -23,37 +24,37 @@ export const Navigation = () => {
     switch (profile?.role) {
       case 'admin':
         return [
-          { icon: Database, label: 'Digital Exhibits' },
-          { icon: FileText, label: 'Case Management' },
-          { icon: BarChart3, label: 'System Analytics' },
-          { icon: Users, label: 'User Management' },
-          { icon: Settings, label: 'System Config' },
+          { icon: Database, label: 'Digital Exhibits', path: '/exhibits' },
+          { icon: FileText, label: 'Case Management', path: '/cases' },
+          { icon: BarChart3, label: 'System Analytics', path: '/analytics' },
+          { icon: Users, label: 'User Management', path: '/users' },
+          { icon: Settings, label: 'System Config', path: '/settings' },
         ];
       case 'commanding_officer':
         return [
-          { icon: BarChart3, label: 'Operations Overview' },
-          { icon: Users, label: 'Team Management' },
-          { icon: AlertTriangle, label: 'Security Alerts' },
-          { icon: FileText, label: 'Case Reports' },
+          { icon: BarChart3, label: 'Operations Overview', path: '/operations' },
+          { icon: Users, label: 'Team Management', path: '/team' },
+          { icon: AlertTriangle, label: 'Security Alerts', path: '/security' },
+          { icon: FileText, label: 'Case Reports', path: '/reports' },
         ];
       case 'exhibit_officer':
         return [
-          { icon: Database, label: 'Evidence Queue' },
-          { icon: Activity, label: 'Chain of Custody' },
-          { icon: FileText, label: 'Case Files' },
-          { icon: Search, label: 'Evidence Search' },
+          { icon: Database, label: 'Evidence Queue', path: '/evidence-queue' },
+          { icon: Activity, label: 'Chain of Custody', path: '/chain-of-custody' },
+          { icon: FileText, label: 'Case Files', path: '/cases' },
+          { icon: Search, label: 'Evidence Search', path: '/search' },
         ];
       case 'analyst':
         return [
-          { icon: Activity, label: 'Analysis Workbench' },
-          { icon: Database, label: 'Data Sources' },
-          { icon: FileText, label: 'Investigation Reports' },
-          { icon: BarChart3, label: 'Case Analytics' },
+          { icon: Activity, label: 'Analysis Workbench', path: '/workbench' },
+          { icon: Database, label: 'Data Sources', path: '/data-sources' },
+          { icon: FileText, label: 'Investigation Reports', path: '/reports' },
+          { icon: BarChart3, label: 'Case Analytics', path: '/analytics' },
         ];
       default:
         return [
-          { icon: FileText, label: 'Dashboard' },
-          { icon: Search, label: 'Search' },
+          { icon: FileText, label: 'Dashboard', path: '/' },
+          { icon: Search, label: 'Search', path: '/search' },
         ];
     }
   };
@@ -94,9 +95,11 @@ export const Navigation = () => {
             
             <nav className="hidden md:flex items-center space-x-1">
               {navigationItems.map((item, index) => (
-                <Button key={index} variant="ghost" className="text-blue-100 hover:text-white hover:bg-white/10 transition-colors">
-                  <item.icon className="h-4 w-4 mr-2" />
-                  {item.label}
+                <Button key={index} variant="ghost" className="text-blue-100 hover:text-white hover:bg-white/10 transition-colors" asChild>
+                  <Link to={item.path} aria-label={item.label} title={item.label}>
+                    <item.icon className="h-4 w-4 mr-2" />
+                    {item.label}
+                  </Link>
                 </Button>
               ))}
             </nav>

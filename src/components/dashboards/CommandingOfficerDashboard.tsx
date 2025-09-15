@@ -26,7 +26,7 @@ export const CommandingOfficerDashboard = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
             Overview
@@ -34,10 +34,6 @@ export const CommandingOfficerDashboard = () => {
           <TabsTrigger value="team" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             Team
-          </TabsTrigger>
-          <TabsTrigger value="assignments" className="flex items-center gap-2">
-            <ClipboardList className="h-4 w-4" />
-            Assignments
           </TabsTrigger>
           <TabsTrigger value="approval" className="flex items-center gap-2">
             <CheckCircle className="h-4 w-4" />
@@ -83,10 +79,6 @@ export const CommandingOfficerDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button className="w-full justify-start" variant="outline">
-                  <ClipboardList className="h-4 w-4 mr-2" />
-                  Strategic Case Assignment
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
                   <Users className="h-4 w-4 mr-2" />
                   Staff Performance Review
                 </Button>
@@ -107,9 +99,6 @@ export const CommandingOfficerDashboard = () => {
           <TeamManagement />
         </TabsContent>
 
-        <TabsContent value="assignments">
-          <CaseAssignment />
-        </TabsContent>
 
         <TabsContent value="approval">
           <Card>

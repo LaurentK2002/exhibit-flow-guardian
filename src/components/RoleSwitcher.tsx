@@ -24,6 +24,7 @@ export const RoleSwitcher = ({ currentViewRole, onRoleChange }: RoleSwitcherProp
   const roleOptions = [
     { value: 'admin', label: 'Administrator', icon: Shield, color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' },
     { value: 'commanding_officer', label: 'Commanding Officer', icon: Users, color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
+    { value: 'officer_commanding_unit', label: 'Officer Commanding Unit', icon: Settings, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' },
     { value: 'exhibit_officer', label: 'Exhibit Officer', icon: Package, color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' },
     { value: 'analyst', label: 'Analyst', icon: Microscope, color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' }
   ];

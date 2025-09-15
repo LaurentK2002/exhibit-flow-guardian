@@ -3,6 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { AdminDashboard } from "@/components/dashboards/AdminDashboard";
 import { CommandingOfficerDashboard } from "@/components/dashboards/CommandingOfficerDashboard";
+import { OfficerCommandingUnitDashboard } from "@/components/dashboards/OfficerCommandingUnitDashboard";
 import { ExhibitOfficerDashboard } from "@/components/dashboards/ExhibitOfficerDashboard";
 import { AnalystDashboard } from "@/components/dashboards/AnalystDashboard";
 import { DashboardStats } from "@/components/DashboardStats";
@@ -37,6 +38,8 @@ const Index = () => {
         return <AdminDashboard />;
       case 'commanding_officer':
         return <CommandingOfficerDashboard />;
+      case 'officer_commanding_unit':
+        return <OfficerCommandingUnitDashboard />;
       case 'exhibit_officer':
         return <ExhibitOfficerDashboard />;
       case 'analyst':

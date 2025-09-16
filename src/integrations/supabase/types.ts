@@ -103,6 +103,7 @@ export type Database = {
           exhibit_officer_id: string | null
           id: string
           incident_date: string | null
+          lab_number: string | null
           location: string | null
           opened_date: string | null
           priority: Database["public"]["Enums"]["case_priority"] | null
@@ -124,6 +125,7 @@ export type Database = {
           exhibit_officer_id?: string | null
           id?: string
           incident_date?: string | null
+          lab_number?: string | null
           location?: string | null
           opened_date?: string | null
           priority?: Database["public"]["Enums"]["case_priority"] | null
@@ -145,6 +147,7 @@ export type Database = {
           exhibit_officer_id?: string | null
           id?: string
           incident_date?: string | null
+          lab_number?: string | null
           location?: string | null
           opened_date?: string | null
           priority?: Database["public"]["Enums"]["case_priority"] | null
@@ -401,6 +404,10 @@ export type Database = {
       cleanup_expired_sessions: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      generate_case_lab_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       get_current_user_department: {
         Args: Record<PropertyKey, never>

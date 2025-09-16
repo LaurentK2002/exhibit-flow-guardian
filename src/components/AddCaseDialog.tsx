@@ -40,24 +40,17 @@ export const AddCaseDialog = ({ open, onOpenChange, onSuccess }: AddCaseDialogPr
   };
 
   const generateLabNumber = async () => {
-    const currentYear = new Date().getFullYear();
-    const { data } = await supabase
-      .from('cases')
-      .select('lab_number')
-      .like('lab_number', `FB/CYBER/${currentYear}/CASE/%`)
-      .order('created_at', { ascending: false })
-      .limit(1);
-
-    let nextNumber = 1;
-    if (data && data.length > 0) {
-      const lastLabNumber = data[0].lab_number;
-      const match = lastLabNumber?.match(/CASE\/(\d+)$/);
-      if (match) {
-        nextNumber = parseInt(match[1]) + 1;
+    try {
+      const { data, error } = await supabase.rpc('generate_case_lab_number');
+      if (error) {
+        console.error('Error generating lab number:', error);
+        return null;
       }
+      return data;
+    } catch (error) {
+      console.error('Error generating lab number:', error);
+      return null;
     }
-
-    return `FB/CYBER/${currentYear}/CASE/${nextNumber.toString().padStart(4, '0')}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

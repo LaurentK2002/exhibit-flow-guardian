@@ -116,6 +116,7 @@ export const CaseTable = () => {
             <thead>
               <tr className="border-b border-border">
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Case #</th>
+                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Lab #</th>
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Title</th>
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Assigned To</th>
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Priority</th>
@@ -127,7 +128,7 @@ export const CaseTable = () => {
             <tbody>
               {cases.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <td colSpan={8} className="text-center py-8 text-muted-foreground">
                     No cases found. <br />
                     <span className="text-sm">Create some cases to get started.</span>
                   </td>
@@ -137,6 +138,9 @@ export const CaseTable = () => {
                   <tr key={caseItem.id} className="border-b border-border hover:bg-muted/50 transition-colors">
                     <td className="py-3 px-2">
                       <span className="font-mono text-sm font-medium text-foreground">{caseItem.case_number}</span>
+                    </td>
+                    <td className="py-3 px-2">
+                      <span className="font-mono text-xs text-muted-foreground">{caseItem.lab_number || 'N/A'}</span>
                     </td>
                     <td className="py-3 px-2">
                       <div>

@@ -39,17 +39,40 @@ export const AddCaseDialog = ({ open, onOpenChange, onSuccess }: AddCaseDialogPr
     return `CR-${year}-${random}`;
   };
 
+  const generateLabNumber = async () => {
+    const currentYear = new Date().getFullYear();
+    const { data } = await supabase
+      .from('cases')
+      .select('lab_number')
+      .like('lab_number', `FB/CYBER/${currentYear}/CASE/%`)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    let nextNumber = 1;
+    if (data && data.length > 0) {
+      const lastLabNumber = data[0].lab_number;
+      const match = lastLabNumber?.match(/CASE\/(\d+)$/);
+      if (match) {
+        nextNumber = parseInt(match[1]) + 1;
+      }
+    }
+
+    return `FB/CYBER/${currentYear}/CASE/${nextNumber.toString().padStart(4, '0')}`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       const caseNumber = generateCaseNumber();
+      const labNumber = await generateLabNumber();
       
       const { error } = await supabase
         .from('cases')
         .insert({
           case_number: caseNumber,
+          lab_number: labNumber,
           title: formData.title,
           description: formData.description || null,
           priority: formData.priority,
@@ -72,13 +95,13 @@ export const AddCaseDialog = ({ open, onOpenChange, onSuccess }: AddCaseDialogPr
             .eq('case_number', caseNumber)
             .single()).data?.id,
           activity_type: 'case_created',
-          description: `New case "${formData.title}" created with case number ${caseNumber}`,
-          metadata: { priority: formData.priority, status: formData.status },
+          description: `New case "${formData.title}" created with case number ${caseNumber} and lab number ${labNumber}`,
+          metadata: { priority: formData.priority, status: formData.status, lab_number: labNumber },
         });
 
       toast({
         title: "Case Created",
-        description: `Case ${caseNumber} has been successfully created.`,
+        description: `Case ${caseNumber} with lab number ${labNumber} has been successfully created.`,
       });
 
       // Reset form

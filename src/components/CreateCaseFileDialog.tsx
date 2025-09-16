@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Database } from '@/integrations/supabase/types';
-import { Upload, FileText, X } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 
 type CaseStatus = Database['public']['Enums']['case_status'];
 type CasePriority = Database['public']['Enums']['case_priority'];
@@ -21,8 +21,8 @@ interface CreateCaseFileDialogProps {
 
 export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCaseFileDialogProps) => {
   const [loading, setLoading] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const { toast } = useToast();
   
   const [formData, setFormData] = useState({
@@ -38,58 +38,54 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
   });
 
   const generateCaseNumber = async () => {
-    const currentYear = new Date().getFullYear();
-    
-    // Get the latest case number for current year
+    const year = new Date().getFullYear();
     const { data } = await supabase
       .from('cases')
       .select('case_number')
-      .like('case_number', `FB/CYBER/${currentYear}/%`)
+      .like('case_number', `CCU-${year}-%`)
       .order('created_at', { ascending: false })
       .limit(1);
 
     let nextNumber = 1;
     if (data && data.length > 0) {
-      const lastNumber = parseInt(data[0].case_number.split('/').pop() || '0');
+      const lastNumber = parseInt(data[0].case_number.split('-')[2]) || 0;
       nextNumber = lastNumber + 1;
     }
 
-    return `FB/CYBER/${currentYear}/${nextNumber.toString().padStart(4, '0')}`;
+    return `CCU-${year}-${nextNumber.toString().padStart(4, '0')}`;
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newFiles = Array.from(e.target.files);
-      setUploadedFiles(prev => [...prev, ...newFiles]);
+  useEffect(() => {
+    if (open) {
+      generateCaseNumber().then(caseNumber => {
+        setFormData(prev => ({ ...prev, caseNumber }));
+      });
     }
+  }, [open]);
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    setSelectedFiles(prev => [...prev, ...files]);
   };
 
   const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const uploadDocuments = async (caseId: string) => {
-    const uploadPromises = uploadedFiles.map(async (file) => {
+    if (selectedFiles.length === 0) return [];
+
+    const uploadPromises = selectedFiles.map(async (file) => {
       const fileName = `${caseId}/${Date.now()}-${file.name}`;
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('case-documents')
         .upload(fileName, file);
-      
-      if (error) {
-        console.error('Error uploading file:', error);
-        return null;
-      }
-      
-      return {
-        name: file.name,
-        path: data.path,
-        size: file.size,
-        type: file.type,
-      };
+
+      if (error) throw error;
+      return fileName;
     });
 
-    const results = await Promise.all(uploadPromises);
-    return results.filter(result => result !== null);
+    return Promise.all(uploadPromises);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -97,13 +93,11 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
     setLoading(true);
 
     try {
-      const caseNumber = formData.caseNumber || await generateCaseNumber();
-      
       // Create the case
       const { data: caseData, error: caseError } = await supabase
         .from('cases')
         .insert({
-          case_number: caseNumber,
+          case_number: formData.caseNumber,
           title: formData.title,
           description: formData.description,
           victim_name: formData.victimName || null,
@@ -119,9 +113,20 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
       if (caseError) throw caseError;
 
       // Upload documents if any
-      let uploadedDocuments = [];
-      if (uploadedFiles.length > 0) {
-        uploadedDocuments = await uploadDocuments(caseData.id);
+      if (selectedFiles.length > 0) {
+        setUploadingFiles(true);
+        try {
+          await uploadDocuments(caseData.id);
+        } catch (uploadError) {
+          console.error('Error uploading documents:', uploadError);
+          toast({
+            title: "Warning",
+            description: "Case created successfully, but some documents failed to upload.",
+            variant: "destructive",
+          });
+        } finally {
+          setUploadingFiles(false);
+        }
       }
 
       // Log activity
@@ -130,17 +135,16 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
         .insert({
           case_id: caseData.id,
           activity_type: 'case_created',
-          description: `Case file "${formData.title}" (${caseNumber}) created with ${uploadedFiles.length} documents`,
+          description: `Case file ${formData.caseNumber} created with ${selectedFiles.length} document(s)`,
           metadata: { 
-            case_number: caseNumber,
-            documents_count: uploadedFiles.length,
-            uploaded_documents: uploadedDocuments
+            case_number: formData.caseNumber,
+            document_count: selectedFiles.length
           },
         });
 
       toast({
         title: "Case File Created",
-        description: `Case ${caseNumber} has been successfully created with ${uploadedFiles.length} documents.`,
+        description: `Case ${formData.caseNumber} has been successfully created.`,
       });
 
       // Reset form
@@ -155,7 +159,7 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
         status: 'open',
         priority: 'medium',
       });
-      setUploadedFiles([]);
+      setSelectedFiles([]);
 
       onOpenChange(false);
       onSuccess?.();
@@ -174,18 +178,18 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Case File</DialogTitle>
+          <DialogTitle>Create New Case File</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="caseNumber">Case Number (auto-generated if empty)</Label>
+              <Label htmlFor="caseNumber">Case Number</Label>
               <Input
                 id="caseNumber"
                 value={formData.caseNumber}
-                onChange={(e) => setFormData({ ...formData, caseNumber: e.target.value })}
-                placeholder="FB/CYBER/2025/0001"
+                readOnly
+                className="bg-muted"
               />
             </div>
             
@@ -195,19 +199,19 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="Enter case title"
+                placeholder="Brief case description"
                 required
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">Case Description</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Detailed description of the case..."
+              placeholder="Detailed case description..."
               rows={3}
             />
           </div>
@@ -219,7 +223,7 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
                 id="victimName"
                 value={formData.victimName}
                 onChange={(e) => setFormData({ ...formData, victimName: e.target.value })}
-                placeholder="Name of the victim"
+                placeholder="Victim or complainant name"
               />
             </div>
             
@@ -229,7 +233,7 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
                 id="suspectName"
                 value={formData.suspectName}
                 onChange={(e) => setFormData({ ...formData, suspectName: e.target.value })}
-                placeholder="Name of the suspect"
+                placeholder="Suspect name (if known)"
               />
             </div>
           </div>
@@ -241,7 +245,7 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
                 id="location"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="Location of the incident"
+                placeholder="Incident location"
               />
             </div>
             
@@ -258,21 +262,6 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select value={formData.status} onValueChange={(value: CaseStatus) => setFormData({ ...formData, status: value })}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="open">Open</SelectItem>
-                  <SelectItem value="under_investigation">Under Investigation</SelectItem>
-                  <SelectItem value="closed">Closed</SelectItem>
-                  <SelectItem value="suspended">Suspended</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
               <Label htmlFor="priority">Priority</Label>
               <Select value={formData.priority} onValueChange={(value: CasePriority) => setFormData({ ...formData, priority: value })}>
                 <SelectTrigger>
@@ -282,53 +271,64 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
                   <SelectItem value="low">Low</SelectItem>
                   <SelectItem value="medium">Medium</SelectItem>
                   <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="critical">Critical</SelectItem>
+                  <SelectItem value="urgent">Urgent</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select value={formData.status} onValueChange={(value: CaseStatus) => setFormData({ ...formData, status: value })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="open">Open</SelectItem>
+                  <SelectItem value="under_investigation">Under Investigation</SelectItem>
+                  <SelectItem value="pending_review">Pending Review</SelectItem>
+                  <SelectItem value="closed">Closed</SelectItem>
+                  <SelectItem value="on_hold">On Hold</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           {/* Document Upload Section */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
+          <div className="space-y-4 border-t pt-4">
+            <div className="space-y-2">
               <Label>Case Documents</Label>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Upload Documents
-              </Button>
+              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
+                <div className="text-center">
+                  <Upload className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
+                  <div className="text-sm text-muted-foreground mb-2">
+                    Upload case documents (letters, reports, etc.)
+                  </div>
+                  <Input
+                    type="file"
+                    multiple
+                    accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    id="file-upload"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('file-upload')?.click()}
+                  >
+                    Select Files
+                  </Button>
+                </div>
+              </div>
             </div>
-            
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileSelect}
-              multiple
-              accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
-              className="hidden"
-            />
 
-            {uploadedFiles.length > 0 && (
+            {selectedFiles.length > 0 && (
               <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">
-                  Selected Files ({uploadedFiles.length})
-                </Label>
-                <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
-                  {uploadedFiles.map((file, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <FileText className="h-4 w-4" />
-                        <div>
-                          <p className="text-sm font-medium">{file.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {(file.size / 1024 / 1024).toFixed(2)} MB
-                          </p>
-                        </div>
-                      </div>
+                <Label>Selected Files ({selectedFiles.length})</Label>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {selectedFiles.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
+                      <span className="text-sm truncate">{file.name}</span>
                       <Button
                         type="button"
                         variant="ghost"
@@ -348,8 +348,8 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || !formData.title}>
-              {loading ? 'Creating...' : 'Create Case File'}
+            <Button type="submit" disabled={loading || uploadingFiles || !formData.title}>
+              {loading ? 'Creating...' : uploadingFiles ? 'Uploading...' : 'Create Case File'}
             </Button>
           </div>
         </form>

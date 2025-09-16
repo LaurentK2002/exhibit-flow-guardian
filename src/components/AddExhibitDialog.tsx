@@ -64,27 +64,6 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     }
   };
 
-  const generateLabNumber = async () => {
-    // Get the current year
-    const currentYear = new Date().getFullYear();
-    
-    // Get the latest lab number for current year
-    const { data } = await supabase
-      .from('exhibits')
-      .select('lab_number')
-      .like('lab_number', `FB/CYBER/${currentYear}/LAB/%`)
-      .order('created_at', { ascending: false })
-      .limit(1);
-
-    let nextNumber = 1;
-    if (data && data.length > 0 && data[0].lab_number) {
-      const lastNumber = parseInt(data[0].lab_number.split('/LAB/')[1]) || 0;
-      nextNumber = lastNumber + 1;
-    }
-
-    return `FB/CYBER/${currentYear}/LAB/${nextNumber.toString().padStart(4, '0')}`;
-  };
-
   const generateExhibitNumber = async () => {
     // Get the latest exhibit number
     const { data } = await supabase
@@ -101,6 +80,28 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     }
 
     return `EXH-${nextNumber.toString().padStart(4, '0')}`;
+  };
+
+  const generateLabNumber = async () => {
+    // Get the latest lab number for the current year
+    const currentYear = new Date().getFullYear();
+    const { data } = await supabase
+      .from('exhibits')
+      .select('lab_number')
+      .like('lab_number', `FB/CYBER/${currentYear}/LAB/%`)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    let nextNumber = 1;
+    if (data && data.length > 0) {
+      const lastLabNumber = data[0].lab_number;
+      const match = lastLabNumber.match(/LAB\/(\d+)$/);
+      if (match) {
+        nextNumber = parseInt(match[1]) + 1;
+      }
+    }
+
+    return `FB/CYBER/${currentYear}/LAB/${nextNumber.toString().padStart(4, '0')}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,7 +138,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
         .insert({
           case_id: formData.caseId,
           activity_type: 'exhibit_received',
-          description: `New digital exhibit "${formData.deviceName}" (${exhibitNumber}, Lab: ${labNumber}) received and logged into evidence system`,
+          description: `New digital exhibit "${formData.deviceName}" (${exhibitNumber}) with lab number ${labNumber} received and logged into evidence system`,
           metadata: { 
             exhibit_number: exhibitNumber,
             lab_number: labNumber,
@@ -148,7 +149,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
 
       toast({
         title: "Exhibit Added",
-        description: `Exhibit ${exhibitNumber} (Lab: ${labNumber}) has been successfully logged.`,
+        description: `Exhibit ${exhibitNumber} with lab number ${labNumber} has been successfully logged.`,
       });
 
       // Reset form

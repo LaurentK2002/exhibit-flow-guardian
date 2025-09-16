@@ -12,8 +12,8 @@ import { CreateCaseFileDialog } from "@/components/CreateCaseFileDialog";
 
 export const ExhibitOfficerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [addExhibitOpen, setAddExhibitOpen] = useState(false);
-  const [createCaseFileOpen, setCreateCaseFileOpen] = useState(false);
+  const [showAddExhibit, setShowAddExhibit] = useState(false);
+  const [showCreateCaseFile, setShowCreateCaseFile] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -97,7 +97,7 @@ export const ExhibitOfficerDashboard = () => {
                 <Button 
                   className="w-full justify-start" 
                   variant="outline"
-                  onClick={() => setAddExhibitOpen(true)}
+                  onClick={() => setShowAddExhibit(true)}
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Intake New Evidence
@@ -105,7 +105,7 @@ export const ExhibitOfficerDashboard = () => {
                 <Button 
                   className="w-full justify-start" 
                   variant="outline"
-                  onClick={() => setCreateCaseFileOpen(true)}
+                  onClick={() => setShowCreateCaseFile(true)}
                 >
                   <FolderPlus className="h-4 w-4 mr-2" />
                   Create Case File
@@ -144,7 +144,7 @@ export const ExhibitOfficerDashboard = () => {
             <CardContent>
               <div className="text-center py-8">
                 <p className="text-muted-foreground mb-4">Create new case files and upload supporting documents</p>
-                <Button onClick={() => setCreateCaseFileOpen(true)}>
+                <Button onClick={() => setShowCreateCaseFile(true)}>
                   <FolderPlus className="h-4 w-4 mr-2" />
                   Create New Case File
                 </Button>
@@ -173,16 +173,16 @@ export const ExhibitOfficerDashboard = () => {
       </Tabs>
 
       <AddExhibitDialog 
-        open={addExhibitOpen} 
-        onOpenChange={setAddExhibitOpen}
+        open={showAddExhibit} 
+        onOpenChange={setShowAddExhibit}
         onSuccess={() => {
           // Refresh the exhibits table or show success message
         }}
       />
       
       <CreateCaseFileDialog 
-        open={createCaseFileOpen} 
-        onOpenChange={setCreateCaseFileOpen}
+        open={showCreateCaseFile} 
+        onOpenChange={setShowCreateCaseFile}
         onSuccess={() => {
           // Refresh case files or show success message
         }}

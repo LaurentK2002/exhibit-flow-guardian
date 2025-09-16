@@ -5,44 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Package, Clock, CheckCircle, AlertCircle, Smartphone, Laptop, HardDrive } from "lucide-react";
 
 export const EvidenceQueue = () => {
-  const evidenceQueue = [
-    {
-      id: "EV-2024-001",
-      type: "Smartphone",
-      model: "iPhone 14 Pro",
-      caseNumber: "CC2024-015",
-      priority: "high",
-      status: "processing",
-      receivedTime: "2 hours ago",
-      estimatedCompletion: "4 hours",
-      progress: 65,
-      icon: Smartphone
-    },
-    {
-      id: "EV-2024-002", 
-      type: "Laptop",
-      model: "MacBook Pro 16\"",
-      caseNumber: "CC2024-012",
-      priority: "medium",
-      status: "queued",
-      receivedTime: "6 hours ago",
-      estimatedCompletion: "8 hours",
-      progress: 0,
-      icon: Laptop
-    },
-    {
-      id: "EV-2024-003",
-      type: "External Drive",
-      model: "Seagate 2TB",
-      caseNumber: "CC2024-018",
-      priority: "high",
-      status: "ready",
-      receivedTime: "1 day ago",
-      estimatedCompletion: "2 hours",
-      progress: 100,
-      icon: HardDrive
-    }
-  ];
+  const evidenceQueue: any[] = [];
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -73,51 +36,14 @@ export const EvidenceQueue = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-800 dark:text-blue-200">In Queue</CardTitle>
-            <Package className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-800 dark:text-blue-200">12</div>
-            <p className="text-xs text-blue-600 dark:text-blue-400">Awaiting processing</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950 dark:border-orange-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-orange-800 dark:text-orange-200">Processing</CardTitle>
-            <Clock className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-800 dark:text-orange-200">5</div>
-            <p className="text-xs text-orange-600 dark:text-orange-400">Currently active</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-green-800 dark:text-green-200">Ready</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-800 dark:text-green-200">8</div>
-            <p className="text-xs text-green-600 dark:text-green-400">For analyst assignment</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-red-200 bg-red-50 dark:bg-red-950 dark:border-red-800">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-red-800 dark:text-red-200">High Priority</CardTitle>
-            <AlertCircle className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-800 dark:text-red-200">3</div>
-            <p className="text-xs text-red-600 dark:text-red-400">Urgent processing</p>
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="border-border bg-muted/30">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium text-foreground">Evidence Queue</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-sm text-muted-foreground">No evidence in queue yet.</div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

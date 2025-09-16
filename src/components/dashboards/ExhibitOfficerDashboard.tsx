@@ -66,22 +66,12 @@ export const ExhibitOfficerDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="p-3 bg-red-50 dark:bg-red-950 rounded-lg border border-red-200 dark:border-red-800">
+                  <div className="p-3 rounded-lg border border-border bg-muted/30">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-red-800 dark:text-red-200 text-sm">Exhibit EV-2024-004</p>
-                        <p className="text-xs text-red-600 dark:text-red-400">Chain of custody gap detected</p>
+                        <p className="font-medium text-sm text-foreground">No custody alerts</p>
+                        <p className="text-xs text-muted-foreground">New alerts will appear here as you add data.</p>
                       </div>
-                      <Badge variant="destructive" className="text-xs">Critical</Badge>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-orange-50 dark:bg-orange-950 rounded-lg border border-orange-200 dark:border-orange-800">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium text-orange-800 dark:text-orange-200 text-sm">Exhibit EV-2024-007</p>
-                        <p className="text-xs text-orange-600 dark:text-orange-400">Pending custody transfer approval</p>
-                      </div>
-                      <Badge variant="secondary" className="text-xs">Warning</Badge>
                     </div>
                   </div>
                 </div>

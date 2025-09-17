@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { Database } from '@/integrations/supabase/types';
 
 type ExhibitType = Database['public']['Enums']['exhibit_type'];
@@ -23,6 +24,7 @@ interface AddExhibitDialogProps {
 export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDialogProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
   
   const [formData, setFormData] = useState({
     // Case Information
@@ -135,6 +137,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
           incident_date: formData.incidentDate ? new Date(formData.incidentDate).toISOString() : null,
           status: formData.caseStatus,
           priority: formData.casePriority,
+          exhibit_officer_id: user?.id,
         })
         .select()
         .single();
@@ -162,6 +165,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
           description: formData.description || null,
           storage_location: formData.storageLocation || null,
           status: formData.status,
+          received_by: user?.id,
         });
 
       if (exhibitError) throw exhibitError;

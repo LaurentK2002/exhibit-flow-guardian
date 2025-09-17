@@ -31,10 +31,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     caseNumber: '',
     caseTitle: '',
     caseDescription: '',
-    victimName: '',
-    suspectName: '',
     location: '',
-    incidentDate: '',
     caseStatus: 'open' as CaseStatus,
     casePriority: 'medium' as CasePriority,
     // Investigation Report Information
@@ -54,21 +51,25 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
   });
 
   const generateCaseNumber = async () => {
-    const year = new Date().getFullYear();
+    // Generate lab number format for case number  
+    const currentYear = new Date().getFullYear();
     const { data } = await supabase
       .from('cases')
       .select('case_number')
-      .like('case_number', `CCU-${year}-%`)
+      .like('case_number', `FB/CYBER/${currentYear}/LAB/%`)
       .order('created_at', { ascending: false })
       .limit(1);
 
     let nextNumber = 1;
     if (data && data.length > 0) {
-      const lastNumber = parseInt(data[0].case_number.split('-')[2]) || 0;
-      nextNumber = lastNumber + 1;
+      const lastLabNumber = data[0].case_number;
+      const match = lastLabNumber.match(/LAB\/(\d+)$/);
+      if (match) {
+        nextNumber = parseInt(match[1]) + 1;
+      }
     }
 
-    return `CCU-${year}-${nextNumber.toString().padStart(4, '0')}`;
+    return `FB/CYBER/${currentYear}/LAB/${nextNumber.toString().padStart(4, '0')}`;
   };
 
   useEffect(() => {
@@ -131,10 +132,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
           case_number: formData.caseNumber,
           title: formData.caseTitle,
           description: formData.caseDescription,
-          victim_name: formData.victimName || null,
-          suspect_name: formData.suspectName || null,
           location: formData.location || null,
-          incident_date: formData.incidentDate ? new Date(formData.incidentDate).toISOString() : null,
           status: formData.caseStatus,
           priority: formData.casePriority,
           exhibit_officer_id: user?.id,
@@ -211,10 +209,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
         caseNumber: '',
         caseTitle: '',
         caseDescription: '',
-        victimName: '',
-        suspectName: '',
         location: '',
-        incidentDate: '',
         caseStatus: 'open',
         casePriority: 'medium',
         irNumber: '',
@@ -291,44 +286,12 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="victimName">Victim Name</Label>
-                <Input
-                  id="victimName"
-                  value={formData.victimName}
-                  onChange={(e) => setFormData({ ...formData, victimName: e.target.value })}
-                  placeholder="Victim or complainant name"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="suspectName">Suspect Name</Label>
-                <Input
-                  id="suspectName"
-                  value={formData.suspectName}
-                  onChange={(e) => setFormData({ ...formData, suspectName: e.target.value })}
-                  placeholder="Suspect name (if known)"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
                 <Label htmlFor="location">Location</Label>
                 <Input
                   id="location"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                   placeholder="Incident location"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="incidentDate">Incident Date</Label>
-                <Input
-                  id="incidentDate"
-                  type="datetime-local"
-                  value={formData.incidentDate}
-                  onChange={(e) => setFormData({ ...formData, incidentDate: e.target.value })}
                 />
               </div>
 

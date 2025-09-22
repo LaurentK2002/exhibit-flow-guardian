@@ -9,9 +9,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Database } from '@/integrations/supabase/types';
+import { ExhibitForm, ExhibitFormData } from './ExhibitForm';
+import { Plus, Upload } from 'lucide-react';
 
-type ExhibitType = Database['public']['Enums']['exhibit_type'];
-type ExhibitStatus = Database['public']['Enums']['exhibit_status'];
 type CaseStatus = Database['public']['Enums']['case_status'];
 type CasePriority = Database['public']['Enums']['case_priority'];
 
@@ -26,19 +26,19 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
   const { toast } = useToast();
   const { user } = useAuth();
   
-  const [formData, setFormData] = useState({
-    // Case Information
+  const [caseFormData, setCaseFormData] = useState({
     caseNumber: '',
     caseTitle: '',
     caseDescription: '',
     location: '',
     caseStatus: 'open' as CaseStatus,
     casePriority: 'medium' as CasePriority,
-    // Investigation Report Information
     irNumber: '',
     referenceNumber: '',
-    // Exhibit Information
-    exhibitType: 'mobile_device' as ExhibitType,
+  });
+
+  const [exhibits, setExhibits] = useState<ExhibitFormData[]>([{
+    exhibitType: 'mobile_device',
     deviceName: '',
     brand: '',
     model: '',
@@ -47,8 +47,10 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     macAddress: '',
     description: '',
     storageLocation: '',
-    status: 'received' as ExhibitStatus,
-  });
+    status: 'received',
+  }]);
+
+  const [referenceLetterFile, setReferenceLetterFile] = useState<File | null>(null);
 
   const generateCaseNumber = async () => {
     // Generate lab number format for case number  
@@ -75,10 +77,42 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
   useEffect(() => {
     if (open) {
       generateCaseNumber().then(caseNumber => {
-        setFormData(prev => ({ ...prev, caseNumber }));
+        setCaseFormData(prev => ({ ...prev, caseNumber }));
       });
     }
   }, [open]);
+
+  const addExhibit = () => {
+    setExhibits([...exhibits, {
+      exhibitType: 'mobile_device',
+      deviceName: '',
+      brand: '',
+      model: '',
+      serialNumber: '',
+      imei: '',
+      macAddress: '',
+      description: '',
+      storageLocation: '',
+      status: 'received',
+    }]);
+  };
+
+  const removeExhibit = (index: number) => {
+    setExhibits(exhibits.filter((_, i) => i !== index));
+  };
+
+  const updateExhibit = (index: number, field: keyof ExhibitFormData, value: string) => {
+    setExhibits(exhibits.map((exhibit, i) => 
+      i === index ? { ...exhibit, [field]: value } : exhibit
+    ));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setReferenceLetterFile(file);
+    }
+  };
 
   const generateExhibitNumber = async () => {
     // Get the latest exhibit number
@@ -125,16 +159,30 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     setLoading(true);
 
     try {
+      // Upload reference letter file if provided
+      let referenceLetterPath = null;
+      if (referenceLetterFile) {
+        const fileExt = referenceLetterFile.name.split('.').pop();
+        const fileName = `${Date.now()}-reference-letter.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('case-documents')
+          .upload(fileName, referenceLetterFile);
+
+        if (uploadError) throw uploadError;
+        referenceLetterPath = uploadData.path;
+      }
+
       // First create the case file
       const { data: caseData, error: caseError } = await supabase
         .from('cases')
         .insert({
-          case_number: formData.caseNumber,
-          title: formData.caseTitle,
-          description: formData.caseDescription,
-          location: formData.location || null,
-          status: formData.caseStatus,
-          priority: formData.casePriority,
+          case_number: caseFormData.caseNumber,
+          title: caseFormData.caseTitle,
+          description: caseFormData.caseDescription,
+          location: caseFormData.location || null,
+          status: caseFormData.caseStatus,
+          priority: caseFormData.casePriority,
           exhibit_officer_id: user?.id,
         })
         .select()
@@ -142,31 +190,54 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
 
       if (caseError) throw caseError;
 
-      // Generate exhibit and lab numbers
-      const exhibitNumber = await generateExhibitNumber();
-      const labNumber = await generateLabNumber();
-      
-      // Create the exhibit linked to the new case
-      const { error: exhibitError } = await supabase
-        .from('exhibits')
-        .insert({
-          exhibit_number: exhibitNumber,
-          lab_number: labNumber,
-          case_id: caseData.id,
-          exhibit_type: formData.exhibitType,
-          device_name: formData.deviceName,
-          brand: formData.brand || null,
-          model: formData.model || null,
-          serial_number: formData.serialNumber || null,
-          imei: formData.imei || null,
-          mac_address: formData.macAddress || null,
-          description: formData.description || null,
-          storage_location: formData.storageLocation || null,
-          status: formData.status,
-          received_by: user?.id,
-        });
+      // Create all exhibits linked to the new case
+      const exhibitPromises = exhibits.map(async (exhibit) => {
+        const exhibitNumber = await generateExhibitNumber();
+        const labNumber = await generateLabNumber();
+        
+        const { error: exhibitError } = await supabase
+          .from('exhibits')
+          .insert({
+            exhibit_number: exhibitNumber,
+            lab_number: labNumber,
+            case_id: caseData.id,
+            exhibit_type: exhibit.exhibitType,
+            device_name: exhibit.deviceName,
+            brand: exhibit.brand || null,
+            model: exhibit.model || null,
+            serial_number: exhibit.serialNumber || null,
+            imei: exhibit.imei || null,
+            mac_address: exhibit.macAddress || null,
+            description: exhibit.description || null,
+            storage_location: exhibit.storageLocation || null,
+            status: exhibit.status,
+            received_by: user?.id,
+          });
 
-      if (exhibitError) throw exhibitError;
+        if (exhibitError) throw exhibitError;
+
+        // Log exhibit received activity
+        await supabase
+          .from('case_activities')
+          .insert({
+            case_id: caseData.id,
+            activity_type: 'exhibit_received',
+            description: `Digital exhibit "${exhibit.deviceName}" (${exhibitNumber}) with lab number ${labNumber} received and logged into evidence system`,
+            metadata: { 
+              exhibit_number: exhibitNumber,
+              lab_number: labNumber,
+              exhibit_type: exhibit.exhibitType,
+              device_name: exhibit.deviceName,
+              ir_number: caseFormData.irNumber,
+              reference_number: caseFormData.referenceNumber,
+              reference_letter_path: referenceLetterPath
+            },
+          });
+
+        return { exhibitNumber, labNumber };
+      });
+
+      const createdExhibits = await Promise.all(exhibitPromises);
 
       // Log case creation activity
       await supabase
@@ -174,38 +245,25 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
         .insert({
           case_id: caseData.id,
           activity_type: 'case_created',
-          description: `Case file ${formData.caseNumber} created with digital exhibit registration`,
+          description: `Case file ${caseFormData.caseNumber} created with ${exhibits.length} digital exhibit(s) registration`,
           metadata: { 
-            case_number: formData.caseNumber,
-            ir_number: formData.irNumber,
-            reference_number: formData.referenceNumber
+            case_number: caseFormData.caseNumber,
+            ir_number: caseFormData.irNumber,
+            reference_number: caseFormData.referenceNumber,
+            exhibits_count: exhibits.length,
+            reference_letter_path: referenceLetterPath
           },
         });
 
-      // Log exhibit received activity
-      await supabase
-        .from('case_activities')
-        .insert({
-          case_id: caseData.id,
-          activity_type: 'exhibit_received',
-          description: `Digital exhibit "${formData.deviceName}" (${exhibitNumber}) with lab number ${labNumber} received and logged into evidence system`,
-          metadata: { 
-            exhibit_number: exhibitNumber,
-            lab_number: labNumber,
-            exhibit_type: formData.exhibitType,
-            device_name: formData.deviceName,
-            ir_number: formData.irNumber,
-            reference_number: formData.referenceNumber
-          },
-        });
-
+      const exhibitsList = createdExhibits.map(ex => `${ex.exhibitNumber} (Lab: ${ex.labNumber})`).join(', ');
+      
       toast({
-        title: "Case File and Exhibit Created",
-        description: `Case ${formData.caseNumber} created with exhibit ${exhibitNumber} (Lab: ${labNumber}).`,
+        title: "Case File and Exhibits Created",
+        description: `Case ${caseFormData.caseNumber} created with ${exhibits.length} exhibit(s): ${exhibitsList}`,
       });
 
       // Reset form
-      setFormData({
+      setCaseFormData({
         caseNumber: '',
         caseTitle: '',
         caseDescription: '',
@@ -214,6 +272,9 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
         casePriority: 'medium',
         irNumber: '',
         referenceNumber: '',
+      });
+
+      setExhibits([{
         exhibitType: 'mobile_device',
         deviceName: '',
         brand: '',
@@ -224,8 +285,9 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
         description: '',
         storageLocation: '',
         status: 'received',
-      });
+      }]);
 
+      setReferenceLetterFile(null);
       onOpenChange(false);
       onSuccess?.();
     } catch (error: any) {
@@ -252,10 +314,10 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
             <h3 className="text-lg font-semibold">Case Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="caseNumber">Case Number</Label>
+                <Label htmlFor="caseNumber">Case Number (Lab Number)</Label>
                 <Input
                   id="caseNumber"
-                  value={formData.caseNumber}
+                  value={caseFormData.caseNumber}
                   readOnly
                   className="bg-muted"
                 />
@@ -265,8 +327,8 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                 <Label htmlFor="caseTitle">Case Title *</Label>
                 <Input
                   id="caseTitle"
-                  value={formData.caseTitle}
-                  onChange={(e) => setFormData({ ...formData, caseTitle: e.target.value })}
+                  value={caseFormData.caseTitle}
+                  onChange={(e) => setCaseFormData({ ...caseFormData, caseTitle: e.target.value })}
                   placeholder="Brief case description"
                   required
                 />
@@ -277,8 +339,8 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
               <Label htmlFor="caseDescription">Case Description</Label>
               <Textarea
                 id="caseDescription"
-                value={formData.caseDescription}
-                onChange={(e) => setFormData({ ...formData, caseDescription: e.target.value })}
+                value={caseFormData.caseDescription}
+                onChange={(e) => setCaseFormData({ ...caseFormData, caseDescription: e.target.value })}
                 placeholder="Detailed case description..."
                 rows={3}
               />
@@ -289,15 +351,15 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                 <Label htmlFor="location">Location</Label>
                 <Input
                   id="location"
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  value={caseFormData.location}
+                  onChange={(e) => setCaseFormData({ ...caseFormData, location: e.target.value })}
                   placeholder="Incident location"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="casePriority">Priority</Label>
-                <Select value={formData.casePriority} onValueChange={(value: CasePriority) => setFormData({ ...formData, casePriority: value })}>
+                <Select value={caseFormData.casePriority} onValueChange={(value: CasePriority) => setCaseFormData({ ...caseFormData, casePriority: value })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -320,8 +382,8 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                 <Label htmlFor="irNumber">IR (Investigation Report) Number *</Label>
                 <Input
                   id="irNumber"
-                  value={formData.irNumber}
-                  onChange={(e) => setFormData({ ...formData, irNumber: e.target.value })}
+                  value={caseFormData.irNumber}
+                  onChange={(e) => setCaseFormData({ ...caseFormData, irNumber: e.target.value })}
                   placeholder="e.g., IR/2024/0001"
                   required
                 />
@@ -331,139 +393,52 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                 <Label htmlFor="referenceNumber">Reference Number *</Label>
                 <Input
                   id="referenceNumber"
-                  value={formData.referenceNumber}
-                  onChange={(e) => setFormData({ ...formData, referenceNumber: e.target.value })}
+                  value={caseFormData.referenceNumber}
+                  onChange={(e) => setCaseFormData({ ...caseFormData, referenceNumber: e.target.value })}
                   placeholder="e.g., REF/CCU/2024/001"
                   required
                 />
               </div>
             </div>
-          </div>
-
-          {/* Digital Exhibit Information Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Digital Exhibit Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="exhibitType">Exhibit Type *</Label>
-                <Select value={formData.exhibitType} onValueChange={(value: ExhibitType) => setFormData({ ...formData, exhibitType: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="mobile_device">Mobile Device</SelectItem>
-                    <SelectItem value="computer">Computer</SelectItem>
-                    <SelectItem value="storage_media">Storage Media</SelectItem>
-                    <SelectItem value="network_device">Network Device</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="deviceName">Device Name *</Label>
+            
+            <div className="space-y-2">
+              <Label>Reference Letter from Station *</Label>
+              <div className="flex items-center gap-2">
                 <Input
-                  id="deviceName"
-                  value={formData.deviceName}
-                  onChange={(e) => setFormData({ ...formData, deviceName: e.target.value })}
-                  placeholder="e.g., iPhone 14 Pro"
+                  type="file"
+                  onChange={handleFileChange}
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                   required
                 />
+                <Upload className="h-5 w-5 text-muted-foreground" />
               </div>
+              <p className="text-xs text-muted-foreground">
+                Upload the reference letter from the station where the exhibit originates. Accepted formats: PDF, DOC, DOCX, JPG, PNG
+              </p>
+            </div>
+          </div>
+
+          {/* Digital Exhibits Information Section */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Digital Exhibits Information</h3>
+              <Button type="button" onClick={addExhibit} variant="outline" size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Another Exhibit
+              </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="brand">Brand</Label>
-                <Input
-                  id="brand"
-                  value={formData.brand}
-                  onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                  placeholder="e.g., Apple, Samsung"
+            <div className="space-y-6">
+              {exhibits.map((exhibit, index) => (
+                <ExhibitForm
+                  key={index}
+                  exhibit={exhibit}
+                  index={index}
+                  onChange={updateExhibit}
+                  onRemove={removeExhibit}
+                  canRemove={exhibits.length > 1}
                 />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="model">Model</Label>
-                <Input
-                  id="model"
-                  value={formData.model}
-                  onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                  placeholder="Model number"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="serialNumber">Serial Number</Label>
-                <Input
-                  id="serialNumber"
-                  value={formData.serialNumber}
-                  onChange={(e) => setFormData({ ...formData, serialNumber: e.target.value })}
-                  placeholder="Device serial number"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="imei">IMEI (Mobile devices)</Label>
-                <Input
-                  id="imei"
-                  value={formData.imei}
-                  onChange={(e) => setFormData({ ...formData, imei: e.target.value })}
-                  placeholder="IMEI number"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="macAddress">MAC Address</Label>
-                <Input
-                  id="macAddress"
-                  value={formData.macAddress}
-                  onChange={(e) => setFormData({ ...formData, macAddress: e.target.value })}
-                  placeholder="Network MAC address"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">Exhibit Description</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Detailed description of the exhibit and circumstances of seizure..."
-                rows={3}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="storageLocation">Storage Location</Label>
-                <Input
-                  id="storageLocation"
-                  value={formData.storageLocation}
-                  onChange={(e) => setFormData({ ...formData, storageLocation: e.target.value })}
-                  placeholder="e.g., Vault A-201"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="status">Exhibit Status</Label>
-                <Select value={formData.status} onValueChange={(value: ExhibitStatus) => setFormData({ ...formData, status: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="received">Received</SelectItem>
-                    <SelectItem value="in_analysis">In Analysis</SelectItem>
-                    <SelectItem value="analysis_complete">Analysis Complete</SelectItem>
-                    <SelectItem value="released">Released</SelectItem>
-                    <SelectItem value="destroyed">Destroyed</SelectItem>
-                    <SelectItem value="archived">Archived</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              ))}
             </div>
           </div>
 
@@ -471,8 +446,8 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || !formData.caseTitle || !formData.irNumber || !formData.referenceNumber || !formData.deviceName}>
-              {loading ? 'Creating...' : 'Create Case & Register Exhibit'}
+            <Button type="submit" disabled={loading || !caseFormData.caseTitle || !caseFormData.irNumber || !caseFormData.referenceNumber || !referenceLetterFile || exhibits.some(ex => !ex.deviceName)}>
+              {loading ? 'Creating...' : `Create Case & Register ${exhibits.length} Exhibit${exhibits.length > 1 ? 's' : ''}`}
             </Button>
           </div>
         </form>

@@ -110,16 +110,34 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Check file size (50MB limit)
-      if (file.size > 50 * 1024 * 1024) {
+      // Check file size (10MB limit for better performance)
+      if (file.size > 10 * 1024 * 1024) {
         toast({
-          title: "File too large",
-          description: "Please select a file smaller than 50MB",
+          title: "File Too Large",
+          description: "File size must be less than 10MB. Please select a smaller file.",
           variant: "destructive",
         });
+        e.target.value = ''; // Clear the input
         return;
       }
+      
+      // Check file type
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        toast({
+          title: "Invalid File Type",
+          description: "Please select a PDF, DOC, DOCX, JPG, or PNG file.",
+          variant: "destructive",
+        });
+        e.target.value = ''; // Clear the input
+        return;
+      }
+      
       setReferenceLetterFile(file);
+      toast({
+        title: "File Selected",
+        description: `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`,
+      });
     }
   };
 
@@ -171,15 +189,37 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
       // Upload reference letter file if provided
       let referenceLetterPath = null;
       if (referenceLetterFile) {
-        const fileExt = referenceLetterFile.name.split('.').pop();
-        const fileName = `${Date.now()}-reference-letter.${fileExt}`;
-        
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('case-documents')
-          .upload(fileName, referenceLetterFile);
+        try {
+          const fileExt = referenceLetterFile.name.split('.').pop();
+          const fileName = `reference-letters/${caseFormData.caseNumber}-${Date.now()}-reference-letter.${fileExt}`;
+          
+          toast({
+            title: "Uploading File",
+            description: "Uploading reference letter...",
+          });
+          
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('case-documents')
+            .upload(fileName, referenceLetterFile, {
+              cacheControl: '3600',
+              upsert: false
+            });
 
-        if (uploadError) throw uploadError;
-        referenceLetterPath = uploadData.path;
+          if (uploadError) {
+            console.error('Upload error:', uploadError);
+            throw new Error(`File upload failed: ${uploadError.message}`);
+          }
+          
+          referenceLetterPath = uploadData.path;
+          
+          toast({
+            title: "File Uploaded Successfully",
+            description: `Reference letter uploaded: ${referenceLetterFile.name}`,
+          });
+        } catch (uploadErr: any) {
+          console.error('File upload error:', uploadErr);
+          throw new Error(`Failed to upload reference letter: ${uploadErr.message}`);
+        }
       }
 
       // First create the case file

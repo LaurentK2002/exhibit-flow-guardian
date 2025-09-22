@@ -110,6 +110,15 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Check file size (50MB limit)
+      if (file.size > 50 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please select a file smaller than 50MB",
+          variant: "destructive",
+        });
+        return;
+      }
       setReferenceLetterFile(file);
     }
   };
@@ -412,8 +421,13 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                 />
                 <Upload className="h-5 w-5 text-muted-foreground" />
               </div>
+              {referenceLetterFile && (
+                <p className="text-sm text-green-600">
+                  ✓ Selected: {referenceLetterFile.name} ({(referenceLetterFile.size / 1024 / 1024).toFixed(2)} MB)
+                </p>
+              )}
               <p className="text-xs text-muted-foreground">
-                Upload the reference letter from the station where the exhibit originates. Accepted formats: PDF, DOC, DOCX, JPG, PNG
+                Upload the reference letter from the station where the exhibit originates. Accepted formats: PDF, DOC, DOCX, JPG, PNG (Max: 50MB)
               </p>
             </div>
           </div>

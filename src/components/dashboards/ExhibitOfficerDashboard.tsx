@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Package, FileText, QrCode, Truck, Archive, Plus, FolderPlus } from "lucide-react";
+import { Package, FileText, QrCode, Truck, Archive, Plus, FolderPlus, Printer } from "lucide-react";
 import { ExhibitTable } from "@/components/ExhibitTable";
 import { ChainOfCustody } from "@/components/ChainOfCustody";
 import { EvidenceQueue } from "@/components/role-specific/EvidenceQueue";
@@ -103,6 +103,10 @@ export const ExhibitOfficerDashboard = () => {
                 <Button className="w-full justify-start" variant="outline">
                   <QrCode className="h-4 w-4 mr-2" />
                   Generate Barcode Labels
+                </Button>
+                <Button className="w-full justify-start" variant="outline">
+                  <Printer className="h-4 w-4 mr-2" />
+                  Print Exhibit Receipts
                 </Button>
                 <Button className="w-full justify-start" variant="outline">
                   <FileText className="h-4 w-4 mr-2" />

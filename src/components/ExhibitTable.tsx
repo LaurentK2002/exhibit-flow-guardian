@@ -3,6 +3,7 @@ import { StatusBadge } from "./StatusBadge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Download, Plus, FolderPlus } from "lucide-react";
+import { ExhibitPrintDialog } from "./ExhibitPrintDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useRealtime } from "@/hooks/useRealtime";
@@ -193,6 +194,10 @@ export const ExhibitTable = () => {
                           <Button variant="ghost" size="sm" title="View Details">
                             <Eye className="h-4 w-4" />
                           </Button>
+                          <ExhibitPrintDialog 
+                            exhibitId={exhibit.id}
+                            exhibitNumber={exhibit.exhibit_number}
+                          />
                           <Button variant="ghost" size="sm" title="Download Report">
                             <Download className="h-4 w-4" />
                           </Button>

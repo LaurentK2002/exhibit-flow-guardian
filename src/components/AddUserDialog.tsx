@@ -160,9 +160,14 @@ export const AddUserDialog = ({ open, onOpenChange, onUserAdded }: AddUserDialog
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Administrator</SelectItem>
+                  <SelectItem value="administrator">Administrator</SelectItem>
                   <SelectItem value="commanding_officer">Commanding Officer</SelectItem>
+                  <SelectItem value="officer_commanding_unit">Officer Commanding Unit</SelectItem>
+                  <SelectItem value="supervisor">Supervisor</SelectItem>
                   <SelectItem value="exhibit_officer">Exhibit Officer</SelectItem>
+                  <SelectItem value="forensic_analyst">Forensic Analyst</SelectItem>
+                  <SelectItem value="investigator">Investigator</SelectItem>
+                  <SelectItem value="case_officer">Case Officer</SelectItem>
                   <SelectItem value="analyst">Analyst</SelectItem>
                 </SelectContent>
               </Select>

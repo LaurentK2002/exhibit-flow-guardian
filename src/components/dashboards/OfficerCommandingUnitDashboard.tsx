@@ -9,7 +9,9 @@ import { CaseAssignment } from "@/components/CaseAssignment";
 import { TeamManagement } from "@/components/TeamManagement";
 import { RecentActivity } from "@/components/RecentActivity";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
-import { FileText, Users, TrendingUp, AlertCircle } from "lucide-react";
+import { CreateOfficialReportDialog } from "@/components/CreateOfficialReportDialog";
+import { OfficialReportsTable } from "@/components/OfficialReportsTable";
+import { FileText, Users, TrendingUp, AlertCircle, Send } from "lucide-react";
 
 export const OfficerCommandingUnitDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -29,11 +31,12 @@ export const OfficerCommandingUnitDashboard = () => {
 
       {/* Main Dashboard */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="exhibits">Exhibits</TabsTrigger>
           <TabsTrigger value="assignments">Assignments</TabsTrigger>
           <TabsTrigger value="team">Team</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
@@ -95,10 +98,12 @@ export const OfficerCommandingUnitDashboard = () => {
                   <Users className="h-4 w-4 mr-2" />
                   Review analyst workload distribution
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <TrendingUp className="h-4 w-4 mr-2" />
-                  Generate weekly performance report
-                </Button>
+                <CreateOfficialReportDialog>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Send className="h-4 w-4 mr-2" />
+                    Generate official report for CO
+                  </Button>
+                </CreateOfficialReportDialog>
                 <Button variant="outline" className="w-full justify-start">
                   <AlertCircle className="h-4 w-4 mr-2" />
                   Address 3 overdue case analyses
@@ -150,6 +155,24 @@ export const OfficerCommandingUnitDashboard = () => {
               <TeamManagement />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="reports" className="space-y-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold">Official Reports</h2>
+              <p className="text-muted-foreground">
+                Generate and manage official reports for the Commanding Officer
+              </p>
+            </div>
+            <CreateOfficialReportDialog>
+              <Button>
+                <FileText className="h-4 w-4 mr-2" />
+                Create New Report
+              </Button>
+            </CreateOfficialReportDialog>
+          </div>
+          <OfficialReportsTable />
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">

@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DashboardStats } from "@/components/DashboardStats";
 import { ExhibitTable } from "@/components/ExhibitTable";
-import { CaseAssignment } from "@/components/CaseAssignment";
+import { ExhibitAssignment } from "@/components/ExhibitAssignment";
 import { TeamManagement } from "@/components/TeamManagement";
 import { RecentActivity } from "@/components/RecentActivity";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
@@ -130,17 +130,7 @@ export const OfficerCommandingUnitDashboard = () => {
         </TabsContent>
 
         <TabsContent value="assignments" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Case & Exhibit Assignments</CardTitle>
-              <CardDescription>
-                Assign cases and exhibits to appropriate team members
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <CaseAssignment />
-            </CardContent>
-          </Card>
+          <ExhibitAssignment />
         </TabsContent>
 
         <TabsContent value="team" className="space-y-6">

@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useRealtime } from "@/hooks/useRealtime";
 import { Database } from "@/integrations/supabase/types";
 import { AddExhibitDialog } from "./AddExhibitDialog";
+import { usePermissions } from "@/hooks/usePermissions";
 
 type Exhibit = Database['public']['Tables']['exhibits']['Row'] & {
   cases?: {
@@ -39,6 +40,7 @@ export const ExhibitTable = () => {
   const [exhibits, setExhibits] = useState<Exhibit[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddExhibit, setShowAddExhibit] = useState(false);
+  const { role } = usePermissions();
 
   const fetchExhibits = async () => {
     try {
@@ -112,14 +114,16 @@ export const ExhibitTable = () => {
           <CardTitle className="flex items-center justify-between">
             <span>Recent Digital Exhibits</span>
             <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowAddExhibit(true)}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Exhibit
-              </Button>
+              {(role === 'exhibit_officer' || role === 'administrator') && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowAddExhibit(true)}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Exhibit
+                </Button>
+              )}
               <Button variant="outline" size="sm">
                 <FolderPlus className="h-4 w-4 mr-2" />
                 View All
@@ -212,11 +216,13 @@ export const ExhibitTable = () => {
         </CardContent>
       </Card>
 
-      <AddExhibitDialog 
-        open={showAddExhibit}
-        onOpenChange={setShowAddExhibit}
-        onSuccess={handleExhibitAdded}
-      />
+      {(role === 'exhibit_officer' || role === 'administrator') && (
+        <AddExhibitDialog 
+          open={showAddExhibit}
+          onOpenChange={setShowAddExhibit}
+          onSuccess={handleExhibitAdded}
+        />
+      )}
     </>
   );
 };

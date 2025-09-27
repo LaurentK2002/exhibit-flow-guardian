@@ -3,17 +3,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Package, FileText, QrCode, Truck, Archive, Plus, FolderPlus, Printer } from "lucide-react";
+import { Package, FileText, QrCode, Truck, Archive, Plus, Printer } from "lucide-react";
 import { ExhibitTable } from "@/components/ExhibitTable";
 import { ChainOfCustody } from "@/components/ChainOfCustody";
 import { EvidenceQueue } from "@/components/role-specific/EvidenceQueue";
 import { AddExhibitDialog } from "@/components/AddExhibitDialog";
-import { CreateCaseFileDialog } from "@/components/CreateCaseFileDialog";
 
 export const ExhibitOfficerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [showAddExhibit, setShowAddExhibit] = useState(false);
-  const [showCreateCaseFile, setShowCreateCaseFile] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -29,7 +27,7 @@ export const ExhibitOfficerDashboard = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
             Overview
@@ -41,10 +39,6 @@ export const ExhibitOfficerDashboard = () => {
           <TabsTrigger value="custody" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
             Chain of Custody
-          </TabsTrigger>
-          <TabsTrigger value="cases" className="flex items-center gap-2">
-            <FolderPlus className="h-4 w-4" />
-            Case Files
           </TabsTrigger>
           <TabsTrigger value="reports" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
@@ -92,14 +86,6 @@ export const ExhibitOfficerDashboard = () => {
                   <Plus className="h-4 w-4 mr-2" />
                   Intake New Evidence
                 </Button>
-                <Button 
-                  className="w-full justify-start" 
-                  variant="outline"
-                  onClick={() => setShowCreateCaseFile(true)}
-                >
-                  <FolderPlus className="h-4 w-4 mr-2" />
-                  Create Case File
-                </Button>
                 <Button className="w-full justify-start" variant="outline">
                   <QrCode className="h-4 w-4 mr-2" />
                   Generate Barcode Labels
@@ -129,24 +115,6 @@ export const ExhibitOfficerDashboard = () => {
           <ChainOfCustody />
         </TabsContent>
 
-        <TabsContent value="cases">
-          <Card>
-            <CardHeader>
-              <CardTitle>Case File Management</CardTitle>
-              <CardDescription>Create and manage case files with documents</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <p className="text-muted-foreground mb-4">Create new case files and upload supporting documents</p>
-                <Button onClick={() => setShowCreateCaseFile(true)}>
-                  <FolderPlus className="h-4 w-4 mr-2" />
-                  Create New Case File
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
         <TabsContent value="reports">
           <Card>
             <CardHeader>
@@ -171,14 +139,6 @@ export const ExhibitOfficerDashboard = () => {
         onOpenChange={setShowAddExhibit}
         onSuccess={() => {
           // Refresh the exhibits table or show success message
-        }}
-      />
-      
-      <CreateCaseFileDialog 
-        open={showCreateCaseFile} 
-        onOpenChange={setShowCreateCaseFile}
-        onSuccess={() => {
-          // Refresh case files or show success message
         }}
       />
     </div>

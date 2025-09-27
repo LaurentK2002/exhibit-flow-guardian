@@ -14,6 +14,7 @@ type Exhibit = Database['public']['Tables']['exhibits']['Row'] & {
     priority: Database['public']['Enums']['case_priority'];
     incident_date: string;
     location: string;
+    lab_number: string;
   } | null;
   received_profile?: {
     full_name: string;
@@ -47,7 +48,8 @@ export const ExhibitPrintDialog = ({ exhibitId, exhibitNumber, trigger }: Exhibi
             title,
             priority,
             incident_date,
-            location
+            location,
+            lab_number
           ),
           received_profile:received_by (
             full_name,

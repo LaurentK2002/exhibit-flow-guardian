@@ -175,7 +175,6 @@ export type Database = {
           exhibit_type: Database["public"]["Enums"]["exhibit_type"]
           id: string
           imei: string | null
-          lab_number: string | null
           mac_address: string | null
           model: string | null
           received_by: string | null
@@ -199,7 +198,6 @@ export type Database = {
           exhibit_type: Database["public"]["Enums"]["exhibit_type"]
           id?: string
           imei?: string | null
-          lab_number?: string | null
           mac_address?: string | null
           model?: string | null
           received_by?: string | null
@@ -223,7 +221,6 @@ export type Database = {
           exhibit_type?: Database["public"]["Enums"]["exhibit_type"]
           id?: string
           imei?: string | null
-          lab_number?: string | null
           mac_address?: string | null
           model?: string | null
           received_by?: string | null

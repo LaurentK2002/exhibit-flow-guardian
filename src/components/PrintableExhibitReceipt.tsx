@@ -10,6 +10,7 @@ type Exhibit = Database['public']['Tables']['exhibits']['Row'] & {
     priority: Database['public']['Enums']['case_priority'];
     incident_date: string;
     location: string;
+    lab_number: string;
   } | null;
   received_profile?: {
     full_name: string;
@@ -75,8 +76,8 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
                 <span className="font-mono">{exhibit.exhibit_number}</span>
               </div>
               <div className="flex">
-                <span className="font-semibold w-32">Lab Number:</span>
-                <span className="font-mono">{exhibit.lab_number || 'Pending Assignment'}</span>
+                <span className="font-semibold w-32">Case Lab Number:</span>
+                <span className="font-mono">{exhibit.cases?.lab_number || 'Pending Assignment'}</span>
               </div>
               <div className="flex">
                 <span className="font-semibold w-32">Device Type:</span>

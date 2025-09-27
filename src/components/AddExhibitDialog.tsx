@@ -142,43 +142,24 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
   };
 
   const generateExhibitNumber = async () => {
-    // Get the latest exhibit number
-    const { data } = await supabase
-      .from('exhibits')
-      .select('exhibit_number')
-      .like('exhibit_number', 'EXH-%')
-      .order('created_at', { ascending: false })
-      .limit(1);
-
-    let nextNumber = 1;
-    if (data && data.length > 0) {
-      const lastNumber = parseInt(data[0].exhibit_number.split('-')[1]) || 0;
-      nextNumber = lastNumber + 1;
-    }
-
-    return `EXH-${nextNumber.toString().padStart(4, '0')}`;
-  };
-
-  const generateLabNumber = async () => {
-    // Get the latest lab number for the current year
     const currentYear = new Date().getFullYear();
     const { data } = await supabase
       .from('exhibits')
-      .select('lab_number')
-      .like('lab_number', `FB/CYBER/${currentYear}/LAB/%`)
+      .select('exhibit_number')
+      .like('exhibit_number', `EXH-${currentYear}-%`)
       .order('created_at', { ascending: false })
       .limit(1);
 
     let nextNumber = 1;
     if (data && data.length > 0) {
-      const lastLabNumber = data[0].lab_number;
-      const match = lastLabNumber.match(/LAB\/(\d+)$/);
+      const lastExhibitNumber = data[0].exhibit_number;
+      const match = lastExhibitNumber.match(/EXH-\d+-(\d+)$/);
       if (match) {
         nextNumber = parseInt(match[1]) + 1;
       }
     }
 
-    return `FB/CYBER/${currentYear}/LAB/${nextNumber.toString().padStart(4, '0')}`;
+    return `EXH-${currentYear}-${String(nextNumber).padStart(4, '0')}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -242,13 +223,11 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
       // Create all exhibits linked to the new case
       const exhibitPromises = exhibits.map(async (exhibit) => {
         const exhibitNumber = await generateExhibitNumber();
-        const labNumber = await generateLabNumber();
         
         const { error: exhibitError } = await supabase
           .from('exhibits')
           .insert({
             exhibit_number: exhibitNumber,
-            lab_number: labNumber,
             case_id: caseData.id,
             exhibit_type: exhibit.exhibitType,
             device_name: exhibit.deviceName,
@@ -271,10 +250,10 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
           .insert({
             case_id: caseData.id,
             activity_type: 'exhibit_received',
-            description: `Digital exhibit "${exhibit.deviceName}" (${exhibitNumber}) with lab number ${labNumber} received and logged into evidence system`,
+            description: `Digital exhibit "${exhibit.deviceName}" (${exhibitNumber}) received and logged into evidence system for case ${caseData.case_number}`,
             metadata: { 
               exhibit_number: exhibitNumber,
-              lab_number: labNumber,
+              case_lab_number: caseData.lab_number,
               exhibit_type: exhibit.exhibitType,
               device_name: exhibit.deviceName,
               ir_number: caseFormData.irNumber,
@@ -283,7 +262,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
             },
           });
 
-        return { exhibitNumber, labNumber };
+        return { exhibitNumber };
       });
 
       const createdExhibits = await Promise.all(exhibitPromises);
@@ -304,7 +283,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
           },
         });
 
-      const exhibitsList = createdExhibits.map(ex => `${ex.exhibitNumber} (Lab: ${ex.labNumber})`).join(', ');
+      const exhibitsList = createdExhibits.map(ex => ex.exhibitNumber).join(', ');
       
       toast({
         title: "Case File and Exhibits Created",

@@ -141,25 +141,30 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     }
   };
 
-  const generateExhibitNumber = async () => {
-    const currentYear = new Date().getFullYear();
+  const generateExhibitNumber = async (caseLabNumber: string) => {
+    // New format: CYB/LAB/(LAB NO)/A1, A2, A3, etc.
     const { data } = await supabase
       .from('exhibits')
       .select('exhibit_number')
-      .like('exhibit_number', `EXH-${currentYear}-%`)
-      .order('created_at', { ascending: false })
-      .limit(1);
+      .like('exhibit_number', `CYB/LAB/${caseLabNumber}/A%`)
+      .order('created_at', { ascending: false });
 
     let nextNumber = 1;
     if (data && data.length > 0) {
-      const lastExhibitNumber = data[0].exhibit_number;
-      const match = lastExhibitNumber.match(/EXH-\d+-(\d+)$/);
-      if (match) {
-        nextNumber = parseInt(match[1]) + 1;
+      // Find the highest A number for this lab number
+      const numbers = data
+        .map(exhibit => {
+          const match = exhibit.exhibit_number.match(/\/A(\d+)$/);
+          return match ? parseInt(match[1]) : 0;
+        })
+        .filter(num => num > 0);
+      
+      if (numbers.length > 0) {
+        nextNumber = Math.max(...numbers) + 1;
       }
     }
 
-    return `EXH-${currentYear}-${String(nextNumber).padStart(4, '0')}`;
+    return `CYB/LAB/${caseLabNumber}/A${nextNumber}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -222,7 +227,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
 
       // Create all exhibits linked to the new case
       const exhibitPromises = exhibits.map(async (exhibit) => {
-        const exhibitNumber = await generateExhibitNumber();
+        const exhibitNumber = await generateExhibitNumber(caseData.case_number);
         
         const { error: exhibitError } = await supabase
           .from('exhibits')

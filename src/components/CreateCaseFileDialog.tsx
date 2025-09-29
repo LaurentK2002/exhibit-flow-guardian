@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { Database } from '@/integrations/supabase/types';
 import { Upload, X } from 'lucide-react';
 
@@ -24,7 +25,37 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
   const [uploadingFiles, setUploadingFiles] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const { toast } = useToast();
+  const { profile } = useAuth();
   
+  const getAvailablePriorities = () => {
+    const userRole = profile?.role;
+    
+    // CO can set all priorities including urgent
+    if (userRole === 'commanding_officer') {
+      return [
+        { value: 'low', label: 'Low' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'high', label: 'High' },
+        { value: 'urgent', label: 'Urgent' },
+      ];
+    }
+    
+    // OCU can set high, medium, and low
+    if (userRole === 'officer_commanding_unit') {
+      return [
+        { value: 'low', label: 'Low' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'high', label: 'High' },
+      ];
+    }
+    
+    // Exhibit officers and others can only set medium and low
+    return [
+      { value: 'low', label: 'Low' },
+      { value: 'medium', label: 'Medium' },
+    ];
+  };
+
   const [formData, setFormData] = useState({
     caseNumber: '',
     title: '',
@@ -268,12 +299,18 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="urgent">Urgent</SelectItem>
+                  {getAvailablePriorities().map((priority) => (
+                    <SelectItem key={priority.value} value={priority.value}>
+                      {priority.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+              {profile?.role === 'exhibit_officer' && (
+                <p className="text-xs text-muted-foreground">
+                  Note: Only Commanding Officers can set "Urgent" priority and Officer Commanding Units can set "High" priority.
+                </p>
+              )}
             </div>
             
             <div className="space-y-2">

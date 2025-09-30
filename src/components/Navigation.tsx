@@ -132,13 +132,11 @@ export const Navigation = () => {
                   <p className="text-xs text-muted-foreground capitalize">{profile?.role || 'Officer'}</p>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  Profile Settings
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Preferences
+                <DropdownMenuItem asChild>
+                  <Link to="/settings">
+                    <User className="mr-2 h-4 w-4" />
+                    Profile & Security
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut} className="text-red-600">

@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, FileText, Users, Clock, MapPin } from "lucide-react";
+import { Eye, FileText, Users, Clock, MapPin, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRealtime } from "@/hooks/useRealtime";
 import { Database } from "@/integrations/supabase/types";
 import { CaseStatusBadge, CaseStatus } from "./CaseStatusBadge";
+import { UpdateCasePriorityDialog } from "./UpdateCasePriorityDialog";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Case = Database['public']['Tables']['cases']['Row'] & {
   profiles?: {
@@ -23,6 +25,11 @@ type Case = Database['public']['Tables']['cases']['Row'] & {
 export const CaseTable = () => {
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCase, setSelectedCase] = useState<Case | null>(null);
+  const [isPriorityDialogOpen, setIsPriorityDialogOpen] = useState(false);
+  const { profile } = useAuth();
+  
+  const canUpdatePriority = profile?.role === 'commanding_officer' || profile?.role === 'officer_commanding_unit';
 
   const fetchCases = async () => {
     try {
@@ -183,6 +190,19 @@ export const CaseTable = () => {
                         <Button variant="ghost" size="sm" title="View Details">
                           <Eye className="h-4 w-4" />
                         </Button>
+                        {canUpdatePriority && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            title="Update Priority"
+                            onClick={() => {
+                              setSelectedCase(caseItem);
+                              setIsPriorityDialogOpen(true);
+                            }}
+                          >
+                            <TrendingUp className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button variant="ghost" size="sm" title="View Team">
                           <Users className="h-4 w-4" />
                         </Button>
@@ -195,6 +215,19 @@ export const CaseTable = () => {
           </table>
         </div>
       </CardContent>
+      
+      {selectedCase && (
+        <UpdateCasePriorityDialog
+          caseId={selectedCase.id}
+          caseNumber={selectedCase.case_number}
+          caseTitle={selectedCase.title}
+          currentPriority={selectedCase.priority || 'medium'}
+          userRole={profile?.role || ''}
+          open={isPriorityDialogOpen}
+          onOpenChange={setIsPriorityDialogOpen}
+          onUpdate={fetchCases}
+        />
+      )}
     </Card>
   );
 };

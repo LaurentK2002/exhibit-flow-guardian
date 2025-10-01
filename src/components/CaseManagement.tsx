@@ -26,6 +26,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Database } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtime } from "@/hooks/useRealtime";
+import { AddExhibitDialog } from "./AddExhibitDialog";
 
 type Case = Database['public']['Tables']['cases']['Row'] & {
   profiles?: {
@@ -46,7 +47,7 @@ export const CaseManagement = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [showOpenCaseDialog, setShowOpenCaseDialog] = useState(false);
   const { user, profile } = useAuth();
   const { toast } = useToast();
 
@@ -120,162 +121,6 @@ export const CaseManagement = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const CreateCaseDialog = () => {
-    const [formData, setFormData] = useState({
-      title: '',
-      description: '',
-      priority: 'medium',
-      location: '',
-      victim_name: '',
-      suspect_name: '',
-      incident_date: ''
-    });
-
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      
-      try {
-        // Generate case number
-        const caseNumber = `CYB-${new Date().getFullYear()}-${String(cases.length + 1).padStart(3, '0')}`;
-        
-        const { error } = await supabase
-          .from('cases')
-          .insert({
-            ...formData,
-            case_number: caseNumber,
-            assigned_to: user?.id,
-            supervisor_id: profile?.role === 'administrator' ? user?.id : null,
-            incident_date: formData.incident_date ? new Date(formData.incident_date).toISOString() : null,
-            priority: formData.priority as Database['public']['Enums']['case_priority']
-          });
-
-        if (error) throw error;
-
-        toast({
-          title: "Success",
-          description: "Case created successfully"
-        });
-        
-        setIsCreateDialogOpen(false);
-        setFormData({
-          title: '',
-          description: '',
-          priority: 'medium',
-          location: '',
-          victim_name: '',
-          suspect_name: '',
-          incident_date: ''
-        });
-        
-        fetchCases();
-      } catch (error) {
-        console.error('Error creating case:', error);
-        toast({
-          title: "Error",
-          description: "Failed to create case",
-          variant: "destructive"
-        });
-      }
-    };
-
-    return (
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogTrigger asChild>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Case
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Create New Case</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Case Title</label>
-                <Input
-                  value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  placeholder="Enter case title"
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Priority</label>
-                <Select value={formData.priority} onValueChange={(value) => setFormData({...formData, priority: value})}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="critical">Critical</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium">Description</label>
-              <Textarea
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                placeholder="Case description"
-                rows={3}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Location</label>
-                <Input
-                  value={formData.location}
-                  onChange={(e) => setFormData({...formData, location: e.target.value})}
-                  placeholder="Incident location"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Incident Date</label>
-                <Input
-                  type="datetime-local"
-                  value={formData.incident_date}
-                  onChange={(e) => setFormData({...formData, incident_date: e.target.value})}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Victim Name</label>
-                <Input
-                  value={formData.victim_name}
-                  onChange={(e) => setFormData({...formData, victim_name: e.target.value})}
-                  placeholder="Victim name (if known)"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Suspect Name</label>
-                <Input
-                  value={formData.suspect_name}
-                  onChange={(e) => setFormData({...formData, suspect_name: e.target.value})}
-                  placeholder="Suspect name (if known)"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-2">
-              <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit">Create Case</Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-    );
-  };
 
   if (loading) {
     return (
@@ -297,7 +142,10 @@ export const CaseManagement = () => {
           <h2 className="text-2xl font-bold text-foreground">Case Management</h2>
           <p className="text-muted-foreground">Manage and track investigation cases</p>
         </div>
-        <CreateCaseDialog />
+        <Button onClick={() => setShowOpenCaseDialog(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Open Case File
+        </Button>
       </div>
 
       {/* Filters */}
@@ -343,7 +191,7 @@ export const CaseManagement = () => {
                   : "Create your first case to get started"}
               </p>
               {!searchQuery && statusFilter === 'all' && (
-                <Button onClick={() => setIsCreateDialogOpen(true)}>
+                <Button onClick={() => setShowOpenCaseDialog(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   Create First Case
                 </Button>
@@ -421,6 +269,12 @@ export const CaseManagement = () => {
           ))
         )}
       </div>
+
+      <AddExhibitDialog 
+        open={showOpenCaseDialog}
+        onOpenChange={setShowOpenCaseDialog}
+        onSuccess={fetchCases}
+      />
     </div>
   );
 };

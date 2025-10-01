@@ -7,11 +7,11 @@ import { Package, FileText, QrCode, Truck, Archive, Plus, Printer } from "lucide
 import { ExhibitTable } from "@/components/ExhibitTable";
 import { ChainOfCustody } from "@/components/ChainOfCustody";
 import { EvidenceQueue } from "@/components/role-specific/EvidenceQueue";
-import { AddCaseDialog } from "@/components/AddCaseDialog";
+import { AddExhibitDialog } from "@/components/AddExhibitDialog";
 
 export const ExhibitOfficerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [showAddCase, setShowAddCase] = useState(false);
+  const [showAddExhibit, setShowAddExhibit] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -81,10 +81,10 @@ export const ExhibitOfficerDashboard = () => {
                 <Button 
                   className="w-full justify-start" 
                   variant="outline"
-                  onClick={() => setShowAddCase(true)}
+                  onClick={() => setShowAddExhibit(true)}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Create New Case
+                  Open Case File
                 </Button>
                 <Button className="w-full justify-start" variant="outline">
                   <QrCode className="h-4 w-4 mr-2" />
@@ -134,9 +134,9 @@ export const ExhibitOfficerDashboard = () => {
         </TabsContent>
       </Tabs>
 
-      <AddCaseDialog 
-        open={showAddCase} 
-        onOpenChange={setShowAddCase}
+      <AddExhibitDialog 
+        open={showAddExhibit} 
+        onOpenChange={setShowAddExhibit}
       />
     </div>
   );

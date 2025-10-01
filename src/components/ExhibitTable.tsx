@@ -121,7 +121,7 @@ export const ExhibitTable = () => {
                   onClick={() => setShowAddExhibit(true)}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Exhibit
+                  Open Case File
                 </Button>
               )}
               <Button variant="outline" size="sm">
@@ -150,7 +150,7 @@ export const ExhibitTable = () => {
                   <tr>
                     <td colSpan={7} className="text-center py-8 text-muted-foreground">
                       No exhibits found. <br />
-                      <span className="text-sm">Add some exhibits to get started.</span>
+                      <span className="text-sm">Open a case file to register exhibits.</span>
                     </td>
                   </tr>
                 ) : (

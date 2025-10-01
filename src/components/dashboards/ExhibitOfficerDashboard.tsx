@@ -7,11 +7,11 @@ import { Package, FileText, QrCode, Truck, Archive, Plus, Printer } from "lucide
 import { ExhibitTable } from "@/components/ExhibitTable";
 import { ChainOfCustody } from "@/components/ChainOfCustody";
 import { EvidenceQueue } from "@/components/role-specific/EvidenceQueue";
-import { AddExhibitDialog } from "@/components/AddExhibitDialog";
+import { AddCaseDialog } from "@/components/AddCaseDialog";
 
 export const ExhibitOfficerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [showAddExhibit, setShowAddExhibit] = useState(false);
+  const [showAddCase, setShowAddCase] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -81,10 +81,10 @@ export const ExhibitOfficerDashboard = () => {
                 <Button 
                   className="w-full justify-start" 
                   variant="outline"
-                  onClick={() => setShowAddExhibit(true)}
+                  onClick={() => setShowAddCase(true)}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Intake New Evidence
+                  Create New Case
                 </Button>
                 <Button className="w-full justify-start" variant="outline">
                   <QrCode className="h-4 w-4 mr-2" />
@@ -134,12 +134,9 @@ export const ExhibitOfficerDashboard = () => {
         </TabsContent>
       </Tabs>
 
-      <AddExhibitDialog 
-        open={showAddExhibit} 
-        onOpenChange={setShowAddExhibit}
-        onSuccess={() => {
-          // Refresh the exhibits table or show success message
-        }}
+      <AddCaseDialog 
+        open={showAddCase} 
+        onOpenChange={setShowAddCase}
       />
     </div>
   );

@@ -134,7 +134,7 @@ export const Navigation = () => {
                   <span className="hidden md:block">{profile?.full_name || 'Officer'}</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" className="dark w-56 border border-border/30">
                 <div className="px-2 py-1.5">
                   <p className="text-sm font-medium">{profile?.full_name}</p>
                   <p className="text-xs text-muted-foreground">{profile?.badge_number && `Badge: ${profile.badge_number}`}</p>

@@ -113,26 +113,14 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor={`model-${index}`}>Model</Label>
-                  <Input
-                    id={`model-${index}`}
-                    value={exhibit.model}
-                    onChange={(e) => onChange(index, 'model', e.target.value)}
-                    placeholder="Model number"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor={`serialNumber-${index}`}>Serial Number</Label>
-                  <Input
-                    id={`serialNumber-${index}`}
-                    value={exhibit.serialNumber}
-                    onChange={(e) => onChange(index, 'serialNumber', e.target.value)}
-                    placeholder="Device serial number"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor={`serialNumber-${index}`}>Serial Number</Label>
+                <Input
+                  id={`serialNumber-${index}`}
+                  value={exhibit.serialNumber}
+                  onChange={(e) => onChange(index, 'serialNumber', e.target.value)}
+                  placeholder="Device serial number"
+                />
               </div>
             </>
           )}

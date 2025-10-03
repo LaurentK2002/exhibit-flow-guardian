@@ -37,17 +37,37 @@ serve(async (req) => {
     const { data: { user }, error: userError } = await userClient.auth.getUser(token);
     
     if (userError || !user) {
+      console.error('User authentication error:', userError);
       throw new Error('Invalid authentication token');
     }
 
-    // Check if user has admin role
-    const { data: profile, error: profileError } = await userClient
+    console.log('Authenticated user ID:', user.id);
+
+    // Create admin client to check permissions (bypasses RLS)
+    const adminClient = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
+
+    // Check if user has admin role using service role
+    const { data: profile, error: profileError } = await adminClient
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single();
 
-    if (profileError || !profile || profile.role !== 'admin') {
+    console.log('Profile data:', profile);
+    console.log('Profile error:', profileError);
+
+    if (profileError || !profile) {
+      throw new Error('Unable to verify user permissions');
+    }
+
+    // Check for admin or administrator role
+    const allowedRoles = ['admin', 'administrator'];
+    if (!allowedRoles.includes(profile.role)) {
       throw new Error('Only administrators can create users');
     }
 
@@ -59,15 +79,7 @@ serve(async (req) => {
       throw new Error('Missing required fields: email, password, fullName, role');
     }
 
-    // Create admin client with service role
-    const adminClient = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    });
-
-    // Create the user
+    // Create the user (adminClient already initialized above)
     const { data: newUser, error: createError } = await adminClient.auth.admin.createUser({
       email,
       password,

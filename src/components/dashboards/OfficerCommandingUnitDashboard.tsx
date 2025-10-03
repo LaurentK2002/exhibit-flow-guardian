@@ -14,6 +14,7 @@ import { OfficialReportsTable } from "@/components/OfficialReportsTable";
 import { FileText, Users, TrendingUp, AlertCircle, Send } from "lucide-react";
 import { CaseSearch } from "@/components/CaseSearch";
 import { ReportReviewPanel } from "@/components/ReportReviewPanel";
+import { UnassignedCasesForOCU } from "@/components/UnassignedCasesForOCU";
 
 export const OfficerCommandingUnitDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -120,6 +121,7 @@ export const OfficerCommandingUnitDashboard = () => {
         </TabsContent>
 
         <TabsContent value="cases" className="space-y-6">
+          <UnassignedCasesForOCU />
           <CaseTable />
         </TabsContent>
 

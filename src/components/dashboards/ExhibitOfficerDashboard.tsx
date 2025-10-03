@@ -10,6 +10,8 @@ import { EvidenceQueue } from "@/components/role-specific/EvidenceQueue";
 import { AddExhibitDialog } from "@/components/AddExhibitDialog";
 import { GenerateBarcodesDialog } from "@/components/GenerateBarcodesDialog";
 import { PrintExhibitReceiptsDialog } from "@/components/PrintExhibitReceiptsDialog";
+import { GenerateProfessionalReportDialog } from "@/components/GenerateProfessionalReportDialog";
+import { OfficialReportsTable } from "@/components/OfficialReportsTable";
 
 export const ExhibitOfficerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -127,22 +129,17 @@ export const ExhibitOfficerDashboard = () => {
           <ChainOfCustody />
         </TabsContent>
 
-        <TabsContent value="reports">
-          <Card>
-            <CardHeader>
-              <CardTitle>Exhibit Reports</CardTitle>
-              <CardDescription>Generate and manage evidence reports</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <p className="text-muted-foreground mb-4">Generate comprehensive exhibit reports</p>
-                <Button>
-                  <FileText className="h-4 w-4 mr-2" />
-                  Create New Report
-                </Button>
+        <TabsContent value="reports" className="space-y-6">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold">Professional Reports</h2>
+                <p className="text-muted-foreground">Generate comprehensive evidence management reports with statistics and case details</p>
               </div>
-            </CardContent>
-          </Card>
+              <GenerateProfessionalReportDialog />
+            </div>
+            <OfficialReportsTable />
+          </div>
         </TabsContent>
       </Tabs>
 

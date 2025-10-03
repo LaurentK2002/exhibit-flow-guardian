@@ -17,6 +17,8 @@ export interface ExhibitFormData {
   serialNumber: string;
   imei: string;
   macAddress: string;
+  hasSim: string;
+  iccid: string;
   description: string;
   storageLocation: string;
   status: ExhibitStatus;
@@ -113,15 +115,46 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor={`serialNumber-${index}`}>Serial Number</Label>
-                <Input
-                  id={`serialNumber-${index}`}
-                  value={exhibit.serialNumber}
-                  onChange={(e) => onChange(index, 'serialNumber', e.target.value)}
-                  placeholder="Device serial number"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor={`serialNumber-${index}`}>Serial Number</Label>
+                  <Input
+                    id={`serialNumber-${index}`}
+                    value={exhibit.serialNumber}
+                    onChange={(e) => onChange(index, 'serialNumber', e.target.value)}
+                    placeholder="Device serial number"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor={`hasSim-${index}`}>Contains SIM Card *</Label>
+                  <Select 
+                    value={exhibit.hasSim} 
+                    onValueChange={(value) => onChange(index, 'hasSim', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="NO">NO</SelectItem>
+                      <SelectItem value="YES">YES</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
+
+              {exhibit.hasSim === 'YES' && (
+                <div className="space-y-2">
+                  <Label htmlFor={`iccid-${index}`}>ICCID Number *</Label>
+                  <Input
+                    id={`iccid-${index}`}
+                    value={exhibit.iccid}
+                    onChange={(e) => onChange(index, 'iccid', e.target.value)}
+                    placeholder="SIM card ICCID number"
+                    required
+                  />
+                </div>
+              )}
             </>
           )}
 

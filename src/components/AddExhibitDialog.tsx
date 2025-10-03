@@ -46,6 +46,8 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     serialNumber: '',
     imei: '',
     macAddress: '',
+    hasSim: 'NO',
+    iccid: '',
     description: '',
     storageLocation: '',
     status: 'received',
@@ -113,6 +115,8 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
       serialNumber: '',
       imei: '',
       macAddress: '',
+      hasSim: 'NO',
+      iccid: '',
       description: '',
       storageLocation: '',
       status: 'received',
@@ -339,6 +343,8 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
         serialNumber: '',
         imei: '',
         macAddress: '',
+        hasSim: 'NO',
+        iccid: '',
         description: '',
         storageLocation: '',
         status: 'received',
@@ -548,8 +554,8 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                   // Basic validation - device name is always required
                   if (!ex.deviceName) return true;
                   
-                  // Mobile Device - requires brand and IMEI
-                  if (ex.exhibitType === 'mobile_device' && (!ex.brand || !ex.imei)) return true;
+                  // Mobile Device - requires brand, IMEI, hasSim selection, and ICCID if SIM present
+                  if (ex.exhibitType === 'mobile_device' && (!ex.brand || !ex.imei || !ex.hasSim || (ex.hasSim === 'YES' && !ex.iccid))) return true;
                   
                   // Computer - requires brand, model, and serial number
                   if (ex.exhibitType === 'computer' && (!ex.brand || !ex.model || !ex.serialNumber)) return true;

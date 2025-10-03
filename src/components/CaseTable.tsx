@@ -2,13 +2,11 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, FileText, Users, Clock, MapPin, TrendingUp } from "lucide-react";
+import { FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRealtime } from "@/hooks/useRealtime";
 import { Database } from "@/integrations/supabase/types";
 import { CaseStatusBadge, CaseStatus } from "./CaseStatusBadge";
-import { UpdateCasePriorityDialog } from "./UpdateCasePriorityDialog";
-import { useAuth } from "@/contexts/AuthContext";
 
 type Case = Database['public']['Tables']['cases']['Row'] & {
   profiles?: {
@@ -25,11 +23,6 @@ type Case = Database['public']['Tables']['cases']['Row'] & {
 export const CaseTable = () => {
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCase, setSelectedCase] = useState<Case | null>(null);
-  const [isPriorityDialogOpen, setIsPriorityDialogOpen] = useState(false);
-  const { profile } = useAuth();
-  
-  const canUpdatePriority = profile?.role === 'commanding_officer' || profile?.role === 'officer_commanding_unit';
 
   const fetchCases = async () => {
     try {
@@ -37,36 +30,13 @@ export const CaseTable = () => {
         .from('cases')
         .select(`
           *,
-          profiles:assigned_to(full_name, role),
-          supervisor:supervisor_id(full_name)
+          profiles:assigned_to(full_name, role)
         `)
         .limit(10)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-
-      // Get exhibit counts for each case
-      const casesWithCounts = await Promise.all(
-        (data || []).map(async (caseItem) => {
-          const { count: exhibitsCount } = await supabase
-            .from('exhibits')
-            .select('*', { count: 'exact', head: true })
-            .eq('case_id', caseItem.id);
-
-          const { count: activitiesCount } = await supabase
-            .from('case_activities')
-            .select('*', { count: 'exact', head: true })
-            .eq('case_id', caseItem.id);
-
-          return {
-            ...caseItem,
-            exhibits_count: exhibitsCount || 0,
-            activities_count: activitiesCount || 0
-          };
-        })
-      );
-
-      setCases(casesWithCounts as any);
+      setCases((data as any) || []);
     } catch (error) {
       console.error('Error fetching cases:', error);
     } finally {
@@ -122,19 +92,17 @@ export const CaseTable = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Lab Number</th>
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Title</th>
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Assigned To</th>
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Priority</th>
+                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Case Number</th>
+                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Analyst</th>
+                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Case Title</th>
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Status</th>
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Exhibits</th>
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Actions</th>
+                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Priority</th>
               </tr>
             </thead>
             <tbody>
               {cases.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-8 text-muted-foreground">
+                  <td colSpan={5} className="text-center py-8 text-muted-foreground">
                     No cases found. <br />
                     <span className="text-sm">Create some cases to get started.</span>
                   </td>
@@ -144,18 +112,6 @@ export const CaseTable = () => {
                   <tr key={caseItem.id} className="border-b border-border hover:bg-muted/50 transition-colors">
                     <td className="py-3 px-2">
                       <span className="font-mono text-sm font-medium text-foreground">{caseItem.lab_number || caseItem.case_number}</span>
-                      <div className="text-xs text-muted-foreground">Lab Number</div>
-                    </td>
-                    <td className="py-3 px-2">
-                      <div>
-                        <div className="text-sm font-medium text-foreground">{caseItem.title}</div>
-                        {caseItem.location && (
-                          <div className="text-xs text-muted-foreground flex items-center mt-1">
-                            <MapPin className="h-3 w-3 mr-1" />
-                            {caseItem.location}
-                          </div>
-                        )}
-                      </div>
                     </td>
                     <td className="py-3 px-2">
                       <span className="text-sm text-foreground">
@@ -163,47 +119,15 @@ export const CaseTable = () => {
                       </span>
                     </td>
                     <td className="py-3 px-2">
+                      <div className="text-sm font-medium text-foreground">{caseItem.title}</div>
+                    </td>
+                    <td className="py-3 px-2">
+                      <CaseStatusBadge status={(caseItem.status as CaseStatus) || 'open'} />
+                    </td>
+                    <td className="py-3 px-2">
                       <Badge variant={getPriorityVariant(caseItem.priority || 'medium')} className="text-xs">
                         {caseItem.priority?.toUpperCase() || 'MEDIUM'}
                       </Badge>
-                    </td>
-                     <td className="py-3 px-2">
-                       <CaseStatusBadge status={(caseItem.status as CaseStatus) || 'open'} />
-                     </td>
-                    <td className="py-3 px-2">
-                      <div className="flex items-center space-x-3 text-sm text-muted-foreground">
-                        <div className="flex items-center">
-                          <FileText className="h-4 w-4 mr-1" />
-                          {caseItem.exhibits_count || 0}
-                        </div>
-                        <div className="flex items-center">
-                          <Clock className="h-4 w-4 mr-1" />
-                          {caseItem.activities_count || 0}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-2">
-                      <div className="flex space-x-1">
-                        <Button variant="ghost" size="sm" title="View Details">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        {canUpdatePriority && (
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            title="Update Priority"
-                            onClick={() => {
-                              setSelectedCase(caseItem);
-                              setIsPriorityDialogOpen(true);
-                            }}
-                          >
-                            <TrendingUp className="h-4 w-4" />
-                          </Button>
-                        )}
-                        <Button variant="ghost" size="sm" title="View Team">
-                          <Users className="h-4 w-4" />
-                        </Button>
-                      </div>
                     </td>
                   </tr>
                 ))
@@ -212,19 +136,6 @@ export const CaseTable = () => {
           </table>
         </div>
       </CardContent>
-      
-      {selectedCase && (
-        <UpdateCasePriorityDialog
-          caseId={selectedCase.id}
-          caseNumber={selectedCase.case_number}
-          caseTitle={selectedCase.title}
-          currentPriority={selectedCase.priority || 'medium'}
-          userRole={profile?.role || ''}
-          open={isPriorityDialogOpen}
-          onOpenChange={setIsPriorityDialogOpen}
-          onUpdate={fetchCases}
-        />
-      )}
     </Card>
   );
 };

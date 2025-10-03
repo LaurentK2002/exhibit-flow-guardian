@@ -46,8 +46,7 @@ export const Navigation = () => {
         ];
       case 'analyst':
         return [
-          { icon: Activity, label: 'Analysis Workbench', path: '/workbench' },
-          { icon: Database, label: 'Data Sources', path: '/data-sources' },
+          { icon: FileText, label: 'My Cases', path: '/cases' },
           { icon: FileText, label: 'Investigation Reports', path: '/reports' },
           { icon: BarChart3, label: 'Case Analytics', path: '/analytics' },
         ];
@@ -63,13 +62,13 @@ export const Navigation = () => {
   const getSearchPlaceholder = () => {
     switch (profile?.role) {
       case 'admin':
-        return 'Search users, cases, exhibits, system analytics...';
+        return 'Search users, cases, exhibits, system data...';
       case 'commanding_officer':
         return 'Search operations, team reports, security alerts...';
       case 'exhibit_officer':
         return 'Search evidence, exhibits, chain of custody...';
       case 'analyst':
-        return 'Search investigations, data sources, reports...';
+        return 'Search investigations, cases, reports...';
       default:
         return 'Search system resources...';
     }

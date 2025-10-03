@@ -42,7 +42,7 @@ export const AdminDashboard = () => {
         </div>
         
         {/* Quick Stats Row */}
-        <div className="grid grid-cols-4 gap-4 mt-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mt-6 md:mt-8">
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
             <div className="flex items-center justify-between">
               <div>
@@ -105,7 +105,7 @@ export const AdminDashboard = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5 h-12">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-5 h-auto md:h-12">
           <TabsTrigger value="overview" className="flex items-center gap-2 text-sm">
             <Crown className="h-4 w-4" />
             Command Center

@@ -131,18 +131,18 @@ export const ExhibitTable = () => {
             </div>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
+            <table className="w-full min-w-[700px]">
+              <thead className="bg-muted/30">
                 <tr className="border-b border-border">
-                  <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Exhibit #</th>
-                  <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Case #</th>
-                  <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Device</th>
-                  <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Analyst</th>
-                  <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Priority</th>
-                  <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Actions</th>
+                  <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Exhibit #</th>
+                  <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Case #</th>
+                  <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground">Device</th>
+                  <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Analyst</th>
+                  <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Status</th>
+                  <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Priority</th>
+                  <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -156,31 +156,31 @@ export const ExhibitTable = () => {
                 ) : (
                   exhibits.map((exhibit) => (
                     <tr key={exhibit.id} className="border-b border-border hover:bg-muted/50 transition-colors">
-                      <td className="py-3 px-2">
-                        <span className="font-mono text-sm font-medium text-foreground">{exhibit.exhibit_number}</span>
+                      <td className="py-3 px-3">
+                        <span className="font-mono text-xs font-medium text-foreground whitespace-nowrap">{exhibit.exhibit_number}</span>
                       </td>
-                      <td className="py-3 px-2">
-                        <span className="text-sm text-foreground">{exhibit.cases?.case_number || 'N/A'}</span>
+                      <td className="py-3 px-3">
+                        <span className="text-xs text-foreground whitespace-nowrap">{exhibit.cases?.case_number || 'N/A'}</span>
                       </td>
-                      <td className="py-3 px-2">
+                      <td className="py-3 px-3">
                         <div>
-                          <div className="text-sm font-medium text-foreground">
+                          <div className="text-xs font-medium text-foreground max-w-[180px] truncate">
                             {exhibitTypeMap[exhibit.exhibit_type]} - {exhibit.device_name}
                           </div>
-                          <div className="text-xs text-muted-foreground font-mono">
+                          <div className="text-[10px] text-muted-foreground font-mono truncate max-w-[180px]">
                             {exhibit.serial_number || 'No S/N'}
                           </div>
                         </div>
                       </td>
-                      <td className="py-3 px-2">
-                        <span className="text-sm text-foreground">
+                      <td className="py-3 px-3">
+                        <span className="text-xs text-foreground whitespace-nowrap">
                           {exhibit.analyst_profile?.full_name || 'Unassigned'}
                         </span>
                       </td>
-                      <td className="py-3 px-2">
+                      <td className="py-3 px-3">
                         <StatusBadge status={exhibit.status} />
                       </td>
-                      <td className="py-3 px-2">
+                      <td className="py-3 px-3">
                         <Badge 
                           variant={
                             exhibit.cases?.priority === "critical" ? "destructive" : 
@@ -188,13 +188,13 @@ export const ExhibitTable = () => {
                             exhibit.cases?.priority === "medium" ? "default" : 
                             "secondary"
                           }
-                          className="text-xs"
+                          className="text-xs whitespace-nowrap"
                         >
                           {exhibit.cases?.priority ? priorityMap[exhibit.cases.priority] : 'N/A'}
                         </Badge>
                       </td>
-                      <td className="py-3 px-2">
-                        <div className="flex space-x-1">
+                      <td className="py-3 px-3">
+                        <div className="flex space-x-1 whitespace-nowrap">
                           <Button variant="ghost" size="sm" title="View Details">
                             <Eye className="h-4 w-4" />
                           </Button>

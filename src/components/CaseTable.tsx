@@ -90,17 +90,17 @@ export const CaseTable = () => {
           </Button>
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
+          <table className="w-full min-w-[640px]">
+            <thead className="bg-muted/30">
               <tr className="border-b border-border">
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Case Number</th>
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Analyst</th>
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Case Title</th>
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Status</th>
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Priority</th>
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Actions</th>
+                <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Case #</th>
+                <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Analyst</th>
+                <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground">Case Title</th>
+                <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Status</th>
+                <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Priority</th>
+                <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -114,26 +114,26 @@ export const CaseTable = () => {
               ) : (
                 cases.map((caseItem) => (
                   <tr key={caseItem.id} className="border-b border-border hover:bg-muted/50 transition-colors">
-                    <td className="py-3 px-2">
-                      <span className="font-mono text-sm font-medium text-foreground">{caseItem.lab_number || caseItem.case_number}</span>
+                    <td className="py-3 px-3">
+                      <span className="font-mono text-xs font-medium text-foreground whitespace-nowrap">{caseItem.lab_number || caseItem.case_number}</span>
                     </td>
-                    <td className="py-3 px-2">
-                      <span className="text-sm text-foreground">
+                    <td className="py-3 px-3">
+                      <span className="text-xs text-foreground whitespace-nowrap">
                         {caseItem.profiles?.full_name || 'Unassigned'}
                       </span>
                     </td>
-                    <td className="py-3 px-2">
-                      <div className="text-sm font-medium text-foreground">{caseItem.title}</div>
+                    <td className="py-3 px-3">
+                      <div className="text-xs font-medium text-foreground max-w-[200px] truncate">{caseItem.title}</div>
                     </td>
-                    <td className="py-3 px-2">
+                    <td className="py-3 px-3">
                       <CaseStatusBadge status={(caseItem.status as CaseStatus) || 'open'} />
                     </td>
-                    <td className="py-3 px-2">
-                      <Badge variant={getPriorityVariant(caseItem.priority || 'medium')} className="text-xs">
+                    <td className="py-3 px-3">
+                      <Badge variant={getPriorityVariant(caseItem.priority || 'medium')} className="text-xs whitespace-nowrap">
                         {caseItem.priority?.toUpperCase() || 'MEDIUM'}
                       </Badge>
                     </td>
-                    <td className="py-3 px-2">
+                    <td className="py-3 px-3">
                       <Button
                         size="sm"
                         variant="outline"
@@ -141,9 +141,10 @@ export const CaseTable = () => {
                           setSelectedCaseId(caseItem.id);
                           setDetailsOpen(true);
                         }}
+                        className="whitespace-nowrap"
                       >
                         <Eye className="h-4 w-4 mr-1" />
-                        View Details
+                        View
                       </Button>
                     </td>
                   </tr>

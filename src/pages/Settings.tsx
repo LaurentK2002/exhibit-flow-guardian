@@ -24,7 +24,7 @@ export default function Settings() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
       <Navigation />
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-4 md:px-6 py-8 max-w-7xl">
         <h1 className="text-3xl font-bold mb-6">Settings</h1>
         <Tabs defaultValue="profile" className="w-full">
           <TabsList>

@@ -102,7 +102,7 @@ export const ExhibitOfficerDashboard = () => {
                   onClick={() => setShowAddExhibit(true)}
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Register Exhibit to Case
+                  Create New case File
                 </Button>
                 <Button 
                   className="w-full justify-start" 

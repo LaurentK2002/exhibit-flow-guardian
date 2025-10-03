@@ -279,6 +279,62 @@ export type Database = {
         }
         Relationships: []
       }
+      report_submissions: {
+        Row: {
+          analyst_id: string
+          case_id: string | null
+          created_at: string | null
+          file_name: string
+          file_path: string
+          id: string
+          report_title: string
+          review_comments: string | null
+          review_date: string | null
+          reviewed_by: string | null
+          status: string
+          submission_date: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          analyst_id: string
+          case_id?: string | null
+          created_at?: string | null
+          file_name: string
+          file_path: string
+          id?: string
+          report_title: string
+          review_comments?: string | null
+          review_date?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submission_date?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          analyst_id?: string
+          case_id?: string | null
+          created_at?: string | null
+          file_name?: string
+          file_path?: string
+          id?: string
+          report_title?: string
+          review_comments?: string | null
+          review_date?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submission_date?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_submissions_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reports: {
         Row: {
           case_id: string | null

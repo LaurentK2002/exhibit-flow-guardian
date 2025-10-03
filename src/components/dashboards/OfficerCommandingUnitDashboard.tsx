@@ -13,6 +13,7 @@ import { CreateOfficialReportDialog } from "@/components/CreateOfficialReportDia
 import { OfficialReportsTable } from "@/components/OfficialReportsTable";
 import { FileText, Users, TrendingUp, AlertCircle, Send } from "lucide-react";
 import { CaseSearch } from "@/components/CaseSearch";
+import { ReportReviewPanel } from "@/components/ReportReviewPanel";
 
 export const OfficerCommandingUnitDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -32,10 +33,11 @@ export const OfficerCommandingUnitDashboard = () => {
 
       {/* Main Dashboard */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="exhibits">Exhibits</TabsTrigger>
           <TabsTrigger value="assignments">Assignments</TabsTrigger>
+          <TabsTrigger value="review">Report Review</TabsTrigger>
           <TabsTrigger value="team">Team</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -123,6 +125,10 @@ export const OfficerCommandingUnitDashboard = () => {
 
         <TabsContent value="assignments" className="space-y-6">
           <ExhibitAssignment />
+        </TabsContent>
+
+        <TabsContent value="review" className="space-y-6">
+          <ReportReviewPanel />
         </TabsContent>
 
         <TabsContent value="team" className="space-y-6">

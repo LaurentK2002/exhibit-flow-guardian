@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Microscope, FileText, CheckCircle, AlertCircle } from "lucide-react";
 import { MyAssignedCases } from "@/components/MyAssignedCases";
 import { CaseSearch } from "@/components/CaseSearch";
+import { AnalystReportSubmissions } from "@/components/AnalystReportSubmissions";
 
 export const AnalystDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -83,26 +84,7 @@ export const AnalystDashboard = () => {
         </TabsContent>
 
         <TabsContent value="reports">
-          <Card>
-            <CardHeader>
-              <CardTitle>My Analysis Reports</CardTitle>
-              <CardDescription>Generated forensic analysis reports</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <p className="font-medium">Mobile Device Analysis Report</p>
-                    <p className="text-sm text-muted-foreground">Case #CC2024-015 • Generated 2 hours ago</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline">View</Button>
-                    <Button size="sm">Download</Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <AnalystReportSubmissions />
         </TabsContent>
       </Tabs>
     </div>

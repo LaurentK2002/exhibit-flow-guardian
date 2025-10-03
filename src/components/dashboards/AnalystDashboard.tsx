@@ -7,6 +7,7 @@ import { Microscope, FileText, Clock, CheckCircle, AlertCircle, Laptop } from "l
 import { MyAssignedCases } from "@/components/MyAssignedCases";
 import { AnalysisTools } from "@/components/AnalysisTools";
 import { AnalysisWorkbench } from "@/components/role-specific/AnalysisWorkbench";
+import { CaseSearch } from "@/components/CaseSearch";
 
 export const AnalystDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -45,6 +46,8 @@ export const AnalystDashboard = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
+          <CaseSearch />
+          
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

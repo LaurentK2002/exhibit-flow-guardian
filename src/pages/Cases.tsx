@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { CaseManagement } from "@/components/CaseManagement";
+import { CaseSearch } from "@/components/CaseSearch";
 import { CaseTable } from "@/components/CaseTable";
 
 export default function Cases() {
@@ -19,10 +20,11 @@ export default function Cases() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
       <Navigation />
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-6 py-8 space-y-6">
         <h1 className="sr-only">Case Management</h1>
+        <CaseSearch />
         <CaseManagement />
-        <section className="mt-6">
+        <section>
           <CaseTable />
         </section>
       </main>

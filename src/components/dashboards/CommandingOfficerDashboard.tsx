@@ -9,6 +9,7 @@ import { TeamManagement } from "@/components/TeamManagement";
 import { CaseAssignment } from "@/components/CaseAssignment";
 import { StaffProductivity } from "@/components/role-specific/StaffProductivity";
 import { OfficialReportsTable } from "@/components/OfficialReportsTable";
+import { CaseSearch } from "@/components/CaseSearch";
 
 export const CommandingOfficerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -47,6 +48,7 @@ export const CommandingOfficerDashboard = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
+          <CaseSearch />
           <DashboardStats />
           <StaffProductivity />
           

@@ -12,6 +12,7 @@ import { GenerateBarcodesDialog } from "@/components/GenerateBarcodesDialog";
 import { PrintExhibitReceiptsDialog } from "@/components/PrintExhibitReceiptsDialog";
 import { GenerateProfessionalReportDialog } from "@/components/GenerateProfessionalReportDialog";
 import { OfficialReportsTable } from "@/components/OfficialReportsTable";
+import { CaseSearch } from "@/components/CaseSearch";
 
 export const ExhibitOfficerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -53,6 +54,7 @@ export const ExhibitOfficerDashboard = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
+          <CaseSearch />
           <EvidenceQueue />
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

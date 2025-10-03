@@ -39,7 +39,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
   });
 
   const [exhibits, setExhibits] = useState<ExhibitFormData[]>([{
-    exhibitType: 'mobile_device',
+    exhibitType: '' as any,
     deviceName: '',
     brand: '',
     model: '',
@@ -106,7 +106,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
 
   const addExhibit = () => {
     setExhibits([...exhibits, {
-      exhibitType: 'mobile_device',
+      exhibitType: '' as any,
       deviceName: '',
       brand: '',
       model: '',

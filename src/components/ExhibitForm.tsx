@@ -129,12 +129,15 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor={`macAddress-${index}`}>MAC Address</Label>
+          <Label htmlFor={`macAddress-${index}`}>
+            MAC Address{exhibit.exhibitType === 'network_device' ? ' *' : ' (Network devices)'}
+          </Label>
           <Input
             id={`macAddress-${index}`}
             value={exhibit.macAddress}
             onChange={(e) => onChange(index, 'macAddress', e.target.value)}
             placeholder="Network MAC address"
+            required={exhibit.exhibitType === 'network_device'}
           />
         </div>
       </div>

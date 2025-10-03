@@ -544,7 +544,11 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                 !caseFormData.referenceNumber || 
                 !referenceLetterFile || 
                 (caseFormData.fromDesignation === 'Other' && !caseFormData.customDesignation) || 
-                exhibits.some(ex => !ex.deviceName || (ex.exhibitType === 'mobile_device' && (!ex.brand || !ex.imei)))
+                exhibits.some(ex => 
+                  !ex.deviceName || 
+                  (ex.exhibitType === 'mobile_device' && (!ex.brand || !ex.imei)) ||
+                  (ex.exhibitType === 'network_device' && !ex.macAddress)
+                )
               }
             >
               {loading ? 'Creating...' : `Create Case & Register ${exhibits.length} Exhibit${exhibits.length > 1 ? 's' : ''}`}

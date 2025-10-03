@@ -54,6 +54,10 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     status: 'received',
     computerType: '',
     internalStorageType: '',
+    internalStorageBrand: '',
+    internalStorageModel: '',
+    internalStorageSerialNumber: '',
+    internalStorageCapacity: '',
   }]);
 
   const [referenceLetterFile, setReferenceLetterFile] = useState<File | null>(null);
@@ -125,6 +129,10 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
       status: 'received',
       computerType: '',
       internalStorageType: '',
+      internalStorageBrand: '',
+      internalStorageModel: '',
+      internalStorageSerialNumber: '',
+      internalStorageCapacity: '',
     }]);
   };
 
@@ -356,6 +364,10 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
         status: 'received',
         computerType: '',
         internalStorageType: '',
+        internalStorageBrand: '',
+        internalStorageModel: '',
+        internalStorageSerialNumber: '',
+        internalStorageCapacity: '',
       }]);
 
       setReferenceLetterFile(null);
@@ -439,6 +451,10 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                         status: 'received' as const,
                         computerType: '',
                         internalStorageType: '',
+                        internalStorageBrand: '',
+                        internalStorageModel: '',
+                        internalStorageSerialNumber: '',
+                        internalStorageCapacity: '',
                       }));
                       setExhibits([...exhibits, ...newExhibits]);
                     } else if (count < currentCount) {
@@ -615,8 +631,18 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                     if (ex.hasSim === 'YES' && ex.simCards.some(sim => !sim.simCardName || !sim.iccid)) return true;
                   }
                   
-                  // Computer - requires computer type, brand, model, serial number, and internal storage type
-                  if (ex.exhibitType === 'computer' && (!ex.computerType || !ex.brand || !ex.model || !ex.serialNumber || !ex.internalStorageType)) return true;
+                  // Computer - requires all computer fields including internal storage details
+                  if (ex.exhibitType === 'computer' && (
+                    !ex.computerType || 
+                    !ex.brand || 
+                    !ex.model || 
+                    !ex.serialNumber || 
+                    !ex.internalStorageType ||
+                    !ex.internalStorageBrand ||
+                    !ex.internalStorageModel ||
+                    !ex.internalStorageSerialNumber ||
+                    !ex.internalStorageCapacity
+                  )) return true;
                   
                   // Storage Media - requires brand and serial number
                   if (ex.exhibitType === 'storage_media' && (!ex.brand || !ex.serialNumber)) return true;

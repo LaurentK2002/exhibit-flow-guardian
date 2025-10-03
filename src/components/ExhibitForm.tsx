@@ -24,6 +24,10 @@ export interface ExhibitFormData {
   status: ExhibitStatus;
   computerType: string;
   internalStorageType: string;
+  internalStorageBrand: string;
+  internalStorageModel: string;
+  internalStorageSerialNumber: string;
+  internalStorageCapacity: string;
 }
 
 interface ExhibitFormProps {
@@ -317,6 +321,59 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove, cas
                     <SelectItem value="ssd">SSD (Solid State Drive)</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* Internal Storage Media Details */}
+              <div className="border-l-2 border-primary pl-4 space-y-4">
+                <h5 className="font-medium text-sm">Internal Storage Media Information</h5>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor={`internalStorageBrand-${index}`}>Storage Brand *</Label>
+                    <Input
+                      id={`internalStorageBrand-${index}`}
+                      value={exhibit.internalStorageBrand}
+                      onChange={(e) => onChange(index, 'internalStorageBrand', e.target.value)}
+                      placeholder="e.g., Samsung, Western Digital"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor={`internalStorageModel-${index}`}>Storage Model *</Label>
+                    <Input
+                      id={`internalStorageModel-${index}`}
+                      value={exhibit.internalStorageModel}
+                      onChange={(e) => onChange(index, 'internalStorageModel', e.target.value)}
+                      placeholder="e.g., 860 EVO, WD Blue"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor={`internalStorageSerialNumber-${index}`}>Storage Serial Number *</Label>
+                    <Input
+                      id={`internalStorageSerialNumber-${index}`}
+                      value={exhibit.internalStorageSerialNumber}
+                      onChange={(e) => onChange(index, 'internalStorageSerialNumber', e.target.value)}
+                      placeholder="Storage device serial number"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor={`internalStorageCapacity-${index}`}>Storage Capacity *</Label>
+                    <Input
+                      id={`internalStorageCapacity-${index}`}
+                      value={exhibit.internalStorageCapacity}
+                      onChange={(e) => onChange(index, 'internalStorageCapacity', e.target.value)}
+                      placeholder="e.g., 500GB, 1TB"
+                      required
+                    />
+                  </div>
+                </div>
               </div>
             </>
           )}

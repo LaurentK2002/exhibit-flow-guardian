@@ -35,7 +35,7 @@ export const OfficerCommandingUnitDashboard = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="exhibits">Exhibits</TabsTrigger>
+          <TabsTrigger value="cases">Cases</TabsTrigger>
           <TabsTrigger value="assignments">Assignments</TabsTrigger>
           <TabsTrigger value="review">Report Review</TabsTrigger>
           <TabsTrigger value="team">Team</TabsTrigger>
@@ -119,7 +119,7 @@ export const OfficerCommandingUnitDashboard = () => {
           <RecentActivity />
         </TabsContent>
 
-        <TabsContent value="exhibits" className="space-y-6">
+        <TabsContent value="cases" className="space-y-6">
           <CaseTable />
         </TabsContent>
 

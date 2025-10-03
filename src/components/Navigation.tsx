@@ -1,4 +1,4 @@
-import { Shield, Database, FileText, Settings, Search, Users, BarChart3, LogOut, User, Activity, AlertTriangle } from "lucide-react";
+import { Shield, Database, FileText, Settings, Search, Users, BarChart3, LogOut, User, Activity, AlertTriangle, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
@@ -94,6 +94,12 @@ export const Navigation = () => {
             </div>
             
             <nav className="hidden md:flex items-center space-x-1">
+              <Button variant="ghost" className="text-blue-100 hover:text-white hover:bg-white/10 transition-colors" asChild>
+                <Link to="/" aria-label="Home" title="Home">
+                  <Home className="h-4 w-4 mr-2" />
+                  Home
+                </Link>
+              </Button>
               {navigationItems.map((item, index) => (
                 <Button key={index} variant="ghost" className="text-blue-100 hover:text-white hover:bg-white/10 transition-colors" asChild>
                   <Link to={item.path} aria-label={item.label} title={item.label}>

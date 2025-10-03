@@ -29,7 +29,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
   const [caseFormData, setCaseFormData] = useState({
     caseNumber: '',
     caseTitle: '',
-    caseDescription: '',
+    fromDesignation: 'DCI',
     location: '',
     caseStatus: 'open' as CaseStatus,
     casePriority: 'medium' as CasePriority,
@@ -236,7 +236,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
           case_number: caseFormData.caseNumber,
           lab_number: caseFormData.caseNumber, // Lab number is the primary identifier
           title: caseFormData.caseTitle,
-          description: caseFormData.caseDescription,
+          description: `From: ${caseFormData.fromDesignation}`,
           location: caseFormData.location || null,
           status: caseFormData.caseStatus,
           priority: caseFormData.casePriority,
@@ -321,7 +321,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
       setCaseFormData({
         caseNumber: '',
         caseTitle: '',
-        caseDescription: '',
+        fromDesignation: 'DCI',
         location: '',
         caseStatus: 'open',
         casePriority: 'medium',
@@ -394,14 +394,24 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="caseDescription">Case Description</Label>
-              <Textarea
-                id="caseDescription"
-                value={caseFormData.caseDescription}
-                onChange={(e) => setCaseFormData({ ...caseFormData, caseDescription: e.target.value })}
-                placeholder="Detailed case description..."
-                rows={3}
-              />
+              <Label htmlFor="fromDesignation">From *</Label>
+              <Select 
+                value={caseFormData.fromDesignation} 
+                onValueChange={(value) => setCaseFormData({ ...caseFormData, fromDesignation: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="DCI">DCI</SelectItem>
+                  <SelectItem value="ZCO">ZCO</SelectItem>
+                  <SelectItem value="RCO">RCO</SelectItem>
+                  <SelectItem value="OC-CID">OC-CID</SelectItem>
+                  <SelectItem value="DCEA">DCEA</SelectItem>
+                  <SelectItem value="DCO">DCO</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

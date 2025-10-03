@@ -31,6 +31,12 @@ interface ExhibitFormProps {
 }
 
 export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: ExhibitFormProps) => {
+  // Define required fields for each device type
+  const isMobileDevice = exhibit.exhibitType === 'mobile_device';
+  const isComputer = exhibit.exhibitType === 'computer';
+  const isStorageMedia = exhibit.exhibitType === 'storage_media';
+  const isNetworkDevice = exhibit.exhibitType === 'network_device';
+
   return (
     <div className="space-y-4 border rounded-lg p-4 relative">
       <div className="flex justify-between items-center">
@@ -79,68 +85,223 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor={`brand-${index}`}>
-            Brand{exhibit.exhibitType === 'mobile_device' && ' *'}
-          </Label>
-          <Input
-            id={`brand-${index}`}
-            value={exhibit.brand}
-            onChange={(e) => onChange(index, 'brand', e.target.value)}
-            placeholder="e.g., Apple, Samsung"
-            required={exhibit.exhibitType === 'mobile_device'}
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor={`model-${index}`}>Model</Label>
-          <Input
-            id={`model-${index}`}
-            value={exhibit.model}
-            onChange={(e) => onChange(index, 'model', e.target.value)}
-            placeholder="Model number"
-          />
-        </div>
-      </div>
+      {/* Mobile Device Specific Fields */}
+      {isMobileDevice && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor={`brand-${index}`}>Brand *</Label>
+              <Input
+                id={`brand-${index}`}
+                value={exhibit.brand}
+                onChange={(e) => onChange(index, 'brand', e.target.value)}
+                placeholder="e.g., Apple, Samsung"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor={`imei-${index}`}>IMEI *</Label>
+              <Input
+                id={`imei-${index}`}
+                value={exhibit.imei}
+                onChange={(e) => onChange(index, 'imei', e.target.value)}
+                placeholder="IMEI number"
+                required
+              />
+            </div>
+          </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor={`serialNumber-${index}`}>Serial Number</Label>
-          <Input
-            id={`serialNumber-${index}`}
-            value={exhibit.serialNumber}
-            onChange={(e) => onChange(index, 'serialNumber', e.target.value)}
-            placeholder="Device serial number"
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor={`model-${index}`}>Model</Label>
+              <Input
+                id={`model-${index}`}
+                value={exhibit.model}
+                onChange={(e) => onChange(index, 'model', e.target.value)}
+                placeholder="Model number"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor={`serialNumber-${index}`}>Serial Number</Label>
+              <Input
+                id={`serialNumber-${index}`}
+                value={exhibit.serialNumber}
+                onChange={(e) => onChange(index, 'serialNumber', e.target.value)}
+                placeholder="Device serial number"
+              />
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Computer Specific Fields */}
+      {isComputer && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor={`brand-${index}`}>Brand *</Label>
+              <Input
+                id={`brand-${index}`}
+                value={exhibit.brand}
+                onChange={(e) => onChange(index, 'brand', e.target.value)}
+                placeholder="e.g., Dell, HP, Apple"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor={`model-${index}`}>Model *</Label>
+              <Input
+                id={`model-${index}`}
+                value={exhibit.model}
+                onChange={(e) => onChange(index, 'model', e.target.value)}
+                placeholder="Model number"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor={`serialNumber-${index}`}>Serial Number *</Label>
+              <Input
+                id={`serialNumber-${index}`}
+                value={exhibit.serialNumber}
+                onChange={(e) => onChange(index, 'serialNumber', e.target.value)}
+                placeholder="Device serial number"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor={`macAddress-${index}`}>MAC Address</Label>
+              <Input
+                id={`macAddress-${index}`}
+                value={exhibit.macAddress}
+                onChange={(e) => onChange(index, 'macAddress', e.target.value)}
+                placeholder="Network MAC address"
+              />
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Storage Media Specific Fields */}
+      {isStorageMedia && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor={`brand-${index}`}>Brand *</Label>
+              <Input
+                id={`brand-${index}`}
+                value={exhibit.brand}
+                onChange={(e) => onChange(index, 'brand', e.target.value)}
+                placeholder="e.g., SanDisk, Kingston"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor={`model-${index}`}>Model</Label>
+              <Input
+                id={`model-${index}`}
+                value={exhibit.model}
+                onChange={(e) => onChange(index, 'model', e.target.value)}
+                placeholder="Model number"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor={`serialNumber-${index}`}>Serial Number *</Label>
+            <Input
+              id={`serialNumber-${index}`}
+              value={exhibit.serialNumber}
+              onChange={(e) => onChange(index, 'serialNumber', e.target.value)}
+              placeholder="Device serial number"
+              required
+            />
+          </div>
+        </>
+      )}
+
+      {/* Network Device Specific Fields */}
+      {isNetworkDevice && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor={`brand-${index}`}>Brand *</Label>
+              <Input
+                id={`brand-${index}`}
+                value={exhibit.brand}
+                onChange={(e) => onChange(index, 'brand', e.target.value)}
+                placeholder="e.g., Cisco, TP-Link"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor={`macAddress-${index}`}>MAC Address *</Label>
+              <Input
+                id={`macAddress-${index}`}
+                value={exhibit.macAddress}
+                onChange={(e) => onChange(index, 'macAddress', e.target.value)}
+                placeholder="Network MAC address"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor={`model-${index}`}>Model</Label>
+              <Input
+                id={`model-${index}`}
+                value={exhibit.model}
+                onChange={(e) => onChange(index, 'model', e.target.value)}
+                placeholder="Model number"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor={`serialNumber-${index}`}>Serial Number</Label>
+              <Input
+                id={`serialNumber-${index}`}
+                value={exhibit.serialNumber}
+                onChange={(e) => onChange(index, 'serialNumber', e.target.value)}
+                placeholder="Device serial number"
+              />
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Other Device Type - Basic Fields */}
+      {exhibit.exhibitType === 'other' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor={`brand-${index}`}>Brand</Label>
+            <Input
+              id={`brand-${index}`}
+              value={exhibit.brand}
+              onChange={(e) => onChange(index, 'brand', e.target.value)}
+              placeholder="Device brand"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor={`model-${index}`}>Model</Label>
+            <Input
+              id={`model-${index}`}
+              value={exhibit.model}
+              onChange={(e) => onChange(index, 'model', e.target.value)}
+              placeholder="Model number"
+            />
+          </div>
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor={`imei-${index}`}>
-            IMEI{exhibit.exhibitType === 'mobile_device' ? ' *' : ' (Mobile devices)'}
-          </Label>
-          <Input
-            id={`imei-${index}`}
-            value={exhibit.imei}
-            onChange={(e) => onChange(index, 'imei', e.target.value)}
-            placeholder="IMEI number"
-            required={exhibit.exhibitType === 'mobile_device'}
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor={`macAddress-${index}`}>
-            MAC Address{exhibit.exhibitType === 'network_device' ? ' *' : ' (Network devices)'}
-          </Label>
-          <Input
-            id={`macAddress-${index}`}
-            value={exhibit.macAddress}
-            onChange={(e) => onChange(index, 'macAddress', e.target.value)}
-            placeholder="Network MAC address"
-            required={exhibit.exhibitType === 'network_device'}
-          />
-        </div>
-      </div>
+      )}
 
       <div className="space-y-2">
         <Label htmlFor={`description-${index}`}>Exhibit Description</Label>

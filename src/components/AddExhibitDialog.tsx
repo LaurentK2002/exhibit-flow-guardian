@@ -544,11 +544,24 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                 !caseFormData.referenceNumber || 
                 !referenceLetterFile || 
                 (caseFormData.fromDesignation === 'Other' && !caseFormData.customDesignation) || 
-                exhibits.some(ex => 
-                  !ex.deviceName || 
-                  (ex.exhibitType === 'mobile_device' && (!ex.brand || !ex.imei)) ||
-                  (ex.exhibitType === 'network_device' && !ex.macAddress)
-                )
+                exhibits.some(ex => {
+                  // Basic validation - device name is always required
+                  if (!ex.deviceName) return true;
+                  
+                  // Mobile Device - requires brand and IMEI
+                  if (ex.exhibitType === 'mobile_device' && (!ex.brand || !ex.imei)) return true;
+                  
+                  // Computer - requires brand, model, and serial number
+                  if (ex.exhibitType === 'computer' && (!ex.brand || !ex.model || !ex.serialNumber)) return true;
+                  
+                  // Storage Media - requires brand and serial number
+                  if (ex.exhibitType === 'storage_media' && (!ex.brand || !ex.serialNumber)) return true;
+                  
+                  // Network Device - requires brand and MAC address
+                  if (ex.exhibitType === 'network_device' && (!ex.brand || !ex.macAddress)) return true;
+                  
+                  return false;
+                })
               }
             >
               {loading ? 'Creating...' : `Create Case & Register ${exhibits.length} Exhibit${exhibits.length > 1 ? 's' : ''}`}

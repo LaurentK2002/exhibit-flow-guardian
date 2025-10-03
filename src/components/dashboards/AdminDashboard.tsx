@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,9 +16,44 @@ import { UserManagement } from "@/components/UserManagement";
 import { SystemSettings } from "@/components/SystemSettings";
 import { SecurityOverview } from "@/components/security/SecurityOverview";
 import { UserPresence } from "@/components/UserPresence";
+import { supabase } from "@/integrations/supabase/client";
+import { useRealtime } from "@/hooks/useRealtime";
 
 export const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    activeSessions: 0,
+    recentAuditLogs: [] as any[]
+  });
+
+  const fetchAdminStats = async () => {
+    try {
+      const { data: profiles } = await supabase.from('profiles').select('*');
+      const { data: sessions } = await supabase.from('user_sessions').select('*').eq('is_active', true);
+      const { data: auditLogs } = await supabase
+        .from('audit_logs')
+        .select('*, profiles(full_name)')
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+      setStats({
+        totalUsers: profiles?.length || 0,
+        activeSessions: sessions?.length || 0,
+        recentAuditLogs: auditLogs || []
+      });
+    } catch (error) {
+      console.error('Error fetching admin stats:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdminStats();
+  }, []);
+
+  useRealtime('profiles', fetchAdminStats);
+  useRealtime('user_sessions', fetchAdminStats);
+  useRealtime('audit_logs', fetchAdminStats);
 
   return (
     <div className="space-y-6">
@@ -47,7 +82,7 @@ export const AdminDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-red-100 text-sm">Total Users</p>
-                <p className="text-2xl font-bold">127</p>
+                <p className="text-2xl font-bold">{stats.totalUsers}</p>
               </div>
               <Users className="h-8 w-8 text-red-200" />
             </div>
@@ -56,7 +91,7 @@ export const AdminDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-red-100 text-sm">System Health</p>
-                <p className="text-2xl font-bold text-green-300">98%</p>
+                <p className="text-2xl font-bold text-green-300">Operational</p>
               </div>
               <Activity className="h-8 w-8 text-green-300" />
             </div>
@@ -64,8 +99,8 @@ export const AdminDashboard = () => {
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-red-100 text-sm">Security Alerts</p>
-                <p className="text-2xl font-bold text-yellow-300">3</p>
+                <p className="text-red-100 text-sm">Recent Activity</p>
+                <p className="text-2xl font-bold text-yellow-300">{stats.recentAuditLogs.length}</p>
               </div>
               <AlertTriangle className="h-8 w-8 text-yellow-300" />
             </div>
@@ -74,7 +109,7 @@ export const AdminDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-red-100 text-sm">Active Sessions</p>
-                <p className="text-2xl font-bold">89</p>
+                <p className="text-2xl font-bold">{stats.activeSessions}</p>
               </div>
               <Eye className="h-8 w-8 text-blue-300" />
             </div>
@@ -82,27 +117,18 @@ export const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Critical Alerts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Alert className="border-yellow-500 bg-yellow-50 dark:bg-yellow-950">
-          <AlertTriangle className="h-4 w-4 text-yellow-600" />
-          <AlertDescription className="text-yellow-800 dark:text-yellow-200">
-            <strong>Security Notice:</strong> 3 failed login attempts detected from unusual locations
-          </AlertDescription>
-        </Alert>
-        <Alert className="border-blue-500 bg-blue-50 dark:bg-blue-950">
-          <Server className="h-4 w-4 text-blue-600" />
-          <AlertDescription className="text-blue-800 dark:text-blue-200">
-            <strong>System Update:</strong> Database backup completed successfully
-          </AlertDescription>
-        </Alert>
-        <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
-          <TrendingUp className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-800 dark:text-green-200">
-            <strong>Performance:</strong> System running at optimal capacity
-          </AlertDescription>
-        </Alert>
-      </div>
+      {stats.recentAuditLogs.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {stats.recentAuditLogs.slice(0, 3).map((log: any) => (
+            <Alert key={log.id} className="border-blue-500 bg-blue-50 dark:bg-blue-950">
+              <Activity className="h-4 w-4 text-blue-600" />
+              <AlertDescription className="text-blue-800 dark:text-blue-200">
+                <strong>{log.profiles?.full_name || 'User'}:</strong> {log.action} on {log.table_name}
+              </AlertDescription>
+            </Alert>
+          ))}
+        </div>
+      )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-5 h-auto md:h-12">
@@ -172,38 +198,31 @@ export const AdminDashboard = () => {
                   System Status
                 </CardTitle>
                 <CardDescription className="text-blue-600 dark:text-blue-400">
-                  Real-time system health monitoring
+                  System operational metrics
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   <div>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-blue-700 dark:text-blue-300">Database Performance</span>
-                      <span className="font-medium text-blue-800 dark:text-blue-200">94%</span>
+                      <span className="text-blue-700 dark:text-blue-300">Total Users</span>
+                      <span className="font-medium text-blue-800 dark:text-blue-200">{stats.totalUsers}</span>
                     </div>
-                    <Progress value={94} className="h-2 bg-blue-200" />
+                    <Progress value={Math.min((stats.totalUsers / 200) * 100, 100)} className="h-2 bg-blue-200" />
                   </div>
                   <div>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-blue-700 dark:text-blue-300">Server Resources</span>
-                      <span className="font-medium text-blue-800 dark:text-blue-200">87%</span>
+                      <span className="text-blue-700 dark:text-blue-300">Active Sessions</span>
+                      <span className="font-medium text-blue-800 dark:text-blue-200">{stats.activeSessions}</span>
                     </div>
-                    <Progress value={87} className="h-2 bg-blue-200" />
+                    <Progress value={Math.min((stats.activeSessions / 100) * 100, 100)} className="h-2 bg-blue-200" />
                   </div>
                   <div>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-blue-700 dark:text-blue-300">Security Score</span>
-                      <span className="font-medium text-blue-800 dark:text-blue-200">98%</span>
+                      <span className="text-blue-700 dark:text-blue-300">System Status</span>
+                      <span className="font-medium text-blue-800 dark:text-blue-200">Operational</span>
                     </div>
-                    <Progress value={98} className="h-2 bg-blue-200" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-blue-700 dark:text-blue-300">User Satisfaction</span>
-                      <span className="font-medium text-blue-800 dark:text-blue-200">91%</span>
-                    </div>
-                    <Progress value={91} className="h-2 bg-blue-200" />
+                    <Progress value={100} className="h-2 bg-blue-200" />
                   </div>
                 </div>
               </CardContent>
@@ -217,44 +236,32 @@ export const AdminDashboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-purple-800 dark:text-purple-200">
                   <FileText className="h-5 w-5" />
-                  Critical System Events
+                  Recent System Activity
                 </CardTitle>
                 <CardDescription className="text-purple-600 dark:text-purple-400">
-                  High-priority administrative actions and alerts
+                  Latest administrative actions
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-red-100 dark:bg-red-900/30 rounded-lg border border-red-200 dark:border-red-800">
-                    <div className="flex items-center gap-3">
-                      <AlertTriangle className="h-4 w-4 text-red-600" />
-                      <div>
-                        <p className="font-medium text-sm text-red-800 dark:text-red-200">Security Breach Attempt</p>
-                        <p className="text-xs text-red-600 dark:text-red-400">Multiple failed admin login attempts</p>
+                  {stats.recentAuditLogs.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
+                  ) : (
+                    stats.recentAuditLogs.map((log: any) => (
+                      <div key={log.id} className="flex items-center justify-between p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <div className="flex items-center gap-3">
+                          <Activity className="h-4 w-4 text-blue-600" />
+                          <div>
+                            <p className="font-medium text-sm text-blue-800 dark:text-blue-200">{log.action}</p>
+                            <p className="text-xs text-blue-600 dark:text-blue-400">{log.profiles?.full_name || 'System'} - {log.table_name}</p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="text-xs border-blue-300 text-blue-700">
+                          {new Date(log.created_at).toLocaleTimeString()}
+                        </Badge>
                       </div>
-                    </div>
-                    <Badge variant="destructive" className="text-xs">URGENT</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                    <div className="flex items-center gap-3">
-                      <UserPlus className="h-4 w-4 text-yellow-600" />
-                      <div>
-                        <p className="font-medium text-sm text-yellow-800 dark:text-yellow-200">New Admin Account Created</p>
-                        <p className="text-xs text-yellow-600 dark:text-yellow-400">User elevated to administrator privileges</p>
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="text-xs border-yellow-300 text-yellow-700">1h ago</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-green-100 dark:bg-green-900/30 rounded-lg border border-green-200 dark:border-green-800">
-                    <div className="flex items-center gap-3">
-                      <Database className="h-4 w-4 text-green-600" />
-                      <div>
-                        <p className="font-medium text-sm text-green-800 dark:text-green-200">System Backup Completed</p>
-                        <p className="text-xs text-green-600 dark:text-green-400">Full database backup and verification</p>
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="text-xs border-green-300 text-green-700">30m ago</Badge>
-                  </div>
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>

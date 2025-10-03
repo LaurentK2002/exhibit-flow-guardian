@@ -3,8 +3,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Trash2, ChevronDown } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
+import { useState } from 'react';
 
 type ExhibitType = Database['public']['Enums']['exhibit_type'];
 type ExhibitStatus = Database['public']['Enums']['exhibit_status'];
@@ -31,11 +33,14 @@ interface ExhibitFormProps {
 }
 
 export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: ExhibitFormProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
   // Define required fields for each device type
   const isMobileDevice = exhibit.exhibitType === 'mobile_device';
   const isComputer = exhibit.exhibitType === 'computer';
   const isStorageMedia = exhibit.exhibitType === 'storage_media';
   const isNetworkDevice = exhibit.exhibitType === 'network_device';
+  const hasDeviceType = exhibit.exhibitType !== undefined;
 
   return (
     <div className="space-y-4 border rounded-lg p-4 relative">
@@ -85,9 +90,23 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
         </div>
       </div>
 
-      {/* Mobile Device Specific Fields */}
-      {isMobileDevice && (
-        <>
+      {/* Device-Specific Fields Dropdown */}
+      {hasDeviceType && (
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+          <CollapsibleTrigger asChild>
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="w-full flex justify-between items-center"
+            >
+              <span>Device Specific Information</span>
+              <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-4 space-y-4">
+            {/* Mobile Device Specific Fields */}
+            {isMobileDevice && (
+              <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor={`brand-${index}`}>Brand *</Label>
@@ -133,12 +152,12 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
               />
             </div>
           </div>
-        </>
-      )}
+              </>
+            )}
 
-      {/* Computer Specific Fields */}
-      {isComputer && (
-        <>
+            {/* Computer Specific Fields */}
+            {isComputer && (
+              <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor={`brand-${index}`}>Brand *</Label>
@@ -185,12 +204,12 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
               />
             </div>
           </div>
-        </>
-      )}
+              </>
+            )}
 
-      {/* Storage Media Specific Fields */}
-      {isStorageMedia && (
-        <>
+            {/* Storage Media Specific Fields */}
+            {isStorageMedia && (
+              <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor={`brand-${index}`}>Brand *</Label>
@@ -224,12 +243,12 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
               required
             />
           </div>
-        </>
-      )}
+              </>
+            )}
 
-      {/* Network Device Specific Fields */}
-      {isNetworkDevice && (
-        <>
+            {/* Network Device Specific Fields */}
+            {isNetworkDevice && (
+              <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor={`brand-${index}`}>Brand *</Label>
@@ -275,12 +294,12 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
               />
             </div>
           </div>
-        </>
-      )}
+              </>
+            )}
 
-      {/* Other Device Type - Basic Fields */}
-      {exhibit.exhibitType === 'other' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Other Device Type - Basic Fields */}
+            {exhibit.exhibitType === 'other' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor={`brand-${index}`}>Brand</Label>
             <Input
@@ -301,6 +320,9 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
             />
           </div>
         </div>
+            )}
+          </CollapsibleContent>
+        </Collapsible>
       )}
 
       <div className="space-y-2">

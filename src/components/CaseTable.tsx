@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText } from "lucide-react";
+import { FileText, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useRealtime } from "@/hooks/useRealtime";
 import { Database } from "@/integrations/supabase/types";
 import { CaseStatusBadge, CaseStatus } from "./CaseStatusBadge";
+import { CaseDetailsDialog } from "./CaseDetailsDialog";
 
 type Case = Database['public']['Tables']['cases']['Row'] & {
   profiles?: {
@@ -23,6 +24,8 @@ type Case = Database['public']['Tables']['cases']['Row'] & {
 export const CaseTable = () => {
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const fetchCases = async () => {
     try {
@@ -97,12 +100,13 @@ export const CaseTable = () => {
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Case Title</th>
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Status</th>
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Priority</th>
+                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Actions</th>
               </tr>
             </thead>
             <tbody>
               {cases.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-8 text-muted-foreground">
+                  <td colSpan={6} className="text-center py-8 text-muted-foreground">
                     No cases found. <br />
                     <span className="text-sm">Create some cases to get started.</span>
                   </td>
@@ -129,6 +133,19 @@ export const CaseTable = () => {
                         {caseItem.priority?.toUpperCase() || 'MEDIUM'}
                       </Badge>
                     </td>
+                    <td className="py-3 px-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedCaseId(caseItem.id);
+                          setDetailsOpen(true);
+                        }}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        View Details
+                      </Button>
+                    </td>
                   </tr>
                 ))
               )}
@@ -136,6 +153,12 @@ export const CaseTable = () => {
           </table>
         </div>
       </CardContent>
+
+      <CaseDetailsDialog
+        caseId={selectedCaseId}
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+      />
     </Card>
   );
 };

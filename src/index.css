@@ -12,10 +12,10 @@ All colors MUST be HSL.
     --background: 220 26% 98%;
     --foreground: 220 30% 15%;
 
-    --card: 0 0% 100%;
+    --card: 0 0% 99%;
     --card-foreground: 220 30% 15%;
 
-    --popover: 0 0% 100%;
+    --popover: 0 0% 99%;
     --popover-foreground: 220 30% 15%;
 
     --primary: 220 65% 35%;
@@ -46,8 +46,8 @@ All colors MUST be HSL.
     --case-review: 270 65% 55%;
     --case-closed: 135 65% 45%;
 
-    --border: 220 15% 88%;
-    --input: 220 15% 92%;
+    --border: 220 15% 85%;
+    --input: 220 15% 90%;
     --ring: 220 65% 35%;
 
     --radius: 0.5rem;

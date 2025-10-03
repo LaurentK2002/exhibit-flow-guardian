@@ -31,9 +31,10 @@ interface ExhibitFormProps {
   onRemove: (index: number) => void;
   canRemove: boolean;
   caseLabNumber?: string;
+  totalExhibits?: number;
 }
 
-export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove, caseLabNumber }: ExhibitFormProps) => {
+export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove, caseLabNumber, totalExhibits = 1 }: ExhibitFormProps) => {
   // Define required fields for each device type
   const isMobileDevice = exhibit.exhibitType === 'mobile_device';
   const isComputer = exhibit.exhibitType === 'computer';
@@ -48,7 +49,10 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove, cas
   };
 
   const labSequence = extractLabSequence(caseLabNumber);
-  const exhibitNumber = `CYB/LAB/${labSequence}/A${index + 1}`;
+  
+  // If only one exhibit, use "A", otherwise use "A1", "A2", etc.
+  const exhibitSuffix = totalExhibits === 1 ? 'A' : `A${index + 1}`;
+  const exhibitNumber = `CYB/LAB/${labSequence}/${exhibitSuffix}`;
 
   const addSimCard = () => {
     onChange(index, 'simCards', [...exhibit.simCards, { simCardName: '', iccid: '' }]);

@@ -36,6 +36,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     casePriority: 'medium' as CasePriority,
     irNumber: '',
     referenceNumber: '',
+    numberOfExhibits: 1,
   });
 
   const [exhibits, setExhibits] = useState<ExhibitFormData[]>([{
@@ -333,6 +334,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
         casePriority: 'medium',
         irNumber: '',
         referenceNumber: '',
+        numberOfExhibits: 1,
       });
 
       setExhibits([{
@@ -375,7 +377,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
           {/* Case Information Section */}
           <div className="space-y-4 border-b pb-4">
             <h3 className="text-lg font-semibold">Case Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="caseNumber">Lab Number (Auto-generated)</Label>
                 <Input
@@ -398,6 +400,49 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                   placeholder="Brief case description"
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="numberOfExhibits">Number of Digital Exhibits *</Label>
+                <Input
+                  id="numberOfExhibits"
+                  type="number"
+                  min="1"
+                  max="50"
+                  value={caseFormData.numberOfExhibits}
+                  onChange={(e) => {
+                    const count = parseInt(e.target.value) || 1;
+                    setCaseFormData({ ...caseFormData, numberOfExhibits: count });
+                    
+                    // Automatically adjust exhibits array
+                    const currentCount = exhibits.length;
+                    if (count > currentCount) {
+                      // Add more exhibits
+                      const newExhibits = Array(count - currentCount).fill(null).map(() => ({
+                        exhibitType: '' as any,
+                        deviceName: '',
+                        brand: '',
+                        model: '',
+                        serialNumber: '',
+                        imei: '',
+                        macAddress: '',
+                        hasSim: 'NO',
+                        simCards: [{ simCardName: '', iccid: '' }],
+                        description: '',
+                        storageLocation: '',
+                        status: 'received' as const,
+                      }));
+                      setExhibits([...exhibits, ...newExhibits]);
+                    } else if (count < currentCount) {
+                      // Remove extra exhibits
+                      setExhibits(exhibits.slice(0, count));
+                    }
+                  }}
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  Specify how many exhibits to register (1-50)
+                </p>
               </div>
             </div>
 
@@ -516,11 +561,9 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
           {/* Digital Exhibits Information Section */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold">Digital Exhibits Information</h3>
-              <Button type="button" onClick={addExhibit} variant="outline" size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Another Exhibit
-              </Button>
+              <h3 className="text-lg font-semibold">
+                Digital Exhibits Information ({exhibits.length} exhibit{exhibits.length > 1 ? 's' : ''})
+              </h3>
             </div>
 
             <div className="space-y-6">
@@ -533,6 +576,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                   onRemove={removeExhibit}
                   canRemove={exhibits.length > 1}
                   caseLabNumber={caseFormData.caseNumber}
+                  totalExhibits={exhibits.length}
                 />
               ))}
             </div>
@@ -549,6 +593,8 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                 !caseFormData.caseTitle || 
                 !caseFormData.irNumber || 
                 !caseFormData.referenceNumber || 
+                !caseFormData.numberOfExhibits ||
+                caseFormData.numberOfExhibits < 1 ||
                 !referenceLetterFile || 
                 (caseFormData.fromDesignation === 'Other' && !caseFormData.customDesignation) || 
                 exhibits.some(ex => {

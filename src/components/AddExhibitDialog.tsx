@@ -52,6 +52,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     description: '',
     storageLocation: '',
     status: 'received',
+    computerType: '',
   }]);
 
   const [referenceLetterFile, setReferenceLetterFile] = useState<File | null>(null);
@@ -121,6 +122,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
       description: '',
       storageLocation: '',
       status: 'received',
+      computerType: '',
     }]);
   };
 
@@ -350,6 +352,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
         description: '',
         storageLocation: '',
         status: 'received',
+        computerType: '',
       }]);
 
       setReferenceLetterFile(null);
@@ -431,6 +434,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                         description: '',
                         storageLocation: '',
                         status: 'received' as const,
+                        computerType: '',
                       }));
                       setExhibits([...exhibits, ...newExhibits]);
                     } else if (count < currentCount) {
@@ -607,8 +611,8 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                     if (ex.hasSim === 'YES' && ex.simCards.some(sim => !sim.simCardName || !sim.iccid)) return true;
                   }
                   
-                  // Computer - requires brand, model, and serial number
-                  if (ex.exhibitType === 'computer' && (!ex.brand || !ex.model || !ex.serialNumber)) return true;
+                  // Computer - requires computer type, brand, model, and serial number
+                  if (ex.exhibitType === 'computer' && (!ex.computerType || !ex.brand || !ex.model || !ex.serialNumber)) return true;
                   
                   // Storage Media - requires brand and serial number
                   if (ex.exhibitType === 'storage_media' && (!ex.brand || !ex.serialNumber)) return true;

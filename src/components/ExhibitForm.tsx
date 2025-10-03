@@ -22,6 +22,7 @@ export interface ExhibitFormData {
   description: string;
   storageLocation: string;
   status: ExhibitStatus;
+  computerType: string;
 }
 
 interface ExhibitFormProps {
@@ -234,6 +235,23 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove, cas
           {/* Computer Specific Fields */}
           {isComputer && (
             <>
+              <div className="space-y-2">
+                <Label htmlFor={`computerType-${index}`}>Computer Type *</Label>
+                <Select 
+                  value={exhibit.computerType} 
+                  onValueChange={(value) => onChange(index, 'computerType', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select computer type..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="laptop">Laptop</SelectItem>
+                    <SelectItem value="desktop">Desktop</SelectItem>
+                    <SelectItem value="all-in-one">All-in-one PC</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor={`brand-${index}`}>Brand *</Label>

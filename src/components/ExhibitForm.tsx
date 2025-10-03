@@ -409,36 +409,14 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove, cas
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor={`storageLocation-${index}`}>Storage Location</Label>
-              <Input
-                id={`storageLocation-${index}`}
-                value={exhibit.storageLocation}
-                onChange={(e) => onChange(index, 'storageLocation', e.target.value)}
-                placeholder="e.g., Vault A-201"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor={`status-${index}`}>Exhibit Status</Label>
-              <Select 
-                value={exhibit.status} 
-                onValueChange={(value: ExhibitStatus) => onChange(index, 'status', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="received">Received</SelectItem>
-                  <SelectItem value="in_analysis">In Analysis</SelectItem>
-                  <SelectItem value="analysis_complete">Analysis Complete</SelectItem>
-                  <SelectItem value="released">Released</SelectItem>
-                  <SelectItem value="destroyed">Destroyed</SelectItem>
-                  <SelectItem value="archived">Archived</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor={`storageLocation-${index}`}>Storage Location</Label>
+            <Input
+              id={`storageLocation-${index}`}
+              value={exhibit.storageLocation}
+              onChange={(e) => onChange(index, 'storageLocation', e.target.value)}
+              placeholder="e.g., Vault A-201"
+            />
           </div>
         </>
       )}

@@ -112,7 +112,7 @@ export const ExhibitTable = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Recent Digital Exhibits</span>
+            <span>Recent Cases</span>
             <div className="flex gap-2">
               {(role === 'exhibit_officer' || role === 'administrator') && (
                 <Button 

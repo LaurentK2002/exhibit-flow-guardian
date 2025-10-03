@@ -81,12 +81,15 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor={`brand-${index}`}>Brand</Label>
+          <Label htmlFor={`brand-${index}`}>
+            Brand{exhibit.exhibitType === 'mobile_device' && ' *'}
+          </Label>
           <Input
             id={`brand-${index}`}
             value={exhibit.brand}
             onChange={(e) => onChange(index, 'brand', e.target.value)}
             placeholder="e.g., Apple, Samsung"
+            required={exhibit.exhibitType === 'mobile_device'}
           />
         </div>
         
@@ -113,12 +116,15 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor={`imei-${index}`}>IMEI (Mobile devices)</Label>
+          <Label htmlFor={`imei-${index}`}>
+            IMEI{exhibit.exhibitType === 'mobile_device' ? ' *' : ' (Mobile devices)'}
+          </Label>
           <Input
             id={`imei-${index}`}
             value={exhibit.imei}
             onChange={(e) => onChange(index, 'imei', e.target.value)}
             placeholder="IMEI number"
+            required={exhibit.exhibitType === 'mobile_device'}
           />
         </div>
         

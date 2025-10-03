@@ -535,7 +535,18 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || !caseFormData.caseTitle || !caseFormData.irNumber || !caseFormData.referenceNumber || !referenceLetterFile || (caseFormData.fromDesignation === 'Other' && !caseFormData.customDesignation) || exhibits.some(ex => !ex.deviceName)}>
+            <Button 
+              type="submit" 
+              disabled={
+                loading || 
+                !caseFormData.caseTitle || 
+                !caseFormData.irNumber || 
+                !caseFormData.referenceNumber || 
+                !referenceLetterFile || 
+                (caseFormData.fromDesignation === 'Other' && !caseFormData.customDesignation) || 
+                exhibits.some(ex => !ex.deviceName || (ex.exhibitType === 'mobile_device' && (!ex.brand || !ex.imei)))
+              }
+            >
               {loading ? 'Creating...' : `Create Case & Register ${exhibits.length} Exhibit${exhibits.length > 1 ? 's' : ''}`}
             </Button>
           </div>

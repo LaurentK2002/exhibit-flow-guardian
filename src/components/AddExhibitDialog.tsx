@@ -30,6 +30,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     caseNumber: '',
     caseTitle: '',
     fromDesignation: 'DCI',
+    customDesignation: '',
     location: '',
     caseStatus: 'open' as CaseStatus,
     casePriority: 'medium' as CasePriority,
@@ -236,7 +237,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
           case_number: caseFormData.caseNumber,
           lab_number: caseFormData.caseNumber, // Lab number is the primary identifier
           title: caseFormData.caseTitle,
-          description: `From: ${caseFormData.fromDesignation}`,
+          description: `From: ${caseFormData.fromDesignation === 'Other' ? caseFormData.customDesignation : caseFormData.fromDesignation}`,
           location: caseFormData.location || null,
           status: caseFormData.caseStatus,
           priority: caseFormData.casePriority,
@@ -322,6 +323,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
         caseNumber: '',
         caseTitle: '',
         fromDesignation: 'DCI',
+        customDesignation: '',
         location: '',
         caseStatus: 'open',
         casePriority: 'medium',
@@ -397,7 +399,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
               <Label htmlFor="fromDesignation">From *</Label>
               <Select 
                 value={caseFormData.fromDesignation} 
-                onValueChange={(value) => setCaseFormData({ ...caseFormData, fromDesignation: value })}
+                onValueChange={(value) => setCaseFormData({ ...caseFormData, fromDesignation: value, customDesignation: '' })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -412,6 +414,14 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                   <SelectItem value="Other">Other</SelectItem>
                 </SelectContent>
               </Select>
+              {caseFormData.fromDesignation === 'Other' && (
+                <Input
+                  placeholder="Enter designation"
+                  value={caseFormData.customDesignation}
+                  onChange={(e) => setCaseFormData({ ...caseFormData, customDesignation: e.target.value })}
+                  required
+                />
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -525,7 +535,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || !caseFormData.caseTitle || !caseFormData.irNumber || !caseFormData.referenceNumber || !referenceLetterFile || exhibits.some(ex => !ex.deviceName)}>
+            <Button type="submit" disabled={loading || !caseFormData.caseTitle || !caseFormData.irNumber || !caseFormData.referenceNumber || !referenceLetterFile || (caseFormData.fromDesignation === 'Other' && !caseFormData.customDesignation) || exhibits.some(ex => !ex.deviceName)}>
               {loading ? 'Creating...' : `Create Case & Register ${exhibits.length} Exhibit${exhibits.length > 1 ? 's' : ''}`}
             </Button>
           </div>

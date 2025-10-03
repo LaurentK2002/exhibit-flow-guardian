@@ -30,14 +30,25 @@ interface ExhibitFormProps {
   onChange: (index: number, field: keyof ExhibitFormData, value: any) => void;
   onRemove: (index: number) => void;
   canRemove: boolean;
+  caseLabNumber?: string;
 }
 
-export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: ExhibitFormProps) => {
+export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove, caseLabNumber }: ExhibitFormProps) => {
   // Define required fields for each device type
   const isMobileDevice = exhibit.exhibitType === 'mobile_device';
   const isComputer = exhibit.exhibitType === 'computer';
   const isStorageMedia = exhibit.exhibitType === 'storage_media';
   const isNetworkDevice = exhibit.exhibitType === 'network_device';
+
+  // Extract #### from case lab number (format: FB/CYBER/YYYY/LAB/####)
+  const extractLabSequence = (labNumber: string | undefined) => {
+    if (!labNumber) return '0000';
+    const match = labNumber.match(/LAB\/(\d{4})$/);
+    return match ? match[1] : '0000';
+  };
+
+  const labSequence = extractLabSequence(caseLabNumber);
+  const exhibitNumber = `CYB/LAB/${labSequence}/A${index + 1}`;
 
   const addSimCard = () => {
     onChange(index, 'simCards', [...exhibit.simCards, { simCardName: '', iccid: '' }]);
@@ -57,7 +68,7 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
   return (
     <div className="space-y-4 border rounded-lg p-4 relative">
       <div className="flex justify-between items-center">
-        <h4 className="text-lg font-semibold">Digital Exhibit #{index + 1}</h4>
+        <h4 className="text-lg font-semibold font-mono">{exhibitNumber}</h4>
         {canRemove && (
           <Button
             type="button"

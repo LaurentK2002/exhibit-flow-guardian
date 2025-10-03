@@ -532,6 +532,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                   onChange={updateExhibit}
                   onRemove={removeExhibit}
                   canRemove={exhibits.length > 1}
+                  caseLabNumber={caseFormData.caseNumber}
                 />
               ))}
             </div>

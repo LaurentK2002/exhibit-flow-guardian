@@ -654,7 +654,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                 })
               }
             >
-              {loading ? 'Creating...' : `Create Case & Register ${exhibits.length} Exhibit${exhibits.length > 1 ? 's' : ''}`}
+              {loading ? 'Creating...' : 'Create Case File'}
             </Button>
           </div>
         </form>

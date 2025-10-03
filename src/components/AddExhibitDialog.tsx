@@ -267,6 +267,17 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
       const exhibitPromises = exhibits.map(async (exhibit) => {
         const exhibitNumber = await generateExhibitNumber(caseData.lab_number || caseData.case_number);
         
+        // Initialize chain of custody with receipt event
+        const initialCustodyEvent = {
+          timestamp: new Date().toISOString(),
+          event_type: 'received',
+          description: `Digital exhibit received and logged into evidence system`,
+          officer_name: profile?.full_name || 'System User',
+          officer_badge: profile?.badge_number || 'N/A',
+          location: 'Cyber Crimes Unit Evidence Room',
+          notes: `Received from ${caseFormData.fromDesignation === 'Other' ? caseFormData.customDesignation : caseFormData.fromDesignation}. IR Number: ${caseFormData.irNumber || 'N/A'}, Reference: ${caseFormData.referenceNumber || 'N/A'}`
+        };
+
         const { error: exhibitError } = await supabase
           .from('exhibits')
           .insert({
@@ -283,6 +294,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
             storage_location: exhibit.storageLocation || null,
             status: exhibit.status,
             received_by: user?.id,
+            chain_of_custody: [initialCustodyEvent],
           });
 
         if (exhibitError) throw exhibitError;

@@ -180,16 +180,71 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
           </div>
         )}
 
-        {/* Chain of Custody Summary */}
-        {chainOfCustodyEvents.length > 0 && (
-          <div className="mb-8">
-            <h4 className="font-bold text-lg mb-4 border-b border-gray-300 pb-2">CHAIN OF CUSTODY EVENTS</h4>
-            <div className="text-sm">
-              <p><strong>Total Events:</strong> {chainOfCustodyEvents.length}</p>
-              <p><strong>Latest Event:</strong> {formatDate(chainOfCustodyEvents[chainOfCustodyEvents.length - 1]?.timestamp || exhibit.received_date)}</p>
+        {/* Chain of Custody - Comprehensive Timeline */}
+        <div className="mb-8">
+          <h4 className="font-bold text-lg mb-4 border-b border-gray-300 pb-2">COMPLETE CHAIN OF CUSTODY</h4>
+          {chainOfCustodyEvents.length > 0 ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <p className="text-sm"><strong>Total Custody Events:</strong> {chainOfCustodyEvents.length}</p>
+                  <p className="text-sm"><strong>First Event:</strong> {formatDate(chainOfCustodyEvents[0]?.timestamp || exhibit.received_date)}</p>
+                </div>
+                <div>
+                  <p className="text-sm"><strong>Latest Event:</strong> {formatDate(chainOfCustodyEvents[chainOfCustodyEvents.length - 1]?.timestamp || exhibit.received_date)}</p>
+                  <p className="text-sm"><strong>Days in Custody:</strong> {Math.floor((new Date().getTime() - new Date(exhibit.received_date).getTime()) / (1000 * 60 * 60 * 24))} days</p>
+                </div>
+              </div>
+
+              <div className="border border-gray-300 rounded">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="p-2 text-left border-b border-gray-300">#</th>
+                      <th className="p-2 text-left border-b border-gray-300">Date/Time</th>
+                      <th className="p-2 text-left border-b border-gray-300">Event Type</th>
+                      <th className="p-2 text-left border-b border-gray-300">Officer</th>
+                      <th className="p-2 text-left border-b border-gray-300">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {chainOfCustodyEvents.map((event: any, index: number) => (
+                      <tr key={index} className="border-b border-gray-200 last:border-b-0">
+                        <td className="p-2">{index + 1}</td>
+                        <td className="p-2 text-xs">{formatDate(event.timestamp)}</td>
+                        <td className="p-2">
+                          <span className="px-2 py-1 bg-gray-200 rounded text-xs">
+                            {event.event_type?.replace('_', ' ').toUpperCase() || 'N/A'}
+                          </span>
+                        </td>
+                        <td className="p-2">
+                          <div className="text-xs">
+                            <p>{event.officer_name || 'N/A'}</p>
+                            <p className="text-gray-600">Badge: {event.officer_badge || 'N/A'}</p>
+                          </div>
+                        </td>
+                        <td className="p-2 text-xs">
+                          <p>{event.description || 'N/A'}</p>
+                          {event.location && <p className="text-gray-600 mt-1">📍 {event.location}</p>}
+                          {event.previous_status && event.new_status && (
+                            <p className="text-gray-600 mt-1">
+                              Status: {event.previous_status.replace('_', ' ')} → {event.new_status.replace('_', ' ')}
+                            </p>
+                          )}
+                          {event.notes && (
+                            <p className="text-gray-600 mt-1 italic">Note: {event.notes}</p>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        )}
+          ) : (
+            <p className="text-sm text-gray-600">No custody events recorded. Initial receipt pending.</p>
+          )}
+        </div>
 
         {/* Legal Declaration */}
         <div className="mb-8 p-4 border border-gray-400 bg-gray-50">

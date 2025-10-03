@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FileText, Search, Download, Eye, Clock } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
+import { ExhibitCustodyDetailDialog } from './ExhibitCustodyDetailDialog';
 
 interface Exhibit {
   id: string;
@@ -17,6 +18,11 @@ interface Exhibit {
   case_id: string;
   cases?: {
     case_number: string;
+    lab_number: string;
+  };
+  received_profile?: {
+    full_name: string;
+    badge_number: string;
   };
 }
 
@@ -24,6 +30,8 @@ export const ChainOfCustody = () => {
   const [exhibits, setExhibits] = useState<Exhibit[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedExhibit, setSelectedExhibit] = useState<Exhibit | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchExhibits();
@@ -36,7 +44,8 @@ export const ChainOfCustody = () => {
         .select(`
           *,
           cases (
-            case_number
+            case_number,
+            lab_number
           )
         `)
         .order('received_date', { ascending: false });
@@ -68,9 +77,14 @@ export const ChainOfCustody = () => {
 
   const getCustodyEvents = (custodyChain: any[]) => {
     if (!Array.isArray(custodyChain) || custodyChain.length === 0) {
-      return 1; // At least received event
+      return 0;
     }
     return custodyChain.length;
+  };
+
+  const handleViewCustodyDetail = (exhibit: Exhibit) => {
+    setSelectedExhibit(exhibit);
+    setDetailDialogOpen(true);
   };
 
   if (loading) {
@@ -181,11 +195,12 @@ export const ChainOfCustody = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleViewCustodyDetail(exhibit)}
+                        >
                           <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <Download className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>
@@ -196,6 +211,12 @@ export const ChainOfCustody = () => {
           </div>
         </CardContent>
       </Card>
+
+      <ExhibitCustodyDetailDialog
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+        exhibit={selectedExhibit}
+      />
     </div>
   );
 };

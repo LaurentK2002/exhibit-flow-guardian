@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Package, FileText, QrCode, Truck, Archive, Plus, Printer, FolderPlus } from "lucide-react";
+import { Package, FileText, QrCode, Truck, Archive, Plus, Printer } from "lucide-react";
 import { CaseTable } from "@/components/CaseTable";
 import { ChainOfCustody } from "@/components/ChainOfCustody";
 import { EvidenceQueue } from "@/components/role-specific/EvidenceQueue";
@@ -13,14 +13,12 @@ import { PrintExhibitReceiptsDialog } from "@/components/PrintExhibitReceiptsDia
 import { GenerateProfessionalReportDialog } from "@/components/GenerateProfessionalReportDialog";
 import { OfficialReportsTable } from "@/components/OfficialReportsTable";
 import { CaseSearch } from "@/components/CaseSearch";
-import { CreateCaseFileDialog } from "@/components/CreateCaseFileDialog";
 
 export const ExhibitOfficerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [showAddExhibit, setShowAddExhibit] = useState(false);
   const [showBarcodeGenerator, setShowBarcodeGenerator] = useState(false);
   const [showPrintReceipts, setShowPrintReceipts] = useState(false);
-  const [showCreateCase, setShowCreateCase] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -90,14 +88,6 @@ export const ExhibitOfficerDashboard = () => {
               <CardContent className="space-y-3">
                 <Button 
                   className="w-full justify-start" 
-                  variant="default"
-                  onClick={() => setShowCreateCase(true)}
-                >
-                  <FolderPlus className="h-4 w-4 mr-2" />
-                  Create New Case File
-                </Button>
-                <Button 
-                  className="w-full justify-start" 
                   variant="outline"
                   onClick={() => setShowAddExhibit(true)}
                 >
@@ -154,11 +144,6 @@ export const ExhibitOfficerDashboard = () => {
           </div>
         </TabsContent>
       </Tabs>
-
-      <CreateCaseFileDialog 
-        open={showCreateCase} 
-        onOpenChange={setShowCreateCase}
-      />
 
       <AddExhibitDialog 
         open={showAddExhibit} 

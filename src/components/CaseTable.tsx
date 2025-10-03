@@ -122,8 +122,7 @@ export const CaseTable = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Case #</th>
-                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Lab #</th>
+                <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Lab Number</th>
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Title</th>
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Assigned To</th>
                 <th className="text-left py-3 px-2 text-sm font-medium text-muted-foreground">Priority</th>
@@ -144,10 +143,8 @@ export const CaseTable = () => {
                 cases.map((caseItem) => (
                   <tr key={caseItem.id} className="border-b border-border hover:bg-muted/50 transition-colors">
                     <td className="py-3 px-2">
-                      <span className="font-mono text-sm font-medium text-foreground">{caseItem.case_number}</span>
-                    </td>
-                    <td className="py-3 px-2">
-                      <span className="font-mono text-xs text-muted-foreground">{caseItem.lab_number || 'N/A'}</span>
+                      <span className="font-mono text-sm font-medium text-foreground">{caseItem.lab_number || caseItem.case_number}</span>
+                      <div className="text-xs text-muted-foreground">Lab Number</div>
                     </td>
                     <td className="py-3 px-2">
                       <div>

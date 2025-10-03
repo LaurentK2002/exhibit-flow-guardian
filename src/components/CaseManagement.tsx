@@ -204,7 +204,7 @@ export const CaseManagement = () => {
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-sm font-mono text-muted-foreground">{caseItem.case_number}</p>
+                    <p className="text-sm font-mono text-muted-foreground">Lab #: {caseItem.lab_number || caseItem.case_number}</p>
                     <h3 className="font-semibold text-foreground mt-1">{caseItem.title}</h3>
                   </div>
                   <Badge variant={getPriorityColor(caseItem.priority || 'medium')}>

@@ -62,19 +62,8 @@ export const CommandingOfficerDashboard = () => {
                 <CardDescription>High-level operational insights and decisions</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
-                    <p className="font-medium text-blue-800 dark:text-blue-200">Department Goals</p>
-                    <p className="text-sm text-blue-600 dark:text-blue-400">Q1 case resolution target: 85% (Currently: 87%)</p>
-                  </div>
-                  <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
-                    <p className="font-medium text-green-800 dark:text-green-200">Team Expansion</p>
-                    <p className="text-sm text-green-600 dark:text-green-400">3 new analysts starting next month</p>
-                  </div>
-                  <div className="p-4 bg-orange-50 dark:bg-orange-950 rounded-lg border border-orange-200 dark:border-orange-800">
-                    <p className="font-medium text-orange-800 dark:text-orange-200">Training Initiative</p>
-                    <p className="text-sm text-orange-600 dark:text-orange-400">Mobile forensics certification program</p>
-                  </div>
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>Configure department goals and initiatives here</p>
                 </div>
               </CardContent>
             </Card>
@@ -123,17 +112,9 @@ export const CommandingOfficerDashboard = () => {
               <CardDescription>Reports and documents requiring your approval</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div>
-                    <p className="font-medium">Forensic Analysis Report - Case #CC2024-001</p>
-                    <p className="text-sm text-muted-foreground">Submitted by Analyst Johnson</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline">Review</Button>
-                    <Button size="sm">Approve</Button>
-                  </div>
-                </div>
+              <div className="text-center py-8 text-muted-foreground">
+                <CheckCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No pending approvals at this time</p>
               </div>
             </CardContent>
           </Card>

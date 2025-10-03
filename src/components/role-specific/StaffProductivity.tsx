@@ -34,11 +34,12 @@ export const StaffProductivity = () => {
 
   const fetchProductivityData = async () => {
     try {
-      // Fetch active team members
+      // Fetch only active forensic analysts
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('id, full_name, role')
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .eq('role', 'forensic_analyst');
 
       if (profilesError) throw profilesError;
 

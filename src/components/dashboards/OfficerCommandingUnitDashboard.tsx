@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DashboardStats } from "@/components/DashboardStats";
-import { ExhibitTable } from "@/components/ExhibitTable";
+import { CaseTable } from "@/components/CaseTable";
 import { ExhibitAssignment } from "@/components/ExhibitAssignment";
 import { TeamManagement } from "@/components/TeamManagement";
 import { RecentActivity } from "@/components/RecentActivity";
@@ -116,17 +116,7 @@ export const OfficerCommandingUnitDashboard = () => {
         </TabsContent>
 
         <TabsContent value="exhibits" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Exhibit Management</CardTitle>
-              <CardDescription>
-                Manage and assign exhibits to forensic analysts for processing
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ExhibitTable />
-            </CardContent>
-          </Card>
+          <CaseTable />
         </TabsContent>
 
         <TabsContent value="assignments" className="space-y-6">

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Package, FileText, QrCode, Truck, Archive, Plus, Printer } from "lucide-react";
-import { ExhibitTable } from "@/components/ExhibitTable";
+import { CaseTable } from "@/components/CaseTable";
 import { ChainOfCustody } from "@/components/ChainOfCustody";
 import { EvidenceQueue } from "@/components/role-specific/EvidenceQueue";
 import { AddExhibitDialog } from "@/components/AddExhibitDialog";
@@ -120,7 +120,7 @@ export const ExhibitOfficerDashboard = () => {
         </TabsContent>
 
         <TabsContent value="exhibits">
-          <ExhibitTable />
+          <CaseTable />
         </TabsContent>
 
         <TabsContent value="custody">

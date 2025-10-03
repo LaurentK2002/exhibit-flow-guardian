@@ -8,10 +8,12 @@ import { ExhibitTable } from "@/components/ExhibitTable";
 import { ChainOfCustody } from "@/components/ChainOfCustody";
 import { EvidenceQueue } from "@/components/role-specific/EvidenceQueue";
 import { AddExhibitDialog } from "@/components/AddExhibitDialog";
+import { GenerateBarcodesDialog } from "@/components/GenerateBarcodesDialog";
 
 export const ExhibitOfficerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [showAddExhibit, setShowAddExhibit] = useState(false);
+  const [showBarcodeGenerator, setShowBarcodeGenerator] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -86,7 +88,11 @@ export const ExhibitOfficerDashboard = () => {
                   <Plus className="h-4 w-4 mr-2" />
                   Open Case File
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start" 
+                  variant="outline"
+                  onClick={() => setShowBarcodeGenerator(true)}
+                >
                   <QrCode className="h-4 w-4 mr-2" />
                   Generate Barcode Labels
                 </Button>
@@ -137,6 +143,11 @@ export const ExhibitOfficerDashboard = () => {
       <AddExhibitDialog 
         open={showAddExhibit} 
         onOpenChange={setShowAddExhibit}
+      />
+
+      <GenerateBarcodesDialog 
+        open={showBarcodeGenerator} 
+        onOpenChange={setShowBarcodeGenerator}
       />
     </div>
   );

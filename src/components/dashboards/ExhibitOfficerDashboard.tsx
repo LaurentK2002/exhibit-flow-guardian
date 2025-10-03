@@ -34,7 +34,7 @@ export const ExhibitOfficerDashboard = () => {
           </TabsTrigger>
           <TabsTrigger value="exhibits" className="flex items-center gap-2">
             <Archive className="h-4 w-4" />
-            Exhibits
+            Case Files
           </TabsTrigger>
           <TabsTrigger value="custody" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />

@@ -31,7 +31,6 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     caseTitle: '',
     fromDesignation: 'DCI',
     customDesignation: '',
-    location: '',
     caseStatus: 'open' as CaseStatus,
     casePriority: 'medium' as CasePriority,
     irNumber: '',
@@ -255,7 +254,6 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
           lab_number: caseFormData.caseNumber, // Lab number is the primary identifier
           title: caseFormData.caseTitle,
           description: `From: ${caseFormData.fromDesignation === 'Other' ? caseFormData.customDesignation : caseFormData.fromDesignation}`,
-          location: caseFormData.location || null,
           status: caseFormData.caseStatus,
           priority: caseFormData.casePriority,
           exhibit_officer_id: user?.id,
@@ -341,7 +339,6 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
         caseTitle: '',
         fromDesignation: 'DCI',
         customDesignation: '',
-        location: '',
         caseStatus: 'open',
         casePriority: 'medium',
         irNumber: '',
@@ -499,37 +496,25 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  value={caseFormData.location}
-                  onChange={(e) => setCaseFormData({ ...caseFormData, location: e.target.value })}
-                  placeholder="Incident location"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="casePriority">Priority</Label>
-                <Select value={caseFormData.casePriority} onValueChange={(value: CasePriority) => setCaseFormData({ ...caseFormData, casePriority: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {getAvailablePriorities().map((priority) => (
-                      <SelectItem key={priority.value} value={priority.value}>
-                        {priority.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {profile?.role === 'exhibit_officer' && (
-                  <p className="text-xs text-muted-foreground">
-                    Note: Only Commanding Officers can set "Urgent" priority and Officer Commanding Units can set "High" priority.
-                  </p>
-                )}
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="casePriority">Priority</Label>
+              <Select value={caseFormData.casePriority} onValueChange={(value: CasePriority) => setCaseFormData({ ...caseFormData, casePriority: value })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {getAvailablePriorities().map((priority) => (
+                    <SelectItem key={priority.value} value={priority.value}>
+                      {priority.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {profile?.role === 'exhibit_officer' && (
+                <p className="text-xs text-muted-foreground">
+                  Note: Only Commanding Officers can set "Urgent" priority and Officer Commanding Units can set "High" priority.
+                </p>
+              )}
             </div>
           </div>
 

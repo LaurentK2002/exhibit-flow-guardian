@@ -23,6 +23,7 @@ export interface ExhibitFormData {
   storageLocation: string;
   status: ExhibitStatus;
   computerType: string;
+  internalStorageType: string;
 }
 
 interface ExhibitFormProps {
@@ -300,6 +301,22 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove, cas
                     placeholder="Network MAC address"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor={`internalStorageType-${index}`}>Internal Storage Media Type *</Label>
+                <Select 
+                  value={exhibit.internalStorageType} 
+                  onValueChange={(value) => onChange(index, 'internalStorageType', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select storage type..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hdd">HDD (Hard Disk Drive)</SelectItem>
+                    <SelectItem value="ssd">SSD (Solid State Drive)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </>
           )}

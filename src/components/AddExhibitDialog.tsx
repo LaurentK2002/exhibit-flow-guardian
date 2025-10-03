@@ -53,6 +53,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     storageLocation: '',
     status: 'received',
     computerType: '',
+    internalStorageType: '',
   }]);
 
   const [referenceLetterFile, setReferenceLetterFile] = useState<File | null>(null);
@@ -123,6 +124,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
       storageLocation: '',
       status: 'received',
       computerType: '',
+      internalStorageType: '',
     }]);
   };
 
@@ -353,6 +355,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
         storageLocation: '',
         status: 'received',
         computerType: '',
+        internalStorageType: '',
       }]);
 
       setReferenceLetterFile(null);
@@ -435,6 +438,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                         storageLocation: '',
                         status: 'received' as const,
                         computerType: '',
+                        internalStorageType: '',
                       }));
                       setExhibits([...exhibits, ...newExhibits]);
                     } else if (count < currentCount) {
@@ -611,8 +615,8 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                     if (ex.hasSim === 'YES' && ex.simCards.some(sim => !sim.simCardName || !sim.iccid)) return true;
                   }
                   
-                  // Computer - requires computer type, brand, model, and serial number
-                  if (ex.exhibitType === 'computer' && (!ex.computerType || !ex.brand || !ex.model || !ex.serialNumber)) return true;
+                  // Computer - requires computer type, brand, model, serial number, and internal storage type
+                  if (ex.exhibitType === 'computer' && (!ex.computerType || !ex.brand || !ex.model || !ex.serialNumber || !ex.internalStorageType)) return true;
                   
                   // Storage Media - requires brand and serial number
                   if (ex.exhibitType === 'storage_media' && (!ex.brand || !ex.serialNumber)) return true;

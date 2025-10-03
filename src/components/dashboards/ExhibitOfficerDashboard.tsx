@@ -9,11 +9,13 @@ import { ChainOfCustody } from "@/components/ChainOfCustody";
 import { EvidenceQueue } from "@/components/role-specific/EvidenceQueue";
 import { AddExhibitDialog } from "@/components/AddExhibitDialog";
 import { GenerateBarcodesDialog } from "@/components/GenerateBarcodesDialog";
+import { PrintExhibitReceiptsDialog } from "@/components/PrintExhibitReceiptsDialog";
 
 export const ExhibitOfficerDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [showAddExhibit, setShowAddExhibit] = useState(false);
   const [showBarcodeGenerator, setShowBarcodeGenerator] = useState(false);
+  const [showPrintReceipts, setShowPrintReceipts] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -96,7 +98,11 @@ export const ExhibitOfficerDashboard = () => {
                   <QrCode className="h-4 w-4 mr-2" />
                   Generate Barcode Labels
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start" 
+                  variant="outline"
+                  onClick={() => setShowPrintReceipts(true)}
+                >
                   <Printer className="h-4 w-4 mr-2" />
                   Print Exhibit Receipts
                 </Button>
@@ -148,6 +154,11 @@ export const ExhibitOfficerDashboard = () => {
       <GenerateBarcodesDialog 
         open={showBarcodeGenerator} 
         onOpenChange={setShowBarcodeGenerator}
+      />
+
+      <PrintExhibitReceiptsDialog 
+        open={showPrintReceipts} 
+        onOpenChange={setShowPrintReceipts}
       />
     </div>
   );

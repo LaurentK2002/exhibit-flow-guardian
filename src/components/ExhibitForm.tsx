@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Plus } from 'lucide-react';
 import { Database } from '@/integrations/supabase/types';
 
 type ExhibitType = Database['public']['Enums']['exhibit_type'];
@@ -18,8 +18,7 @@ export interface ExhibitFormData {
   imei: string;
   macAddress: string;
   hasSim: string;
-  simCardName: string;
-  iccid: string;
+  simCards: Array<{ simCardName: string; iccid: string }>;
   description: string;
   storageLocation: string;
   status: ExhibitStatus;
@@ -28,7 +27,7 @@ export interface ExhibitFormData {
 interface ExhibitFormProps {
   exhibit: ExhibitFormData;
   index: number;
-  onChange: (index: number, field: keyof ExhibitFormData, value: string) => void;
+  onChange: (index: number, field: keyof ExhibitFormData, value: any) => void;
   onRemove: (index: number) => void;
   canRemove: boolean;
 }
@@ -39,6 +38,21 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
   const isComputer = exhibit.exhibitType === 'computer';
   const isStorageMedia = exhibit.exhibitType === 'storage_media';
   const isNetworkDevice = exhibit.exhibitType === 'network_device';
+
+  const addSimCard = () => {
+    onChange(index, 'simCards', [...exhibit.simCards, { simCardName: '', iccid: '' }]);
+  };
+
+  const removeSimCard = (simIndex: number) => {
+    const newSimCards = exhibit.simCards.filter((_, i) => i !== simIndex);
+    onChange(index, 'simCards', newSimCards);
+  };
+
+  const updateSimCard = (simIndex: number, field: 'simCardName' | 'iccid', value: string) => {
+    const newSimCards = [...exhibit.simCards];
+    newSimCards[simIndex] = { ...newSimCards[simIndex], [field]: value };
+    onChange(index, 'simCards', newSimCards);
+  };
 
   return (
     <div className="space-y-4 border rounded-lg p-4 relative">
@@ -146,29 +160,57 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
 
               {exhibit.hasSim === 'YES' && (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor={`simCardName-${index}`}>SIM Card Name *</Label>
-                      <Input
-                        id={`simCardName-${index}`}
-                        value={exhibit.simCardName}
-                        onChange={(e) => onChange(index, 'simCardName', e.target.value)}
-                        placeholder="e.g., Vodacom, Airtel"
-                        required
-                      />
-                    </div>
+                  {exhibit.simCards.map((sim, simIndex) => (
+                    <div key={simIndex} className="space-y-4 border-l-2 border-primary pl-4">
+                      <div className="flex justify-between items-center">
+                        <h5 className="font-medium">SIM Card {simIndex + 1}</h5>
+                        {exhibit.simCards.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeSimCard(simIndex)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`simCardName-${index}-${simIndex}`}>SIM Card Name *</Label>
+                          <Input
+                            id={`simCardName-${index}-${simIndex}`}
+                            value={sim.simCardName}
+                            onChange={(e) => updateSimCard(simIndex, 'simCardName', e.target.value)}
+                            placeholder="e.g., Vodacom, Airtel"
+                            required
+                          />
+                        </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor={`iccid-${index}`}>ICCID Number *</Label>
-                      <Input
-                        id={`iccid-${index}`}
-                        value={exhibit.iccid}
-                        onChange={(e) => onChange(index, 'iccid', e.target.value)}
-                        placeholder="SIM card ICCID number"
-                        required
-                      />
+                        <div className="space-y-2">
+                          <Label htmlFor={`iccid-${index}-${simIndex}`}>ICCID Number *</Label>
+                          <Input
+                            id={`iccid-${index}-${simIndex}`}
+                            value={sim.iccid}
+                            onChange={(e) => updateSimCard(simIndex, 'iccid', e.target.value)}
+                            placeholder="SIM card ICCID number"
+                            required
+                          />
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ))}
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addSimCard}
+                    className="w-full"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Another SIM Card
+                  </Button>
                 </>
               )}
             </>

@@ -47,8 +47,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     imei: '',
     macAddress: '',
     hasSim: 'NO',
-    simCardName: '',
-    iccid: '',
+    simCards: [{ simCardName: '', iccid: '' }],
     description: '',
     storageLocation: '',
     status: 'received',
@@ -117,8 +116,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
       imei: '',
       macAddress: '',
       hasSim: 'NO',
-      simCardName: '',
-      iccid: '',
+      simCards: [{ simCardName: '', iccid: '' }],
       description: '',
       storageLocation: '',
       status: 'received',
@@ -346,8 +344,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
         imei: '',
         macAddress: '',
         hasSim: 'NO',
-        simCardName: '',
-        iccid: '',
+        simCards: [{ simCardName: '', iccid: '' }],
         description: '',
         storageLocation: '',
         status: 'received',
@@ -557,8 +554,11 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
                   // Basic validation - device name is always required
                   if (!ex.deviceName) return true;
                   
-                  // Mobile Device - requires brand, IMEI, hasSim selection, and simCardName + ICCID if SIM present
-                  if (ex.exhibitType === 'mobile_device' && (!ex.brand || !ex.imei || !ex.hasSim || (ex.hasSim === 'YES' && (!ex.simCardName || !ex.iccid)))) return true;
+                  // Mobile Device - requires brand, IMEI, hasSim selection, and all SIM cards filled if present
+                  if (ex.exhibitType === 'mobile_device') {
+                    if (!ex.brand || !ex.imei || !ex.hasSim) return true;
+                    if (ex.hasSim === 'YES' && ex.simCards.some(sim => !sim.simCardName || !sim.iccid)) return true;
+                  }
                   
                   // Computer - requires brand, model, and serial number
                   if (ex.exhibitType === 'computer' && (!ex.brand || !ex.model || !ex.serialNumber)) return true;

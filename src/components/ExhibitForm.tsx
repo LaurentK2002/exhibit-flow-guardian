@@ -18,6 +18,7 @@ export interface ExhibitFormData {
   imei: string;
   macAddress: string;
   hasSim: string;
+  simCardName: string;
   iccid: string;
   description: string;
   storageLocation: string;
@@ -144,16 +145,31 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove }: E
               </div>
 
               {exhibit.hasSim === 'YES' && (
-                <div className="space-y-2">
-                  <Label htmlFor={`iccid-${index}`}>ICCID Number *</Label>
-                  <Input
-                    id={`iccid-${index}`}
-                    value={exhibit.iccid}
-                    onChange={(e) => onChange(index, 'iccid', e.target.value)}
-                    placeholder="SIM card ICCID number"
-                    required
-                  />
-                </div>
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor={`simCardName-${index}`}>SIM Card Name *</Label>
+                      <Input
+                        id={`simCardName-${index}`}
+                        value={exhibit.simCardName}
+                        onChange={(e) => onChange(index, 'simCardName', e.target.value)}
+                        placeholder="e.g., Vodacom, Airtel"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor={`iccid-${index}`}>ICCID Number *</Label>
+                      <Input
+                        id={`iccid-${index}`}
+                        value={exhibit.iccid}
+                        onChange={(e) => onChange(index, 'iccid', e.target.value)}
+                        placeholder="SIM card ICCID number"
+                        required
+                      />
+                    </div>
+                  </div>
+                </>
               )}
             </>
           )}

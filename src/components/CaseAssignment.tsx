@@ -41,12 +41,19 @@ export const CaseAssignment = () => {
       const { data, error } = await supabase
         .from('cases')
         .select('*')
+        .is('assigned_to', null)
+        .is('analyst_id', null)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setCases(data || []);
+      // Double-check filtering to ensure only truly unassigned cases
+      const unassignedCases = (data || []).filter(
+        c => !c.assigned_to && !c.analyst_id
+      );
+      setCases(unassignedCases);
     } catch (error) {
       console.error('Error fetching cases:', error);
+      setCases([]);
     }
   };
 
@@ -75,6 +82,7 @@ export const CaseAssignment = () => {
 
   const assignCase = async (caseId: string, analystId: string) => {
     try {
+      // Update both assigned_to and analyst_id for consistency
       const { error } = await supabase
         .from('cases')
         .update({ 
@@ -90,7 +98,11 @@ export const CaseAssignment = () => {
         description: "Case assigned successfully",
       });
 
-      fetchCases(); // Refresh cases
+      // Immediately remove from local state for instant UI update
+      setCases(prevCases => prevCases.filter(c => c.id !== caseId));
+      
+      // Refresh cases list to ensure consistency
+      await fetchCases();
     } catch (error) {
       console.error('Error assigning case:', error);
       toast({
@@ -98,6 +110,8 @@ export const CaseAssignment = () => {
         description: "Failed to assign case",
         variant: "destructive",
       });
+      // Refetch on error to restore correct state
+      fetchCases();
     }
   };
 
@@ -147,21 +161,21 @@ export const CaseAssignment = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div className="text-center p-4 bg-muted/50 rounded-lg">
               <div className="text-2xl font-bold text-blue-600">
-                {cases.filter(c => c.status === 'open').length}
+                {cases.length}
               </div>
               <div className="text-sm text-muted-foreground">Unassigned Cases</div>
             </div>
             <div className="text-center p-4 bg-muted/50 rounded-lg">
               <div className="text-2xl font-bold text-orange-600">
-                {cases.filter(c => c.status === 'in_progress').length}
-              </div>
-              <div className="text-sm text-muted-foreground">In Progress</div>
-            </div>
-            <div className="text-center p-4 bg-muted/50 rounded-lg">
-              <div className="text-2xl font-bold text-red-600">
                 {cases.filter(c => c.priority === 'high').length}
               </div>
               <div className="text-sm text-muted-foreground">High Priority</div>
+            </div>
+            <div className="text-center p-4 bg-muted/50 rounded-lg">
+              <div className="text-2xl font-bold text-red-600">
+                {cases.filter(c => c.priority === 'critical').length}
+              </div>
+              <div className="text-sm text-muted-foreground">Critical Priority</div>
             </div>
             <div className="text-center p-4 bg-muted/50 rounded-lg">
               <div className="text-2xl font-bold text-green-600">

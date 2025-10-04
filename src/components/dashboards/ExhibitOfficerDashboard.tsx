@@ -25,7 +25,7 @@ export const ExhibitOfficerDashboard = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Evidence Management</h1>
+          <h1 className="text-3xl font-bold text-foreground">Case Management</h1>
           <p className="text-muted-foreground">Digital exhibits and chain of custody</p>
         </div>
         <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">

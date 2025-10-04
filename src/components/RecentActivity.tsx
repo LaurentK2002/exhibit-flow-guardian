@@ -60,18 +60,51 @@ export const RecentActivity = () => {
 
   const fetchActivities = async () => {
     try {
-      const { data, error } = await supabase
+      // 1) Fetch recent activities (no joins to avoid FK dependency)
+      const { data: acts, error: actsError } = await supabase
         .from('case_activities')
-        .select(`
-          *,
-          profiles!user_id(full_name),
-          cases(case_number, title)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(6);
 
-      if (error) throw error;
-      setActivities((data as unknown) as Activity[] || []);
+      if (actsError) throw actsError;
+
+      const activities = (acts || []) as Activity[];
+
+      // 2) Collect related IDs
+      const userIds = Array.from(new Set(activities.map(a => a.user_id).filter(Boolean))) as string[];
+      const caseIds = Array.from(new Set(activities.map(a => a.case_id).filter(Boolean))) as string[];
+
+      // 3) Fetch related profiles and cases in parallel (if any)
+      const [profilesRes, casesRes] = await Promise.all([
+        userIds.length
+          ? supabase.from('profiles').select('id, full_name').in('id', userIds)
+          : Promise.resolve({ data: [], error: null } as { data: any[]; error: any }),
+        caseIds.length
+          ? supabase.from('cases').select('id, case_number, title').in('id', caseIds)
+          : Promise.resolve({ data: [], error: null } as { data: any[]; error: any })
+      ]);
+
+      if (profilesRes.error) throw profilesRes.error;
+      if (casesRes.error) throw casesRes.error;
+
+      const profilesMap = new Map<string, { id: string; full_name: string }>();
+      (profilesRes.data || []).forEach((p: any) => profilesMap.set(p.id, p));
+
+      const casesMap = new Map<string, { id: string; case_number: string; title: string }>();
+      (casesRes.data || []).forEach((c: any) => casesMap.set(c.id, c));
+
+      // 4) Enrich activities with related info (matching previous shape)
+      const enriched: Activity[] = activities.map((a: any) => ({
+        ...a,
+        profiles: a.user_id ? { full_name: profilesMap.get(a.user_id)?.full_name || 'System' } : null,
+        cases: a.case_id ? {
+          case_number: casesMap.get(a.case_id)?.case_number || '',
+          title: casesMap.get(a.case_id)?.title || ''
+        } : null
+      }));
+
+      setActivities(enriched);
     } catch (error) {
       console.error('Error fetching activities:', error);
     } finally {

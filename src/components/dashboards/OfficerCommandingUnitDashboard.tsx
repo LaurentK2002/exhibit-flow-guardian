@@ -95,11 +95,11 @@ export const OfficerCommandingUnitDashboard = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => setActiveTab('assignments')}>
                   <FileText className="h-4 w-4 mr-2" />
                   Assign 12 pending exhibits to analysts
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => setActiveTab('analytics')}>
                   <Users className="h-4 w-4 mr-2" />
                   Review analyst workload distribution
                 </Button>
@@ -109,7 +109,7 @@ export const OfficerCommandingUnitDashboard = () => {
                     Generate official report for CO
                   </Button>
                 </CreateOfficialReportDialog>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => setActiveTab('cases')}>
                   <AlertCircle className="h-4 w-4 mr-2" />
                   Address 3 overdue case analyses
                 </Button>

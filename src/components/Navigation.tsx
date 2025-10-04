@@ -39,9 +39,6 @@ export const Navigation = () => {
       case 'exhibit_officer':
         return [
           { icon: Home, label: 'Home', path: '/' },
-          { icon: Database, label: 'Evidence Queue', path: '/evidence-queue' },
-          { icon: Activity, label: 'Chain of Custody', path: '/chain-of-custody' },
-          { icon: FileText, label: 'Case Files', path: '/cases' },
         ];
       case 'analyst':
         return [

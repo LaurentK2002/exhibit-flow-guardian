@@ -179,30 +179,14 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     }
   };
 
-  const generateExhibitNumber = async (caseLabNumber: string) => {
-    // New format: CYB/LAB/(LAB NO)/A1, A2, A3, etc.
-    const { data } = await supabase
-      .from('exhibits')
-      .select('exhibit_number')
-      .like('exhibit_number', `CYB/LAB/${caseLabNumber}/A%`)
-      .order('created_at', { ascending: false });
-
-    let nextNumber = 1;
-    if (data && data.length > 0) {
-      // Find the highest A number for this lab number
-      const numbers = data
-        .map(exhibit => {
-          const match = exhibit.exhibit_number.match(/\/A(\d+)$/);
-          return match ? parseInt(match[1]) : 0;
-        })
-        .filter(num => num > 0);
-      
-      if (numbers.length > 0) {
-        nextNumber = Math.max(...numbers) + 1;
-      }
-    }
-
-    return `CYB/LAB/${caseLabNumber}/A${nextNumber}`;
+  const generateExhibitNumber = (caseLabNumber: string, index: number, totalExhibits: number) => {
+    // Extract #### from lab number format: FB/CYBER/YYYY/LAB/####
+    const match = caseLabNumber.match(/LAB\/(\d{4})$/);
+    const labSequence = match ? match[1] : '0000';
+    
+    // Format: CYB/LAB/####/A for single exhibit, CYB/LAB/####/A1, A2, etc. for multiple
+    const exhibitSuffix = totalExhibits === 1 ? 'A' : `A${index + 1}`;
+    return `CYB/LAB/${labSequence}/${exhibitSuffix}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -265,8 +249,9 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
 
       // Create all exhibits linked to the new case sequentially to avoid duplicate exhibit numbers
       const createdExhibits = [];
-      for (const exhibit of exhibits) {
-        const exhibitNumber = await generateExhibitNumber(caseData.lab_number || caseData.case_number);
+      for (let i = 0; i < exhibits.length; i++) {
+        const exhibit = exhibits[i];
+        const exhibitNumber = generateExhibitNumber(caseData.lab_number || caseData.case_number, i, exhibits.length);
         
         // Initialize chain of custody with receipt event
         const initialCustodyEvent = {

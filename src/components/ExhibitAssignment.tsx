@@ -228,7 +228,6 @@ export const ExhibitAssignment = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Case #</TableHead>
-                  <TableHead>Device</TableHead>
                   <TableHead>Priority</TableHead>
                   <TableHead>Received</TableHead>
                   <TableHead>Assign To</TableHead>
@@ -238,7 +237,7 @@ export const ExhibitAssignment = () => {
               <TableBody>
                 {unassignedExhibits.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                       All exhibits are assigned to analysts
                     </TableCell>
                   </TableRow>
@@ -246,7 +245,6 @@ export const ExhibitAssignment = () => {
                   unassignedExhibits.map((exhibit) => (
                     <TableRow key={exhibit.id}>
                       <TableCell>{exhibit.cases?.case_number || 'N/A'}</TableCell>
-                      <TableCell>{exhibit.device_name}</TableCell>
                       <TableCell>
                         <Badge className={getPriorityColor(exhibit.cases?.priority || 'medium')}>
                           {exhibit.cases?.priority || 'medium'}
@@ -319,7 +317,6 @@ export const ExhibitAssignment = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Case #</TableHead>
-                  <TableHead>Device</TableHead>
                   <TableHead>Assigned To</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Priority</TableHead>
@@ -329,7 +326,7 @@ export const ExhibitAssignment = () => {
               <TableBody>
                 {assignedExhibits.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                       No exhibits assigned yet
                     </TableCell>
                   </TableRow>
@@ -337,7 +334,6 @@ export const ExhibitAssignment = () => {
                   assignedExhibits.map((exhibit) => (
                     <TableRow key={exhibit.id}>
                       <TableCell>{exhibit.cases?.case_number || 'N/A'}</TableCell>
-                      <TableCell>{exhibit.device_name}</TableCell>
                       <TableCell>
                         <div>
                           <div className="font-medium">{exhibit.analyst_profile?.full_name}</div>

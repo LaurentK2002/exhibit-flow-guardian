@@ -161,29 +161,56 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
         .from("case-documents")
         .list(caseId);
 
-      // Fetch reference letters
-      const { data: referenceLetters } = await supabase.storage
-        .from("case-documents")
-        .list("reference-letters");
+      // Recursively fetch reference letters under nested folders
+      const listAll = async (
+        prefix: string
+      ): Promise<{ id: string; name: string; created_at: string | null; path: string }[]> => {
+        const results: { id: string; name: string; created_at: string | null; path: string }[] = [];
+        const { data: items, error: listError } = await supabase.storage
+          .from("case-documents")
+          .list(prefix);
+        if (listError) {
+          console.error("Error listing storage items:", listError);
+          return results;
+        }
+        for (const item of items || []) {
+          const currentPath = prefix ? `${prefix}/${item.name}` : item.name;
+          // Folders in Supabase Storage have null id; files have an id
+          if (!item.id) {
+            const children = await listAll(currentPath);
+            results.push(...children);
+          } else {
+            results.push({
+              id: item.id,
+              name: item.name,
+              created_at: item.created_at || null,
+              path: currentPath,
+            });
+          }
+        }
+        return results;
+      };
 
-      // Filter reference letters that match this case's lab number or case number
-      const caseReferenceLetters = referenceLetters?.filter((file) => 
-        file.name.includes(caseData.lab_number || caseData.case_number)
-      ) || [];
+      const allRefFiles = await listAll("reference-letters");
+
+      const tokens = [caseData.lab_number, caseData.case_number].filter(Boolean) as string[];
+      const matchedRefFiles = allRefFiles.filter((f) =>
+        tokens.some((t) => f.path.includes(t))
+      );
+
+      const refFilesToShow = matchedRefFiles.length > 0 ? matchedRefFiles : allRefFiles;
 
       const allDocuments = [
         ...(caseDocuments?.map((doc) => ({
           id: doc.id,
           file_path: `${caseId}/${doc.name}`,
           created_at: doc.created_at,
-          type: 'case_document'
         })) || []),
-        ...(caseReferenceLetters.map((doc) => ({
+        ...refFilesToShow.map((doc) => ({
           id: doc.id,
-          file_path: `reference-letters/${doc.name}`,
-          created_at: doc.created_at,
-          type: 'reference_letter'
-        })) || [])
+          file_path: doc.path,
+          created_at: doc.created_at || new Date().toISOString(),
+        })),
       ];
 
       setCaseDetails({
@@ -239,11 +266,12 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
 
   const previewDocument = async (fileName: string) => {
     try {
-      const { data } = await supabase.storage
+      const { data, error } = await supabase.storage
         .from("case-documents")
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 60);
 
-      window.open(data.publicUrl, "_blank");
+      if (error) throw error;
+      window.open(data.signedUrl, "_blank");
     } catch (error) {
       console.error("Error previewing document:", error);
       toast({

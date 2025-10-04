@@ -116,8 +116,6 @@ export const OfficerCommandingUnitDashboard = () => {
               </CardContent>
             </Card>
           </div>
-
-          <RecentActivity />
         </TabsContent>
 
         <TabsContent value="cases" className="space-y-6">

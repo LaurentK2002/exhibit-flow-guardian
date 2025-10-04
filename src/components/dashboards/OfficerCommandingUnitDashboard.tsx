@@ -24,7 +24,7 @@ export const OfficerCommandingUnitDashboard = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Unit Command Center</h1>
-          <p className="text-muted-foreground">Operational oversight and exhibit management</p>
+          <p className="text-muted-foreground">Operational oversight and case management</p>
         </div>
         <Badge variant="default" className="px-4 py-2">
           Officer Commanding Unit

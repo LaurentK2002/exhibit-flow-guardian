@@ -91,7 +91,7 @@ export const ExhibitOfficerDashboard = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Evidence Processing Tools</CardTitle>
+                <CardTitle>Case Processing Tools</CardTitle>
                 <CardDescription>Specialized exhibit management</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">

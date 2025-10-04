@@ -65,12 +65,18 @@ export const UnassignedCasesForOCU = () => {
         .from('profiles')
         .select('id, full_name, role')
         .eq('role', 'analyst')
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .order('full_name');
 
-      if (error) throw error;
-      setAnalysts(data || []);
+      if (error) {
+        console.error('Error fetching analysts:', error);
+        setAnalysts([]);
+      } else {
+        setAnalysts(data || []);
+      }
     } catch (error) {
       console.error('Error fetching analysts:', error);
+      setAnalysts([]);
     }
   };
 

@@ -55,11 +55,7 @@ export const CaseManagement = () => {
     try {
       const { data, error } = await supabase
         .from('cases')
-        .select(`
-          *,
-          profiles:assigned_to(full_name, role),
-          supervisor:supervisor_id(full_name)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;

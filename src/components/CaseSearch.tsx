@@ -60,16 +60,9 @@ export const CaseSearch = () => {
     try {
       let query = supabase
         .from("cases")
-        .select(`
-          id,
-          case_number,
-          lab_number,
-          title,
-          status,
-          priority,
-          analyst_id,
-          analyst:analyst_id(full_name)
-        `)
+        .select(
+          "id, case_number, lab_number, title, status, priority, analyst_id"
+        )
         .ilike('lab_number', `%${searchQuery}%`);
 
       // If user is an analyst, only show their assigned cases

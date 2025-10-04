@@ -179,7 +179,7 @@ export const ExhibitAssignment = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ClipboardList className="h-5 w-5" />
-            Exhibit Assignment Dashboard
+            Case Assignment Dashboard
           </CardTitle>
           <CardDescription>Assign exhibits to analysts and manage workload distribution</CardDescription>
         </CardHeader>

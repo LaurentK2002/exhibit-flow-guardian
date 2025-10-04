@@ -265,7 +265,7 @@ export const GenerateProfessionalReportDialog = ({ children }: GenerateProfessio
           report_type: `${period}_evidence_report`,
           content,
           generated_by: user.id,
-          is_final: true,
+          is_final: false,
         });
 
       if (insertError) throw insertError;
@@ -279,8 +279,8 @@ export const GenerateProfessionalReportDialog = ({ children }: GenerateProfessio
       });
 
       toast({
-        title: "Report Generated",
-        description: `${period.charAt(0).toUpperCase() + period.slice(1)} report created successfully`,
+        title: "Report Submitted",
+        description: `${period.charAt(0).toUpperCase() + period.slice(1)} report sent to OCU for review`,
       });
 
       setOpen(false);

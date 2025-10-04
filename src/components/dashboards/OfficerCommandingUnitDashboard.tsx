@@ -14,6 +14,7 @@ import { OfficialReportsTable } from "@/components/OfficialReportsTable";
 import { FileText, Users, TrendingUp, AlertCircle, Send } from "lucide-react";
 import { CaseSearch } from "@/components/CaseSearch";
 import { ReportReviewPanel } from "@/components/ReportReviewPanel";
+import { ProfessionalReportReview } from "@/components/ProfessionalReportReview";
 import { UnassignedCasesForOCU } from "@/components/UnassignedCasesForOCU";
 
 export const OfficerCommandingUnitDashboard = () => {
@@ -34,13 +35,14 @@ export const OfficerCommandingUnitDashboard = () => {
 
       {/* Main Dashboard */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="cases">Cases</TabsTrigger>
           <TabsTrigger value="assignments">Assignments</TabsTrigger>
-          <TabsTrigger value="review">Report Review</TabsTrigger>
+          <TabsTrigger value="review">Analyst Reports</TabsTrigger>
+          <TabsTrigger value="professional">Professional Reports</TabsTrigger>
           <TabsTrigger value="team">Team</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
+          <TabsTrigger value="reports">Official Reports</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
@@ -129,6 +131,10 @@ export const OfficerCommandingUnitDashboard = () => {
 
         <TabsContent value="review" className="space-y-6">
           <ReportReviewPanel />
+        </TabsContent>
+
+        <TabsContent value="professional" className="space-y-6">
+          <ProfessionalReportReview />
         </TabsContent>
 
         <TabsContent value="team" className="space-y-6">

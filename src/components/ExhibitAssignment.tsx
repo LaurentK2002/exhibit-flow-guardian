@@ -218,7 +218,7 @@ export const ExhibitAssignment = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-red-500" />
-            Exhibits Requiring Assignment
+            Cases Requiring Assignment
           </CardTitle>
           <CardDescription>Assign unassigned exhibits to available analysts</CardDescription>
         </CardHeader>
@@ -311,7 +311,7 @@ export const ExhibitAssignment = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5 text-green-600" />
-            Assigned Exhibits
+            Assigned Cases
           </CardTitle>
           <CardDescription>View and manage already assigned exhibits</CardDescription>
         </CardHeader>

@@ -263,8 +263,9 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
 
       if (caseError) throw caseError;
 
-      // Create all exhibits linked to the new case
-      const exhibitPromises = exhibits.map(async (exhibit) => {
+      // Create all exhibits linked to the new case sequentially to avoid duplicate exhibit numbers
+      const createdExhibits = [];
+      for (const exhibit of exhibits) {
         const exhibitNumber = await generateExhibitNumber(caseData.lab_number || caseData.case_number);
         
         // Initialize chain of custody with receipt event
@@ -304,6 +305,7 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
           .from('case_activities')
           .insert({
             case_id: caseData.id,
+            user_id: user?.id,
             activity_type: 'exhibit_received',
             description: `Digital exhibit "${exhibit.deviceName}" (${exhibitNumber}) received and logged into evidence system for case ${caseData.case_number}`,
             metadata: { 
@@ -317,10 +319,8 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
             },
           });
 
-        return { exhibitNumber };
-      });
-
-      const createdExhibits = await Promise.all(exhibitPromises);
+        createdExhibits.push({ exhibitNumber });
+      }
 
       // Log case creation activity
       await supabase

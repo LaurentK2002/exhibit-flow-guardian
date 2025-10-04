@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Package, FileText, QrCode, Truck, Archive, Plus, Printer } from "lucide-react";
+import { Package, FileText, QrCode, Truck, Archive, Plus, Printer, Home } from "lucide-react";
+import { Link } from "react-router-dom";
 import { CaseTable } from "@/components/CaseTable";
 import { ChainOfCustody } from "@/components/ChainOfCustody";
 import { EvidenceQueue } from "@/components/role-specific/EvidenceQueue";
@@ -23,9 +24,17 @@ export const ExhibitOfficerDashboard = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Evidence Management</h1>
-          <p className="text-muted-foreground">Digital exhibits and chain of custody</p>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/">
+              <Home className="h-4 w-4 mr-2" />
+              Home
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Evidence Management</h1>
+            <p className="text-muted-foreground">Digital exhibits and chain of custody</p>
+          </div>
         </div>
         <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
           <Package className="h-4 w-4 mr-1" />

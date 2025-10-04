@@ -64,7 +64,6 @@ export const ExhibitOfficerDashboard = () => {
 
         <TabsContent value="overview" className="space-y-6">
           <CaseSearch />
-          <EvidenceQueue />
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>

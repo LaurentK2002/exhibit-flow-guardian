@@ -21,7 +21,7 @@ type Case = Database['public']['Tables']['cases']['Row'] & {
   activities_count?: number;
 };
 
-export const CaseTable = () => {
+export const CaseTable = ({ hideUnassigned = false }: { hideUnassigned?: boolean }) => {
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
@@ -129,7 +129,7 @@ export const CaseTable = () => {
                   </td>
                 </tr>
               ) : (
-                cases.map((caseItem) => (
+                (hideUnassigned ? cases.filter((c) => c.assigned_to || c.analyst_id) : cases).map((caseItem) => (
                   <tr key={caseItem.id} className="border-b border-border hover:bg-muted/50 transition-colors">
                     <td className="py-3 px-3">
                       <span className="font-mono text-xs font-medium text-foreground whitespace-nowrap">{caseItem.lab_number || caseItem.case_number}</span>

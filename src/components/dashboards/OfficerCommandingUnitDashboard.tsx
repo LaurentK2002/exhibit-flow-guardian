@@ -48,7 +48,7 @@ export const OfficerCommandingUnitDashboard = () => {
 
         <TabsContent value="cases" className="space-y-6">
           <UnassignedCasesForOCU />
-          <CaseTable />
+          <CaseTable hideUnassigned />
         </TabsContent>
 
         <TabsContent value="assignments" className="space-y-6">

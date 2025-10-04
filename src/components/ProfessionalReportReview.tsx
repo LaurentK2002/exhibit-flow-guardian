@@ -50,7 +50,7 @@ export const ProfessionalReportReview = () => {
         .from("reports")
         .select(`
           *,
-          profiles!reports_generated_by_fkey(full_name, badge_number)
+          profiles!generated_by(full_name, badge_number)
         `)
         .order("created_at", { ascending: false });
 

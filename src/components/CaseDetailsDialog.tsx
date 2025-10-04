@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { CaseStatusBadge, CaseStatus } from "./CaseStatusBadge";
 import { useToast } from "@/hooks/use-toast";
+import { normalizeExhibitNumber } from "@/lib/exhibitNumber";
 
 interface CaseDetailsDialogProps {
   caseId: string | null;
@@ -559,7 +560,7 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
                         <div className="flex items-start justify-between">
                           <div className="space-y-2 flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="font-mono font-semibold">{exhibit.exhibit_number}</span>
+                              <span className="font-mono font-semibold">{normalizeExhibitNumber(exhibit.exhibit_number, caseDetails.lab_number)}</span>
                               {getExhibitStatusBadge(exhibit.status)}
                             </div>
                             <p className="text-sm font-medium">{exhibit.device_name}</p>

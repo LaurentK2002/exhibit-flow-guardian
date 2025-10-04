@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Printer } from "lucide-react";
 import { PrintableBarcodeLabels } from "./PrintableBarcodeLabels";
+import { normalizeExhibitNumber } from "@/lib/exhibitNumber";
 
 interface Case {
   id: string;
@@ -80,7 +81,11 @@ export function GenerateBarcodesDialog({ open, onOpenChange }: GenerateBarcodesD
 
       if (error) throw error;
       
-      setExhibits(data || []);
+      const normalized = (data || []).map((e) => ({
+        ...e,
+        exhibit_number: normalizeExhibitNumber(e.exhibit_number, e.cases?.lab_number),
+      }));
+      setExhibits(normalized);
       
       if (!data || data.length === 0) {
         toast.info('No exhibits found for this case file');

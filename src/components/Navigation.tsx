@@ -49,9 +49,7 @@ export const Navigation = () => {
           { icon: BarChart3, label: 'Case Analytics', path: '/analytics' },
         ];
       default:
-        return [
-          { icon: FileText, label: 'Dashboard', path: '/' },
-        ];
+        return [];
     }
   };
 

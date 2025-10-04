@@ -341,7 +341,7 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
           </DialogTitle>
           <DialogDescription className="flex items-center gap-2 flex-wrap">
             <span className="font-mono font-semibold">{caseDetails.case_number}</span>
-            {caseDetails.lab_number && (
+            {caseDetails.lab_number && caseDetails.lab_number !== caseDetails.case_number && (
               <>
                 <span>•</span>
                 <span className="font-mono">{caseDetails.lab_number}</span>
@@ -378,10 +378,12 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
                     <p className="text-sm text-muted-foreground">Case Number</p>
                     <p className="font-mono font-medium">{caseDetails.case_number}</p>
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Lab Number</p>
-                    <p className="font-mono font-medium">{caseDetails.lab_number || "Not assigned"}</p>
-                  </div>
+                  {caseDetails.lab_number && caseDetails.lab_number !== caseDetails.case_number && (
+                    <div>
+                      <p className="text-sm text-muted-foreground">Lab Number</p>
+                      <p className="font-mono font-medium">{caseDetails.lab_number}</p>
+                    </div>
+                  )}
                   <div>
                     <p className="text-sm text-muted-foreground">Status</p>
                     <div className="mt-1">

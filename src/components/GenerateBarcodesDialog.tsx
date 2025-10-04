@@ -148,7 +148,7 @@ export function GenerateBarcodesDialog({ open, onOpenChange }: GenerateBarcodesD
               <SelectContent>
                 {cases.map((caseFile) => (
                   <SelectItem key={caseFile.id} value={caseFile.id}>
-                    {caseFile.lab_number} - {caseFile.case_number} ({caseFile.title})
+                    {caseFile.lab_number === caseFile.case_number ? `${caseFile.lab_number} (${caseFile.title})` : `${caseFile.lab_number} - ${caseFile.case_number} (${caseFile.title})`}
                   </SelectItem>
                 ))}
               </SelectContent>

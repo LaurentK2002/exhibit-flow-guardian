@@ -64,7 +64,7 @@ export const RecentActivity = () => {
         .from('case_activities')
         .select(`
           *,
-          profiles!case_activities_user_id_fkey(full_name),
+          profiles!user_id(full_name),
           cases(case_number, title)
         `)
         .order('created_at', { ascending: false })

@@ -11,7 +11,6 @@ import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import { CreateOfficialReportDialog } from "@/components/CreateOfficialReportDialog";
 import { OfficialReportsTable } from "@/components/OfficialReportsTable";
 import { FileText } from "lucide-react";
-import { CaseSearch } from "@/components/CaseSearch";
 import { ReportReviewPanel } from "@/components/ReportReviewPanel";
 import { ProfessionalReportReview } from "@/components/ProfessionalReportReview";
 import { UnassignedCasesForOCU } from "@/components/UnassignedCasesForOCU";
@@ -44,7 +43,6 @@ export const OfficerCommandingUnitDashboard = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <CaseSearch />
           <DashboardStats />
         </TabsContent>
 

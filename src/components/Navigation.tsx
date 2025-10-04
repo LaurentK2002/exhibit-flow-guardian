@@ -62,19 +62,10 @@ export const Navigation = () => {
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-4">
-              <div className="bg-white p-2 rounded-lg shadow-md">
-                <img 
-                  src="/images/tanzania-police-logo.png" 
-                  alt="Tanzania Police Force Logo" 
-                  className="h-12 w-12 object-contain"
-                />
-              </div>
-              <div className="flex items-center space-x-6">
-                <h1 className="text-2xl font-bold text-white tracking-wider">TANZANIA POLICE FORCE</h1>
-                <div className="h-8 w-px bg-blue-300 opacity-50"></div>
-                <p className="text-sm text-blue-200 font-medium">Cyber Crimes Investigation Unit</p>
-              </div>
+            <div className="flex items-center space-x-6">
+              <h1 className="text-2xl font-bold text-white tracking-wider">TANZANIA POLICE FORCE</h1>
+              <div className="h-8 w-px bg-blue-300 opacity-50"></div>
+              <p className="text-sm text-blue-200 font-medium">Cyber Crimes Investigation Unit</p>
             </div>
             
             <nav className="hidden md:flex items-center space-x-1">

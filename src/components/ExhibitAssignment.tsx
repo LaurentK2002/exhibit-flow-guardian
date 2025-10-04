@@ -227,7 +227,6 @@ export const ExhibitAssignment = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Exhibit #</TableHead>
                   <TableHead>Case #</TableHead>
                   <TableHead>Device</TableHead>
                   <TableHead>Priority</TableHead>
@@ -239,14 +238,13 @@ export const ExhibitAssignment = () => {
               <TableBody>
                 {unassignedExhibits.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                       All exhibits are assigned to analysts
                     </TableCell>
                   </TableRow>
                 ) : (
                   unassignedExhibits.map((exhibit) => (
                     <TableRow key={exhibit.id}>
-                      <TableCell className="font-mono font-medium">{exhibit.exhibit_number}</TableCell>
                       <TableCell>{exhibit.cases?.case_number || 'N/A'}</TableCell>
                       <TableCell>{exhibit.device_name}</TableCell>
                       <TableCell>
@@ -320,7 +318,6 @@ export const ExhibitAssignment = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Exhibit #</TableHead>
                   <TableHead>Case #</TableHead>
                   <TableHead>Device</TableHead>
                   <TableHead>Assigned To</TableHead>
@@ -332,14 +329,13 @@ export const ExhibitAssignment = () => {
               <TableBody>
                 {assignedExhibits.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                       No exhibits assigned yet
                     </TableCell>
                   </TableRow>
                 ) : (
                   assignedExhibits.map((exhibit) => (
                     <TableRow key={exhibit.id}>
-                      <TableCell className="font-mono font-medium">{exhibit.exhibit_number}</TableCell>
                       <TableCell>{exhibit.cases?.case_number || 'N/A'}</TableCell>
                       <TableCell>{exhibit.device_name}</TableCell>
                       <TableCell>

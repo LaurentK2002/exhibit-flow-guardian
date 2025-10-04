@@ -181,7 +181,7 @@ export const ExhibitAssignment = () => {
             <ClipboardList className="h-5 w-5" />
             Case Assignment Dashboard
           </CardTitle>
-          <CardDescription>Assign exhibits to analysts and manage workload distribution</CardDescription>
+          <CardDescription>Assign cases to analysts and manage workload distribution</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -220,7 +220,7 @@ export const ExhibitAssignment = () => {
             <AlertCircle className="h-5 w-5 text-red-500" />
             Cases Requiring Assignment
           </CardTitle>
-          <CardDescription>Assign unassigned exhibits to available analysts</CardDescription>
+          <CardDescription>Assign unassigned cases to available analysts</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">
@@ -313,7 +313,7 @@ export const ExhibitAssignment = () => {
             <Users className="h-5 w-5 text-green-600" />
             Assigned Cases
           </CardTitle>
-          <CardDescription>View and manage already assigned exhibits</CardDescription>
+          <CardDescription>View and manage already assigned cases</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">

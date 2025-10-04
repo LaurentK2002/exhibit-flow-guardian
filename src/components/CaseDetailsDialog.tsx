@@ -157,9 +157,34 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
       }));
 
       // Fetch documents from storage if any
-      const { data: documents } = await supabase.storage
+      const { data: caseDocuments } = await supabase.storage
         .from("case-documents")
         .list(caseId);
+
+      // Fetch reference letters
+      const { data: referenceLetters } = await supabase.storage
+        .from("case-documents")
+        .list("reference-letters");
+
+      // Filter reference letters that match this case's lab number or case number
+      const caseReferenceLetters = referenceLetters?.filter((file) => 
+        file.name.includes(caseData.lab_number || caseData.case_number)
+      ) || [];
+
+      const allDocuments = [
+        ...(caseDocuments?.map((doc) => ({
+          id: doc.id,
+          file_path: `${caseId}/${doc.name}`,
+          created_at: doc.created_at,
+          type: 'case_document'
+        })) || []),
+        ...(caseReferenceLetters.map((doc) => ({
+          id: doc.id,
+          file_path: `reference-letters/${doc.name}`,
+          created_at: doc.created_at,
+          type: 'reference_letter'
+        })) || [])
+      ];
 
       setCaseDetails({
         ...caseData,
@@ -169,11 +194,7 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
         exhibit_officer: getProfile(caseData.exhibit_officer_id),
         exhibits: exhibits || [],
         activities: activitiesWithUsers || [],
-        documents: documents?.map((doc) => ({
-          id: doc.id,
-          file_path: doc.name,
-          created_at: doc.created_at,
-        })) || [],
+        documents: allDocuments,
       });
     } catch (error) {
       console.error("Error fetching case details:", error);
@@ -188,19 +209,17 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
   };
 
   const downloadDocument = async (fileName: string) => {
-    if (!caseId) return;
-
     try {
       const { data, error } = await supabase.storage
         .from("case-documents")
-        .download(`${caseId}/${fileName}`);
+        .download(fileName);
 
       if (error) throw error;
 
       const url = URL.createObjectURL(data);
       const a = document.createElement("a");
       a.href = url;
-      a.download = fileName;
+      a.download = fileName.split('/').pop() || fileName;
       a.click();
       URL.revokeObjectURL(url);
 
@@ -219,12 +238,10 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
   };
 
   const previewDocument = async (fileName: string) => {
-    if (!caseId) return;
-
     try {
       const { data } = await supabase.storage
         .from("case-documents")
-        .getPublicUrl(`${caseId}/${fileName}`);
+        .getPublicUrl(fileName);
 
       window.open(data.publicUrl, "_blank");
     } catch (error) {
@@ -557,7 +574,11 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
                         className="p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors flex items-center justify-between"
                       >
                         <div>
-                          <p className="font-medium">{doc.file_path}</p>
+                          <p className="font-medium">
+                            {doc.file_path.includes('reference-letters') 
+                              ? '📄 Reference Letter from Station' 
+                              : doc.file_path.split('/').pop()}
+                          </p>
                           <p className="text-sm text-muted-foreground">
                             Uploaded: {format(new Date(doc.created_at), "PPP")}
                           </p>

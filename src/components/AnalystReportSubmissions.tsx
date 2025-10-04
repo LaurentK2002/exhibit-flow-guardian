@@ -41,40 +41,43 @@ export const AnalystReportSubmissions = () => {
     try {
       const { data, error } = await supabase
         .from("report_submissions")
-        .select(`
-          *,
-          cases!report_submissions_case_id_fkey(case_number, lab_number, title)
-        `)
+        .select("*")
         .eq("analyst_id", user.id)
         .order("submission_date", { ascending: false });
 
       if (error) throw error;
 
-      // Fetch reviewer details separately if needed
-      if (data && data.length > 0) {
-        const reviewerIds = data.filter((s: any) => s.reviewed_by).map((s: any) => s.reviewed_by);
-        
-        if (reviewerIds.length > 0) {
-          const { data: reviewers } = await supabase
-            .from("profiles")
-            .select("id, full_name")
-            .in("id", reviewerIds);
+      const submissions = (data as any) || [];
 
-          const reviewerMap = new Map(reviewers?.map(r => [r.id, r]) || []);
-          
-          const enrichedData = data.map((submission: any) => ({
-            ...submission,
-            reviewer: submission.reviewed_by ? reviewerMap.get(submission.reviewed_by) : null,
-            case: submission.cases
-          }));
-
-          setSubmissions(enrichedData as any);
-        } else {
-          setSubmissions(data.map((s: any) => ({ ...s, case: s.cases })) as any);
-        }
-      } else {
-        setSubmissions([]);
+      // Fetch related cases separately to avoid FK join issues
+      const caseIds = [...new Set(submissions.map((s: any) => s.case_id).filter(Boolean))];
+      let casesMap = new Map<string, any>();
+      if (caseIds.length > 0) {
+        const { data: casesData } = await supabase
+          .from("cases")
+          .select("id, case_number, lab_number, title")
+          .in("id", caseIds as string[]);
+        casesMap = new Map((casesData || []).map((c: any) => [c.id, c]));
       }
+
+      // Fetch reviewer details separately if needed
+      const reviewerIds = submissions.filter((s: any) => s.reviewed_by).map((s: any) => s.reviewed_by);
+      let reviewerMap = new Map<string, any>();
+      if (reviewerIds.length > 0) {
+        const { data: reviewers } = await supabase
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", reviewerIds as string[]);
+        reviewerMap = new Map((reviewers || []).map((r: any) => [r.id, r]));
+      }
+
+      const enrichedData = submissions.map((submission: any) => ({
+        ...submission,
+        reviewer: submission.reviewed_by ? reviewerMap.get(submission.reviewed_by) : null,
+        case: submission.case_id ? casesMap.get(submission.case_id) : null,
+      }));
+
+      setSubmissions(enrichedData as any);
     } catch (error) {
       console.error("Error fetching submissions:", error);
       toast({

@@ -53,34 +53,42 @@ export const ReportReviewPanel = () => {
     try {
       const { data, error } = await supabase
         .from("report_submissions")
-        .select(`
-          *,
-          cases!report_submissions_case_id_fkey(id, case_number, lab_number, title)
-        `)
+        .select("*")
         .order("submission_date", { ascending: false });
 
       if (error) throw error;
 
+      const submissions = (data as any) || [];
+
+      // Fetch related cases separately to avoid FK join issues
+      const caseIds = [...new Set(submissions.map((s: any) => s.case_id).filter(Boolean))];
+      let casesMap = new Map<string, any>();
+      if (caseIds.length > 0) {
+        const { data: casesData } = await supabase
+          .from("cases")
+          .select("id, case_number, lab_number, title")
+          .in("id", caseIds as string[]);
+        casesMap = new Map((casesData || []).map((c: any) => [c.id, c]));
+      }
+
       // Fetch analyst details separately
-      if (data && data.length > 0) {
-        const analystIds = [...new Set(data.map((s: any) => s.analyst_id))];
+      const analystIds = [...new Set(submissions.map((s: any) => s.analyst_id).filter(Boolean))];
+      let analystMap = new Map<string, any>();
+      if (analystIds.length > 0) {
         const { data: analysts } = await supabase
           .from("profiles")
           .select("id, full_name, badge_number")
-          .in("id", analystIds);
-
-        const analystMap = new Map(analysts?.map(a => [a.id, a]) || []);
-        
-        const enrichedData = data.map((submission: any) => ({
-          ...submission,
-          analyst: analystMap.get(submission.analyst_id),
-          case: submission.cases
-        }));
-
-        setSubmissions(enrichedData as any);
-      } else {
-        setSubmissions([]);
+          .in("id", analystIds as string[]);
+        analystMap = new Map((analysts || []).map((a: any) => [a.id, a]));
       }
+      
+      const enrichedData = submissions.map((submission: any) => ({
+        ...submission,
+        analyst: submission.analyst_id ? analystMap.get(submission.analyst_id) : null,
+        case: submission.case_id ? casesMap.get(submission.case_id) : null,
+      }));
+
+      setSubmissions(enrichedData as any);
     } catch (error) {
       console.error("Error fetching submissions:", error);
       toast({

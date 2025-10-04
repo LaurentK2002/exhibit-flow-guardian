@@ -19,3 +19,13 @@ export const normalizeExhibitNumber = (exhibitNumber: string, labNumber?: string
 
   return `CYB/LAB/${seq}/${suffix}`;
 };
+
+export const formatExhibitNumber = (
+  labNumber: string | null | undefined,
+  index: number,
+  totalExhibits: number
+): string => {
+  const seq = getLabSequence(labNumber || undefined);
+  const suffix = totalExhibits === 1 ? "A" : `A${index + 1}`;
+  return `CYB/LAB/${seq}/${suffix}`;
+};

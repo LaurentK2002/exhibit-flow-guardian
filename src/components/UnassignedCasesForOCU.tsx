@@ -48,12 +48,18 @@ export const UnassignedCasesForOCU = () => {
         .from('cases')
         .select('*')
         .is('assigned_to', null)
+        .is('analyst_id', null)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setCases((data as any) || []);
+      // Filter out any cases that have assigned_to or analyst_id set
+      const unassignedCases = (data || []).filter(
+        c => !c.assigned_to && !c.analyst_id
+      );
+      setCases((unassignedCases as any) || []);
     } catch (error) {
       console.error('Error fetching unassigned cases:', error);
+      setCases([]);
     } finally {
       setLoading(false);
     }
@@ -103,12 +109,19 @@ export const UnassignedCasesForOCU = () => {
 
     setAssigning(true);
     try {
+      // Update both assigned_to and analyst_id for consistency
       const { error } = await supabase
         .from('cases')
-        .update({ assigned_to: selectedAnalyst })
+        .update({ 
+          assigned_to: selectedAnalyst,
+          analyst_id: selectedAnalyst 
+        })
         .eq('id', selectedCase.id);
 
       if (error) throw error;
+
+      // Immediately remove from local state for instant UI update
+      setCases(prevCases => prevCases.filter(c => c.id !== selectedCase.id));
 
       // Log activity
       await supabase
@@ -128,13 +141,17 @@ export const UnassignedCasesForOCU = () => {
       setAssignDialogOpen(false);
       setSelectedCase(null);
       setSelectedAnalyst("");
-      fetchUnassignedCases();
+      
+      // Refresh the list to ensure consistency
+      await fetchUnassignedCases();
     } catch (error: any) {
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
       });
+      // Refetch on error to restore correct state
+      fetchUnassignedCases();
     } finally {
       setAssigning(false);
     }

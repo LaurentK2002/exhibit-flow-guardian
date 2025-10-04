@@ -43,14 +43,38 @@ export const AnalystReportSubmissions = () => {
         .from("report_submissions")
         .select(`
           *,
-          case:case_id(case_number, lab_number, title),
-          reviewer:reviewed_by(full_name)
+          cases!report_submissions_case_id_fkey(case_number, lab_number, title)
         `)
         .eq("analyst_id", user.id)
         .order("submission_date", { ascending: false });
 
       if (error) throw error;
-      setSubmissions((data as any) || []);
+
+      // Fetch reviewer details separately if needed
+      if (data && data.length > 0) {
+        const reviewerIds = data.filter((s: any) => s.reviewed_by).map((s: any) => s.reviewed_by);
+        
+        if (reviewerIds.length > 0) {
+          const { data: reviewers } = await supabase
+            .from("profiles")
+            .select("id, full_name")
+            .in("id", reviewerIds);
+
+          const reviewerMap = new Map(reviewers?.map(r => [r.id, r]) || []);
+          
+          const enrichedData = data.map((submission: any) => ({
+            ...submission,
+            reviewer: submission.reviewed_by ? reviewerMap.get(submission.reviewed_by) : null,
+            case: submission.cases
+          }));
+
+          setSubmissions(enrichedData as any);
+        } else {
+          setSubmissions(data.map((s: any) => ({ ...s, case: s.cases })) as any);
+        }
+      } else {
+        setSubmissions([]);
+      }
     } catch (error) {
       console.error("Error fetching submissions:", error);
       toast({

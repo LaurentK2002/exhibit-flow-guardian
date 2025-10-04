@@ -55,13 +55,32 @@ export const ReportReviewPanel = () => {
         .from("report_submissions")
         .select(`
           *,
-          analyst:analyst_id(full_name, badge_number),
-          case:case_id(id, case_number, lab_number, title)
+          cases!report_submissions_case_id_fkey(id, case_number, lab_number, title)
         `)
         .order("submission_date", { ascending: false });
 
       if (error) throw error;
-      setSubmissions((data as any) || []);
+
+      // Fetch analyst details separately
+      if (data && data.length > 0) {
+        const analystIds = [...new Set(data.map((s: any) => s.analyst_id))];
+        const { data: analysts } = await supabase
+          .from("profiles")
+          .select("id, full_name, badge_number")
+          .in("id", analystIds);
+
+        const analystMap = new Map(analysts?.map(a => [a.id, a]) || []);
+        
+        const enrichedData = data.map((submission: any) => ({
+          ...submission,
+          analyst: analystMap.get(submission.analyst_id),
+          case: submission.cases
+        }));
+
+        setSubmissions(enrichedData as any);
+      } else {
+        setSubmissions([]);
+      }
     } catch (error) {
       console.error("Error fetching submissions:", error);
       toast({

@@ -165,6 +165,7 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
         .from('case_activities')
         .insert({
           case_id: caseData.id,
+          user_id: profile?.id,
           activity_type: 'case_created',
           description: `Case file ${formData.caseNumber} created with ${selectedFiles.length} document(s)`,
           metadata: { 

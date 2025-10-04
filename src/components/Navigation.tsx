@@ -1,4 +1,4 @@
-import { Shield, Database, FileText, Settings, Users, BarChart3, LogOut, User, Activity, AlertTriangle } from "lucide-react";
+import { Shield, Database, FileText, Settings, Users, BarChart3, LogOut, User, Activity, AlertTriangle, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { NotificationCenter } from "./NotificationCenter";
@@ -38,6 +38,7 @@ export const Navigation = () => {
         ];
       case 'exhibit_officer':
         return [
+          { icon: Home, label: 'Home', path: '/' },
           { icon: Database, label: 'Evidence Queue', path: '/evidence-queue' },
           { icon: Activity, label: 'Chain of Custody', path: '/chain-of-custody' },
           { icon: FileText, label: 'Case Files', path: '/cases' },

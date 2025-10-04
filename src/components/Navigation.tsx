@@ -37,9 +37,7 @@ export const Navigation = () => {
           { icon: FileText, label: 'Case Reports', path: '/reports' },
         ];
       case 'exhibit_officer':
-        return [
-          { icon: Home, label: 'Home', path: '/' },
-        ];
+        return [];
       case 'analyst':
         return [
           { icon: FileText, label: 'My Cases', path: '/cases' },

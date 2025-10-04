@@ -46,10 +46,7 @@ export const UnassignedCasesForOCU = () => {
     try {
       const { data, error } = await supabase
         .from('cases')
-        .select(`
-          *,
-          profiles:assigned_to(full_name, role)
-        `)
+        .select('*')
         .is('assigned_to', null)
         .order('created_at', { ascending: false });
 
@@ -112,6 +109,7 @@ export const UnassignedCasesForOCU = () => {
         .from('case_activities')
         .insert({
           case_id: selectedCase.id,
+          user_id: (await supabase.auth.getUser()).data.user?.id,
           activity_type: 'case_assigned',
           description: `Case ${selectedCase.case_number} assigned to analyst`,
         });

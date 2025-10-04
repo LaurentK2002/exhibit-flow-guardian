@@ -44,21 +44,43 @@ export const ExhibitAssignment = () => {
     try {
       const { data, error } = await supabase
         .from('exhibits')
-        .select(`
-          *,
-          cases:case_id (
-            case_number,
-            priority
-          ),
-          analyst_profile:assigned_analyst (
-            full_name,
-            badge_number
-          )
-        `)
+        .select('*')
         .order('received_date', { ascending: false });
 
       if (error) throw error;
-      setExhibits((data as unknown) as Exhibit[] || []);
+
+      const exhibitsData = (data || []) as any[];
+      
+      // Fetch case and analyst profile data separately
+      const caseIds = [...new Set(exhibitsData.map((e: any) => e.case_id).filter(Boolean))];
+      const analystIds = [...new Set(exhibitsData.map((e: any) => e.assigned_analyst).filter(Boolean))];
+      
+      let casesMap = new Map<string, any>();
+      let profilesMap = new Map<string, any>();
+      
+      if (caseIds.length > 0) {
+        const { data: casesData } = await supabase
+          .from('cases')
+          .select('id, case_number, priority')
+          .in('id', caseIds as string[]);
+        casesMap = new Map((casesData || []).map((c: any) => [c.id, c]));
+      }
+      
+      if (analystIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, full_name, badge_number')
+          .in('id', analystIds as string[]);
+        profilesMap = new Map((profilesData || []).map((p: any) => [p.id, p]));
+      }
+
+      const enriched = exhibitsData.map((e: any) => ({
+        ...e,
+        cases: e.case_id ? casesMap.get(e.case_id) : null,
+        analyst_profile: e.assigned_analyst ? profilesMap.get(e.assigned_analyst) : null,
+      }));
+
+      setExhibits(enriched as Exhibit[]);
     } catch (error) {
       console.error('Error fetching exhibits:', error);
     }

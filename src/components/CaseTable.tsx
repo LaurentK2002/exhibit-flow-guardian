@@ -31,15 +31,32 @@ export const CaseTable = () => {
     try {
       const { data, error } = await supabase
         .from('cases')
-        .select(`
-          *,
-          profiles:assigned_to(full_name, role)
-        `)
+        .select('*')
         .limit(10)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setCases((data as any) || []);
+
+      const casesData = data || [];
+      
+      // Fetch assigned user profiles separately
+      const assignedUserIds = [...new Set(casesData.map((c: any) => c.assigned_to).filter(Boolean))];
+      let profilesMap = new Map<string, any>();
+      
+      if (assignedUserIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, full_name, role')
+          .in('id', assignedUserIds as string[]);
+        profilesMap = new Map((profilesData || []).map((p: any) => [p.id, p]));
+      }
+
+      const enriched = casesData.map((c: any) => ({
+        ...c,
+        profiles: c.assigned_to ? profilesMap.get(c.assigned_to) : null,
+      }));
+
+      setCases(enriched as any);
     } catch (error) {
       console.error('Error fetching cases:', error);
     } finally {

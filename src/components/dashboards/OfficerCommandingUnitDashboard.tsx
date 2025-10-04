@@ -35,14 +35,12 @@ export const OfficerCommandingUnitDashboard = () => {
 
       {/* Main Dashboard */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="cases">Cases</TabsTrigger>
           <TabsTrigger value="assignments">Assignments</TabsTrigger>
-          <TabsTrigger value="review">Analyst Reports</TabsTrigger>
-          <TabsTrigger value="professional">Professional Reports</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="team">Team</TabsTrigger>
-          <TabsTrigger value="reports">Official Reports</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
@@ -129,12 +127,40 @@ export const OfficerCommandingUnitDashboard = () => {
           <ExhibitAssignment />
         </TabsContent>
 
-        <TabsContent value="review" className="space-y-6">
-          <ReportReviewPanel />
-        </TabsContent>
+        <TabsContent value="reports" className="space-y-6">
+          <Tabs defaultValue="analyst" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="analyst">Analyst Reports</TabsTrigger>
+              <TabsTrigger value="professional">Professional Reports</TabsTrigger>
+              <TabsTrigger value="official">Official Reports</TabsTrigger>
+            </TabsList>
 
-        <TabsContent value="professional" className="space-y-6">
-          <ProfessionalReportReview />
+            <TabsContent value="analyst">
+              <ReportReviewPanel />
+            </TabsContent>
+
+            <TabsContent value="professional">
+              <ProfessionalReportReview />
+            </TabsContent>
+
+            <TabsContent value="official">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold">Official Reports</h2>
+                  <p className="text-muted-foreground">
+                    Generate and manage official reports for the Commanding Officer
+                  </p>
+                </div>
+                <CreateOfficialReportDialog>
+                  <Button>
+                    <FileText className="h-4 w-4 mr-2" />
+                    Create New Report
+                  </Button>
+                </CreateOfficialReportDialog>
+              </div>
+              <OfficialReportsTable />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
         <TabsContent value="team" className="space-y-6">
@@ -149,24 +175,6 @@ export const OfficerCommandingUnitDashboard = () => {
               <TeamManagement />
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="reports" className="space-y-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold">Official Reports</h2>
-              <p className="text-muted-foreground">
-                Generate and manage official reports for the Commanding Officer
-              </p>
-            </div>
-            <CreateOfficialReportDialog>
-              <Button>
-                <FileText className="h-4 w-4 mr-2" />
-                Create New Report
-              </Button>
-            </CreateOfficialReportDialog>
-          </div>
-          <OfficialReportsTable />
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">

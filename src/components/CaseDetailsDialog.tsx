@@ -194,12 +194,16 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
 
       const allRefFiles = await listAll("reference-letters");
 
-      const tokens = [caseData.lab_number, caseData.case_number].filter(Boolean) as string[];
-      const matchedRefFiles = allRefFiles.filter((f) =>
-        tokens.some((t) => f.path.includes(t))
-      );
+      // Extract the lab sequence (e.g., "0003" from "FB/CYBER/2025/LAB/0003")
+      const labSeq = caseData.lab_number?.split('/').pop() || caseData.case_number?.split('/').pop();
+      
+      // Filter files that start with the lab sequence number in the filename
+      const matchedRefFiles = allRefFiles.filter((f) => {
+        const fileName = f.name;
+        return labSeq && fileName.startsWith(labSeq + '-');
+      });
 
-      const refFilesToShow = matchedRefFiles.length > 0 ? matchedRefFiles : allRefFiles;
+      const refFilesToShow = matchedRefFiles;
 
       const allDocuments = [
         ...(caseDocuments?.map((doc) => ({

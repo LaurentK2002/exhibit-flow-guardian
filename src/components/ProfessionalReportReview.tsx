@@ -48,14 +48,29 @@ export const ProfessionalReportReview = () => {
     try {
       const { data, error } = await supabase
         .from("reports")
-        .select(`
-          *,
-          profiles!generated_by(full_name, badge_number)
-        `)
+        .select("*")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setReports((data as any) || []);
+
+      const reportsData = (data as any) || [];
+      const generatorIds = [...new Set(reportsData.map((r: any) => r.generated_by).filter(Boolean))];
+
+      let profilesMap = new Map<string, any>();
+      if (generatorIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from("profiles")
+          .select("id, full_name, badge_number")
+          .in("id", generatorIds as string[]);
+        profilesMap = new Map((profilesData || []).map((p: any) => [p.id, p]));
+      }
+
+      const enriched = reportsData.map((r: any) => ({
+        ...r,
+        profiles: r.generated_by ? profilesMap.get(r.generated_by) : null,
+      }));
+
+      setReports(enriched as any);
     } catch (error) {
       console.error("Error fetching reports:", error);
       toast({

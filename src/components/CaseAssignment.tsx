@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ClipboardList, UserCheck, Clock, AlertCircle } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
+import { useRealtime } from "@/hooks/useRealtime";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Case {
@@ -29,6 +30,7 @@ export const CaseAssignment = () => {
   const [cases, setCases] = useState<Case[]>([]);
   const [analysts, setAnalysts] = useState<Analyst[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedAnalysts, setSelectedAnalysts] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -57,12 +59,15 @@ export const CaseAssignment = () => {
     }
   };
 
+  // Real-time refresh when cases table changes
+  useRealtime('cases', fetchCases);
+
   const fetchAnalysts = async () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('id, full_name, badge_number')
-        .eq('role', 'analyst')
+        .in('role', ['analyst', 'forensic_analyst'])
         .eq('is_active', true)
         .order('full_name');
 
@@ -226,17 +231,12 @@ export const CaseAssignment = () => {
                     </TableCell>
                     <TableCell>
                       <Select
+                        value={selectedAnalysts[caseItem.id] || ""}
                         onValueChange={(analystId) => {
-                          // Store selected analyst for this case
-                          const selectElement = document.querySelector(
-                            `[data-case-id="${caseItem.id}"]`
-                          ) as HTMLSelectElement;
-                          if (selectElement) {
-                            selectElement.setAttribute('data-selected-analyst', analystId);
-                          }
+                          setSelectedAnalysts((prev) => ({ ...prev, [caseItem.id]: analystId }));
                         }}
                       >
-                        <SelectTrigger className="w-48" data-case-id={caseItem.id}>
+                        <SelectTrigger className="w-48">
                           <SelectValue placeholder="Select analyst" />
                         </SelectTrigger>
                         <SelectContent>
@@ -252,13 +252,16 @@ export const CaseAssignment = () => {
                       <Button 
                         size="sm"
                         onClick={() => {
-                          const selectElement = document.querySelector(
-                            `[data-case-id="${caseItem.id}"]`
-                          ) as HTMLSelectElement;
-                          const analystId = selectElement?.getAttribute('data-selected-analyst');
-                          if (analystId) {
-                            assignCase(caseItem.id, analystId);
+                          const analystId = selectedAnalysts[caseItem.id];
+                          if (!analystId) {
+                            toast({
+                              title: "Select analyst",
+                              description: "Please choose an analyst first.",
+                              variant: "destructive",
+                            });
+                            return;
                           }
+                          assignCase(caseItem.id, analystId);
                         }}
                       >
                         <UserCheck className="h-4 w-4 mr-1" />

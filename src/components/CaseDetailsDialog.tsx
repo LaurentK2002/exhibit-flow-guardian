@@ -205,18 +205,26 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
 
       const refFilesToShow = matchedRefFiles;
 
-      const allDocuments = [
-        ...(caseDocuments?.map((doc) => ({
-          id: doc.id,
-          file_path: `${caseId}/${doc.name}`,
-          created_at: doc.created_at,
-        })) || []),
-        ...refFilesToShow.map((doc) => ({
-          id: doc.id,
-          file_path: doc.path,
-          created_at: doc.created_at || new Date().toISOString(),
-        })),
-      ];
+      // Merge and de-duplicate by base filename (prefer case uploads over reference letters)
+      const caseDocs = (caseDocuments || []).map((doc) => ({
+        id: doc.id,
+        file_path: `${caseId}/${doc.name}`,
+        created_at: doc.created_at,
+      }));
+
+      const refDocs = refFilesToShow.map((doc) => ({
+        id: doc.id,
+        file_path: doc.path,
+        created_at: doc.created_at || new Date().toISOString(),
+      }));
+
+      const combined = [...caseDocs, ...refDocs];
+      const uniqueByName = new Map<string, { id: string; file_path: string; created_at: string }>();
+      for (const d of combined) {
+        const base = d.file_path.split('/').pop()?.toLowerCase() || d.file_path.toLowerCase();
+        if (!uniqueByName.has(base)) uniqueByName.set(base, d);
+      }
+      const allDocuments = Array.from(uniqueByName.values());
 
       setCaseDetails({
         ...caseData,

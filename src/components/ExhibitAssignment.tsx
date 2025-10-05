@@ -201,9 +201,9 @@ export const ExhibitAssignment = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ClipboardList className="h-5 w-5" />
-            Case Assignment Dashboard
+            Exhibit Assignment Dashboard
           </CardTitle>
-          <CardDescription>Assign cases to analysts and manage workload distribution</CardDescription>
+          <CardDescription>Assign exhibits to analysts and manage workload</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -240,9 +240,9 @@ export const ExhibitAssignment = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-red-500" />
-            Cases Requiring Assignment
+            Exhibits Requiring Assignment
           </CardTitle>
-          <CardDescription>Assign unassigned cases to available analysts</CardDescription>
+          <CardDescription>Assign unassigned exhibits to available analysts</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">
@@ -329,9 +329,9 @@ export const ExhibitAssignment = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5 text-green-600" />
-            Assigned Cases
+            Assigned Exhibits
           </CardTitle>
-          <CardDescription>View and manage already assigned cases</CardDescription>
+          <CardDescription>View and manage already assigned exhibits</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">

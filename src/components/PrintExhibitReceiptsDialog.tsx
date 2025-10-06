@@ -159,19 +159,23 @@ export function PrintExhibitReceiptsDialog({ open, onOpenChange }: PrintExhibitR
   };
 
   if (showPrintView && exhibits.length > 0) {
+    const firstExhibit = exhibits[0];
+    const caseInfo = firstExhibit.cases;
+    const receivedProfile = firstExhibit.received_profile;
+    
     return (
       <div className="fixed inset-0 bg-background z-50 overflow-auto">
         <div className="no-print sticky top-0 bg-background border-b border-border p-4 flex items-center justify-between shadow-sm z-10">
           <div>
-            <h2 className="text-xl font-bold text-foreground">Exhibit Receipts</h2>
+            <h2 className="text-xl font-bold text-foreground">Case Exhibit Receipt</h2>
             <p className="text-sm text-muted-foreground">
-              {exhibits.length} receipt{exhibits.length > 1 ? 's' : ''} ready to print
+              One receipt for {exhibits.length} exhibit{exhibits.length > 1 ? 's' : ''}
             </p>
           </div>
           <div className="flex gap-2">
             <Button onClick={handlePrint} size="lg">
               <Printer className="h-4 w-4 mr-2" />
-              Print Receipts
+              Print Receipt
             </Button>
             <Button 
               onClick={() => {
@@ -188,144 +192,166 @@ export function PrintExhibitReceiptsDialog({ open, onOpenChange }: PrintExhibitR
         </div>
 
         <div ref={printRef} className="p-8">
-          {exhibits.map((exhibit, index) => (
-            <div key={exhibit.id} className={index > 0 ? "print:break-before-page" : ""}>
-              <div className="bg-white text-black p-8 max-w-4xl mx-auto print:p-6 mb-8">
-                {/* Official Header */}
-                <div className="text-center border-b-2 border-black pb-6 mb-6">
-                  <h1 className="text-2xl font-bold mb-2">TANZANIA POLICE FORCE</h1>
-                  <h2 className="text-xl font-semibold mb-1">CYBER CRIMES UNIT</h2>
-                  <h3 className="text-lg font-medium">DIGITAL EXHIBIT RECEIPT</h3>
-                  <p className="text-sm mt-2 text-gray-600">Official Documentation of Digital Evidence Reception</p>
-                </div>
+          <div className="bg-white text-black p-8 max-w-5xl mx-auto print:p-6">
+            {/* Official Header */}
+            <div className="text-center border-b-2 border-black pb-6 mb-6">
+              <h1 className="text-2xl font-bold mb-2">TANZANIA POLICE FORCE</h1>
+              <h2 className="text-xl font-semibold mb-1">CYBER CRIMES UNIT</h2>
+              <h3 className="text-lg font-medium">DIGITAL EXHIBITS RECEIPT</h3>
+              <p className="text-sm mt-2 text-gray-600">Official Documentation of Digital Evidence Reception</p>
+            </div>
 
-                {/* Case Information */}
-                <div className="mb-6">
-                  <h4 className="font-bold text-base mb-3 bg-gray-200 p-2">CASE INFORMATION</h4>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p><span className="font-semibold">Lab Number:</span> {exhibit.cases?.lab_number || 'N/A'}</p>
-                      <p><span className="font-semibold">Case Number:</span> {exhibit.cases?.case_number || 'N/A'}</p>
-                      <p><span className="font-semibold">Case Title:</span> {exhibit.cases?.title || 'N/A'}</p>
-                      <p><span className="font-semibold">Priority:</span> {exhibit.cases?.priority ? priorityMap[exhibit.cases.priority] : 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p><span className="font-semibold">Status:</span> {exhibit.cases?.status ? exhibit.cases.status.toUpperCase() : 'N/A'}</p>
-                      <p><span className="font-semibold">Location:</span> {exhibit.cases?.location || 'N/A'}</p>
-                      <p><span className="font-semibold">Incident Date:</span> {exhibit.cases?.incident_date ? formatDate(exhibit.cases.incident_date) : 'N/A'}</p>
-                    </div>
-                  </div>
-                  {exhibit.cases?.description && (
-                    <div className="mt-2">
-                      <p className="font-semibold text-sm">Case Description:</p>
-                      <p className="text-sm text-gray-700">{exhibit.cases.description}</p>
-                    </div>
+            {/* Case Information */}
+            <div className="mb-6">
+              <h4 className="font-bold text-base mb-3 bg-gray-200 p-2">CASE INFORMATION</h4>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p><span className="font-semibold">Lab Number:</span> {caseInfo?.lab_number || 'N/A'}</p>
+                  <p><span className="font-semibold">Case Number:</span> {caseInfo?.case_number || 'N/A'}</p>
+                  <p><span className="font-semibold">Case Title:</span> {caseInfo?.title || 'N/A'}</p>
+                  <p><span className="font-semibold">Priority:</span> {caseInfo?.priority ? priorityMap[caseInfo.priority] : 'N/A'}</p>
+                </div>
+                <div>
+                  <p><span className="font-semibold">Status:</span> {caseInfo?.status ? caseInfo.status.toUpperCase() : 'N/A'}</p>
+                  <p><span className="font-semibold">Location:</span> {caseInfo?.location || 'N/A'}</p>
+                  <p><span className="font-semibold">Incident Date:</span> {caseInfo?.incident_date ? formatDate(caseInfo.incident_date) : 'N/A'}</p>
+                </div>
+              </div>
+              {caseInfo?.description && (
+                <div className="mt-2">
+                  <p className="font-semibold text-sm">Case Description:</p>
+                  <p className="text-sm text-gray-700">{caseInfo.description}</p>
+                </div>
+              )}
+              {(caseInfo?.victim_name || caseInfo?.suspect_name) && (
+                <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
+                  {caseInfo?.victim_name && (
+                    <p><span className="font-semibold">Victim Name:</span> {caseInfo.victim_name}</p>
                   )}
-                  {(exhibit.cases?.victim_name || exhibit.cases?.suspect_name) && (
-                    <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
-                      {exhibit.cases?.victim_name && (
-                        <p><span className="font-semibold">Victim Name:</span> {exhibit.cases.victim_name}</p>
-                      )}
-                      {exhibit.cases?.suspect_name && (
-                        <p><span className="font-semibold">Suspect Name:</span> {exhibit.cases.suspect_name}</p>
-                      )}
-                    </div>
-                  )}
-                  {exhibit.cases?.case_notes && (
-                    <div className="mt-2">
-                      <p className="font-semibold text-sm">Case Notes:</p>
-                      <p className="text-sm text-gray-700">{exhibit.cases.case_notes}</p>
-                    </div>
+                  {caseInfo?.suspect_name && (
+                    <p><span className="font-semibold">Suspect Name:</span> {caseInfo.suspect_name}</p>
                   )}
                 </div>
+              )}
+            </div>
 
-                {/* Exhibit Information */}
-                <div className="mb-6">
-                  <h4 className="font-bold text-base mb-3 bg-gray-200 p-2">EXHIBIT INFORMATION</h4>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p><span className="font-semibold">Exhibit Number:</span> <span className="font-mono">{exhibit.exhibit_number}</span></p>
-                      <p><span className="font-semibold">Device Type:</span> {exhibitTypeMap[exhibit.exhibit_type]}</p>
-                      <p><span className="font-semibold">Device Name:</span> {exhibit.device_name}</p>
-                      <p><span className="font-semibold">Brand:</span> {exhibit.brand || 'N/A'}</p>
-                      <p><span className="font-semibold">Model:</span> {exhibit.model || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p><span className="font-semibold">Serial Number:</span> <span className="font-mono">{exhibit.serial_number || 'N/A'}</span></p>
-                      {exhibit.imei && <p><span className="font-semibold">IMEI:</span> <span className="font-mono">{exhibit.imei}</span></p>}
-                      {exhibit.mac_address && <p><span className="font-semibold">MAC Address:</span> <span className="font-mono">{exhibit.mac_address}</span></p>}
-                      <p><span className="font-semibold">Status:</span> <span className="capitalize">{exhibit.status.replace('_', ' ')}</span></p>
-                      <p><span className="font-semibold">Storage Location:</span> {exhibit.storage_location || 'Standard Evidence Room'}</p>
-                    </div>
-                  </div>
-                  {exhibit.description && (
-                    <div className="mt-2">
-                      <p className="font-semibold text-sm">Exhibit Description:</p>
-                      <p className="text-sm text-gray-700">{exhibit.description}</p>
-                    </div>
-                  )}
-                  {exhibit.analysis_notes && (
-                    <div className="mt-2">
-                      <p className="font-semibold text-sm">Analysis Notes:</p>
-                      <p className="text-sm text-gray-700">{exhibit.analysis_notes}</p>
-                    </div>
-                  )}
+            {/* Reception Details */}
+            <div className="mb-6">
+              <h4 className="font-bold text-base mb-3 bg-gray-200 p-2">RECEPTION DETAILS</h4>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p><span className="font-semibold">Received Date:</span> {formatDate(firstExhibit.received_date)}</p>
+                  <p><span className="font-semibold">Received By:</span> {receivedProfile?.full_name || 'System User'}</p>
                 </div>
-
-                {/* Reception Details */}
-                <div className="mb-6">
-                  <h4 className="font-bold text-base mb-3 bg-gray-200 p-2">RECEPTION DETAILS</h4>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p><span className="font-semibold">Received Date:</span> {formatDate(exhibit.received_date)}</p>
-                      <p><span className="font-semibold">Received By:</span> {exhibit.received_profile?.full_name || 'System User'}</p>
-                    </div>
-                    <div>
-                      <p><span className="font-semibold">Badge Number:</span> {exhibit.received_profile?.badge_number || 'N/A'}</p>
-                      <p><span className="font-semibold">Department:</span> {exhibit.received_profile?.department || 'Cyber Crimes Unit'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Legal Declaration */}
-                <div className="mb-6 p-3 border border-gray-400 bg-gray-50 text-xs">
-                  <h4 className="font-bold mb-2">LEGAL DECLARATION</h4>
-                  <p className="leading-relaxed">
-                    This document serves as official proof that the above-mentioned digital exhibit has been 
-                    received by the Tanzania Police Force Cyber Crimes Unit in accordance with established 
-                    evidence handling procedures. The exhibit has been properly catalogued and secured 
-                    following chain of custody protocols. This receipt is valid for legal proceedings and court presentations.
-                  </p>
-                </div>
-
-                {/* Signatures */}
-                <div className="grid grid-cols-2 gap-8 mb-6">
-                  <div>
-                    <div className="border-b border-black mb-2 h-12"></div>
-                    <p className="text-xs text-center">
-                      <strong>Receiving Officer</strong><br />
-                      {exhibit.received_profile?.full_name || 'System User'}<br />
-                      Badge: {exhibit.received_profile?.badge_number || 'N/A'}
-                    </p>
-                  </div>
-                  <div>
-                    <div className="border-b border-black mb-2 h-12"></div>
-                    <p className="text-xs text-center">
-                      <strong>Supervisor</strong><br />
-                      Name: ___________________<br />
-                      Badge: __________________
-                    </p>
-                  </div>
-                </div>
-
-                {/* Footer */}
-                <div className="text-center text-xs text-gray-500 border-t border-gray-300 pt-3">
-                  <p>Generated: {new Date().toLocaleString()}</p>
-                  <p>Tanzania Police Force - Cyber Crimes Unit | Evidence Management System</p>
+                <div>
+                  <p><span className="font-semibold">Badge Number:</span> {receivedProfile?.badge_number || 'N/A'}</p>
+                  <p><span className="font-semibold">Department:</span> {receivedProfile?.department || 'Cyber Crimes Unit'}</p>
                 </div>
               </div>
             </div>
-          ))}
+
+            {/* All Exhibits Table */}
+            <div className="mb-6">
+              <h4 className="font-bold text-base mb-3 bg-gray-200 p-2">EXHIBITS RECEIVED ({exhibits.length})</h4>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse border border-gray-400 text-xs">
+                  <thead>
+                    <tr className="bg-gray-200">
+                      <th className="border border-gray-400 p-2 text-left">#</th>
+                      <th className="border border-gray-400 p-2 text-left">Exhibit Number</th>
+                      <th className="border border-gray-400 p-2 text-left">Type</th>
+                      <th className="border border-gray-400 p-2 text-left">Device Name</th>
+                      <th className="border border-gray-400 p-2 text-left">Brand/Model</th>
+                      <th className="border border-gray-400 p-2 text-left">Serial/IMEI</th>
+                      <th className="border border-gray-400 p-2 text-left">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {exhibits.map((exhibit, index) => (
+                      <tr key={exhibit.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="border border-gray-400 p-2">{index + 1}</td>
+                        <td className="border border-gray-400 p-2 font-mono">{exhibit.exhibit_number}</td>
+                        <td className="border border-gray-400 p-2">{exhibitTypeMap[exhibit.exhibit_type]}</td>
+                        <td className="border border-gray-400 p-2">{exhibit.device_name}</td>
+                        <td className="border border-gray-400 p-2">
+                          {exhibit.brand && exhibit.model ? `${exhibit.brand} ${exhibit.model}` : exhibit.brand || exhibit.model || 'N/A'}
+                        </td>
+                        <td className="border border-gray-400 p-2 font-mono text-xs">
+                          {exhibit.serial_number || exhibit.imei || 'N/A'}
+                        </td>
+                        <td className="border border-gray-400 p-2 capitalize">{exhibit.status.replace('_', ' ')}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Detailed Exhibit Information */}
+            <div className="mb-6">
+              <h4 className="font-bold text-base mb-3 bg-gray-200 p-2">DETAILED EXHIBIT INFORMATION</h4>
+              <div className="space-y-3">
+                {exhibits.map((exhibit, index) => (
+                  <div key={exhibit.id} className="border border-gray-300 p-3 rounded text-xs">
+                    <p className="font-semibold mb-2">Exhibit {index + 1}: {exhibit.exhibit_number}</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div><span className="font-semibold">Device:</span> {exhibit.device_name}</div>
+                      <div><span className="font-semibold">Type:</span> {exhibitTypeMap[exhibit.exhibit_type]}</div>
+                      <div><span className="font-semibold">Brand:</span> {exhibit.brand || 'N/A'}</div>
+                      <div><span className="font-semibold">Model:</span> {exhibit.model || 'N/A'}</div>
+                      <div><span className="font-semibold">Serial:</span> {exhibit.serial_number || 'N/A'}</div>
+                      {exhibit.imei && <div><span className="font-semibold">IMEI:</span> {exhibit.imei}</div>}
+                      {exhibit.mac_address && <div><span className="font-semibold">MAC:</span> {exhibit.mac_address}</div>}
+                      <div><span className="font-semibold">Storage:</span> {exhibit.storage_location || 'Standard Evidence Room'}</div>
+                    </div>
+                    {exhibit.description && (
+                      <div className="mt-2">
+                        <span className="font-semibold">Description:</span> {exhibit.description}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Legal Declaration */}
+            <div className="mb-6 p-3 border border-gray-400 bg-gray-50 text-xs">
+              <h4 className="font-bold mb-2">LEGAL DECLARATION</h4>
+              <p className="leading-relaxed">
+                This document serves as official proof that the above-mentioned {exhibits.length} digital exhibit{exhibits.length > 1 ? 's have' : ' has'} been 
+                received by the Tanzania Police Force Cyber Crimes Unit in accordance with established 
+                evidence handling procedures. All exhibits have been properly catalogued and secured 
+                following chain of custody protocols. This receipt is valid for legal proceedings and court presentations.
+              </p>
+            </div>
+
+            {/* Signatures */}
+            <div className="grid grid-cols-2 gap-8 mb-6">
+              <div>
+                <div className="border-b border-black mb-2 h-12"></div>
+                <p className="text-xs text-center">
+                  <strong>Receiving Officer</strong><br />
+                  {receivedProfile?.full_name || 'System User'}<br />
+                  Badge: {receivedProfile?.badge_number || 'N/A'}
+                </p>
+              </div>
+              <div>
+                <div className="border-b border-black mb-2 h-12"></div>
+                <p className="text-xs text-center">
+                  <strong>Supervisor</strong><br />
+                  Name: ___________________<br />
+                  Badge: __________________
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="text-center text-xs text-gray-500 border-t border-gray-300 pt-3">
+              <p>Generated: {new Date().toLocaleString()}</p>
+              <p>Tanzania Police Force - Cyber Crimes Unit | Evidence Management System</p>
+              <p className="font-semibold mt-1">Total Exhibits Received: {exhibits.length}</p>
+            </div>
+          </div>
         </div>
 
         <style>{`
@@ -335,8 +361,8 @@ export function PrintExhibitReceiptsDialog({ open, onOpenChange }: PrintExhibitR
             }
             
             @page {
-              size: A4;
-              margin: 1.5cm;
+              size: A4 landscape;
+              margin: 1cm;
             }
             
             body {
@@ -406,7 +432,7 @@ export function PrintExhibitReceiptsDialog({ open, onOpenChange }: PrintExhibitR
                 size="lg"
               >
                 <Printer className="h-4 w-4 mr-2" />
-                Generate Receipts ({exhibits.length} receipt{exhibits.length > 1 ? 's' : ''})
+                Generate Receipt (All {exhibits.length} Exhibit{exhibits.length > 1 ? 's' : ''})
               </Button>
             </div>
           )}

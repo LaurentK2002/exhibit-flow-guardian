@@ -87,12 +87,22 @@ export const CaseAssignment = () => {
 
   const assignCase = async (caseId: string, analystId: string) => {
     try {
-      // Update both assigned_to and analyst_id for consistency
+      // Get an active exhibit officer to link to the case
+      const { data: exhibitOfficer } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('role', 'exhibit_officer')
+        .eq('is_active', true)
+        .limit(1)
+        .single();
+
+      // Update case with analyst and exhibit officer
       const { error } = await supabase
         .from('cases')
         .update({ 
           analyst_id: analystId,
-          assigned_to: analystId 
+          assigned_to: analystId,
+          exhibit_officer_id: exhibitOfficer?.id || null
         })
         .eq('id', caseId);
 
@@ -100,7 +110,7 @@ export const CaseAssignment = () => {
 
       toast({
         title: "Success",
-        description: "Case assigned successfully",
+        description: "Case assigned successfully to analyst and exhibit officer",
       });
 
       // Immediately remove from local state for instant UI update

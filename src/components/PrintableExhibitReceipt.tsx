@@ -114,7 +114,7 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
             <h4 className="font-bold text-lg mb-4 border-b border-gray-300 pb-2">CASE INFORMATION</h4>
             <div className="space-y-3">
               <div className="flex">
-                <span className="font-semibold w-32">Case Number:</span>
+                <span className="font-semibold w-32">IR Number:</span>
                 <span className="font-mono">{exhibit.cases?.case_number || 'N/A'}</span>
               </div>
               <div className="flex">

@@ -207,7 +207,7 @@ export function PrintExhibitReceiptsDialog({ open, onOpenChange }: PrintExhibitR
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p><span className="font-semibold">Lab Number:</span> {caseInfo?.lab_number || 'N/A'}</p>
-                  <p><span className="font-semibold">Case Number:</span> {caseInfo?.case_number || 'N/A'}</p>
+                  <p><span className="font-semibold">IR Number:</span> {caseInfo?.case_number || 'N/A'}</p>
                   <p><span className="font-semibold">Case Title:</span> {caseInfo?.title || 'N/A'}</p>
                   <p><span className="font-semibold">Priority:</span> {caseInfo?.priority ? priorityMap[caseInfo.priority] : 'N/A'}</p>
                 </div>

@@ -12,6 +12,10 @@ type Exhibit = Database['public']['Tables']['exhibits']['Row'] & {
     incident_date: string;
     location: string;
     lab_number: string;
+    description: string;
+    victim_name: string;
+    suspect_name: string;
+    status: Database['public']['Enums']['case_status'];
   } | null;
   received_profile?: {
     full_name: string;
@@ -37,6 +41,14 @@ const priorityMap: Record<Database['public']['Enums']['case_priority'], string> 
   medium: "Medium", 
   high: "High",
   critical: "Critical"
+};
+
+const statusMap: Record<Database['public']['Enums']['case_status'], string> = {
+  open: "Open",
+  under_investigation: "Under Investigation",
+  pending_review: "Pending Review",
+  closed: "Closed",
+  archived: "Archived"
 };
 
 export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhibitReceiptProps>(
@@ -127,6 +139,10 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
                 <span>{exhibit.cases?.title || 'N/A'}</span>
               </div>
               <div className="flex">
+                <span className="font-semibold w-32">Status:</span>
+                <span>{exhibit.cases?.status ? statusMap[exhibit.cases.status] : 'N/A'}</span>
+              </div>
+              <div className="flex">
                 <span className="font-semibold w-32">Priority:</span>
                 <span>{exhibit.cases?.priority ? priorityMap[exhibit.cases.priority] : 'N/A'}</span>
               </div>
@@ -137,6 +153,14 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
               <div className="flex">
                 <span className="font-semibold w-32">Location:</span>
                 <span>{exhibit.cases?.location || 'N/A'}</span>
+              </div>
+              <div className="flex">
+                <span className="font-semibold w-32">Victim Name:</span>
+                <span>{exhibit.cases?.victim_name || 'N/A'}</span>
+              </div>
+              <div className="flex">
+                <span className="font-semibold w-32">Suspect Name:</span>
+                <span>{exhibit.cases?.suspect_name || 'N/A'}</span>
               </div>
             </div>
           </div>
@@ -177,10 +201,18 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
           </div>
         </div>
 
-        {/* Description */}
+        {/* Case Description */}
+        {exhibit.cases?.description && (
+          <div className="mb-8">
+            <h4 className="font-bold text-lg mb-4 border-b border-gray-300 pb-2">CASE DESCRIPTION</h4>
+            <p className="text-sm leading-relaxed">{exhibit.cases.description}</p>
+          </div>
+        )}
+
+        {/* Exhibit Description */}
         {exhibit.description && (
           <div className="mb-8">
-            <h4 className="font-bold text-lg mb-4 border-b border-gray-300 pb-2">DESCRIPTION</h4>
+            <h4 className="font-bold text-lg mb-4 border-b border-gray-300 pb-2">EXHIBIT DESCRIPTION</h4>
             <p className="text-sm leading-relaxed">{exhibit.description}</p>
           </div>
         )}

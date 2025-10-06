@@ -16,6 +16,10 @@ type Exhibit = Database['public']['Tables']['exhibits']['Row'] & {
     incident_date: string;
     location: string;
     lab_number: string;
+    description: string;
+    victim_name: string;
+    suspect_name: string;
+    status: Database['public']['Enums']['case_status'];
   } | null;
   received_profile?: {
     full_name: string;
@@ -51,7 +55,11 @@ export const ExhibitPrintDialog = ({ exhibitId, exhibitNumber, trigger }: Exhibi
             priority,
             incident_date,
             location,
-            lab_number
+            lab_number,
+            description,
+            victim_name,
+            suspect_name,
+            status
           ),
           received_profile:received_by (
             full_name,

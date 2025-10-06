@@ -15,11 +15,10 @@ type Exhibit = Database['public']['Tables']['exhibits']['Row'] & {
     incident_date: string;
     location: string;
     lab_number: string;
-    status: string;
+    status: Database['public']['Enums']['case_status'];
     description: string;
     victim_name: string;
     suspect_name: string;
-    case_notes: string;
   } | null;
   received_profile?: {
     full_name: string;
@@ -102,8 +101,7 @@ export function PrintExhibitReceiptsDialog({ open, onOpenChange }: PrintExhibitR
             status,
             description,
             victim_name,
-            suspect_name,
-            case_notes
+            suspect_name
           )
         `)
         .eq('case_id', caseId)

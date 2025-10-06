@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 type Exhibit = Database['public']['Tables']['exhibits']['Row'] & {
   cases?: {
     case_number: string;
+    ir_number: string;
     title: string;
     priority: Database['public']['Enums']['case_priority'];
     incident_date: string;
@@ -45,6 +46,7 @@ export const ExhibitPrintDialog = ({ exhibitId, exhibitNumber, trigger }: Exhibi
           *,
           cases:case_id (
             case_number,
+            ir_number,
             title,
             priority,
             incident_date,

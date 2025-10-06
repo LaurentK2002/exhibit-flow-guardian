@@ -6,6 +6,7 @@ import { Database } from "@/integrations/supabase/types";
 type Exhibit = Database['public']['Tables']['exhibits']['Row'] & {
   cases?: {
     case_number: string;
+    ir_number: string;
     title: string;
     priority: Database['public']['Enums']['case_priority'];
     incident_date: string;
@@ -115,6 +116,10 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
             <div className="space-y-3">
               <div className="flex">
                 <span className="font-semibold w-32">IR Number:</span>
+                <span className="font-mono">{exhibit.cases?.ir_number || 'N/A'}</span>
+              </div>
+              <div className="flex">
+                <span className="font-semibold w-32">Case Number:</span>
                 <span className="font-mono">{exhibit.cases?.case_number || 'N/A'}</span>
               </div>
               <div className="flex">

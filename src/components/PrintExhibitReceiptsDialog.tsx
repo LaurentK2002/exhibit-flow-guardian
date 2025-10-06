@@ -9,6 +9,7 @@ import { Database } from "@/integrations/supabase/types";
 type Exhibit = Database['public']['Tables']['exhibits']['Row'] & {
   cases?: {
     case_number: string;
+    ir_number: string;
     title: string;
     priority: Database['public']['Enums']['case_priority'];
     incident_date: string;
@@ -92,6 +93,7 @@ export function PrintExhibitReceiptsDialog({ open, onOpenChange }: PrintExhibitR
           *,
           cases!inner (
             case_number,
+            ir_number,
             title,
             priority,
             incident_date,
@@ -207,7 +209,8 @@ export function PrintExhibitReceiptsDialog({ open, onOpenChange }: PrintExhibitR
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <p><span className="font-semibold">Lab Number:</span> {caseInfo?.lab_number || 'N/A'}</p>
-                  <p><span className="font-semibold">IR Number:</span> {caseInfo?.case_number || 'N/A'}</p>
+                  <p><span className="font-semibold">IR Number:</span> {caseInfo?.ir_number || 'N/A'}</p>
+                  <p><span className="font-semibold">Case Number:</span> {caseInfo?.case_number || 'N/A'}</p>
                   <p><span className="font-semibold">Case Title:</span> {caseInfo?.title || 'N/A'}</p>
                   <p><span className="font-semibold">Priority:</span> {caseInfo?.priority ? priorityMap[caseInfo.priority] : 'N/A'}</p>
                 </div>

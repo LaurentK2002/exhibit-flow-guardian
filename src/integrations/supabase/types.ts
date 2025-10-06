@@ -103,6 +103,7 @@ export type Database = {
           exhibit_officer_id: string | null
           id: string
           incident_date: string | null
+          ir_number: string | null
           lab_number: string | null
           location: string | null
           opened_date: string | null
@@ -125,6 +126,7 @@ export type Database = {
           exhibit_officer_id?: string | null
           id?: string
           incident_date?: string | null
+          ir_number?: string | null
           lab_number?: string | null
           location?: string | null
           opened_date?: string | null
@@ -147,6 +149,7 @@ export type Database = {
           exhibit_officer_id?: string | null
           id?: string
           incident_date?: string | null
+          ir_number?: string | null
           lab_number?: string | null
           location?: string | null
           opened_date?: string | null

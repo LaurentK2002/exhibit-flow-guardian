@@ -154,14 +154,6 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
                 <span className="font-semibold w-32">Location:</span>
                 <span>{exhibit.cases?.location || 'N/A'}</span>
               </div>
-              <div className="flex">
-                <span className="font-semibold w-32">Victim Name:</span>
-                <span>{exhibit.cases?.victim_name || 'N/A'}</span>
-              </div>
-              <div className="flex">
-                <span className="font-semibold w-32">Suspect Name:</span>
-                <span>{exhibit.cases?.suspect_name || 'N/A'}</span>
-              </div>
             </div>
           </div>
         </div>

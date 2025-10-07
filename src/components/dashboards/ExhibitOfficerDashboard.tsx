@@ -110,11 +110,19 @@ export const ExhibitOfficerDashboard = () => {
                   <Printer className="h-4 w-4 mr-2" />
                   Print Exhibit Receipts
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start" 
+                  variant="outline"
+                  onClick={() => setActiveTab("custody")}
+                >
                   <FileText className="h-4 w-4 mr-2" />
                   Custody Documentation
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start" 
+                  variant="outline"
+                  onClick={() => setActiveTab("exhibits")}
+                >
                   <Archive className="h-4 w-4 mr-2" />
                   Storage Management
                 </Button>

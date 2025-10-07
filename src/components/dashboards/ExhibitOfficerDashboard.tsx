@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Package, FileText, QrCode, Truck, Archive, Plus, Printer, Home } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CaseTable } from "@/components/CaseTable";
 import { ChainOfCustody } from "@/components/ChainOfCustody";
 import { EvidenceQueue } from "@/components/role-specific/EvidenceQueue";
@@ -20,7 +20,7 @@ export const ExhibitOfficerDashboard = () => {
   const [showAddExhibit, setShowAddExhibit] = useState(false);
   const [showBarcodeGenerator, setShowBarcodeGenerator] = useState(false);
   const [showPrintReceipts, setShowPrintReceipts] = useState(false);
-
+  const navigate = useNavigate();
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -113,7 +113,7 @@ export const ExhibitOfficerDashboard = () => {
                 <Button 
                   className="w-full justify-start" 
                   variant="outline"
-                  onClick={() => setActiveTab("custody")}
+                  onClick={() => navigate('/chain-of-custody')}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Custody Documentation
@@ -121,7 +121,7 @@ export const ExhibitOfficerDashboard = () => {
                 <Button 
                   className="w-full justify-start" 
                   variant="outline"
-                  onClick={() => setActiveTab("exhibits")}
+                  onClick={() => navigate('/exhibits')}
                 >
                   <Archive className="h-4 w-4 mr-2" />
                   Storage Management

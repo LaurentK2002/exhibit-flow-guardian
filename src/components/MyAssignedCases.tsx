@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { FileText, Clock, AlertCircle, Play } from "lucide-react";
+
+import { FileText, Clock, AlertCircle } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { AnalystCaseDetailDialog } from './AnalystCaseDetailDialog';
@@ -16,7 +16,6 @@ interface AssignedCase {
   priority: string;
   analyst_status: string;
   created_at: string;
-  progress: number;
 }
 
 export const MyAssignedCases = () => {
@@ -42,13 +41,7 @@ export const MyAssignedCases = () => {
 
       if (error) throw error;
 
-      // Mock progress data (in real app, this would be calculated from case activities)
-      const casesWithProgress = data?.map(caseItem => ({
-        ...caseItem,
-        progress: Math.floor(Math.random() * 100)
-      })) || [];
-
-      setCases(casesWithProgress);
+      setCases(data || []);
     } catch (error) {
       console.error('Error fetching assigned cases:', error);
     } finally {
@@ -166,15 +159,7 @@ export const MyAssignedCases = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Analysis Progress</span>
-                  <span>{caseItem.progress}%</span>
-                </div>
-                <Progress value={caseItem.progress} className="h-2" />
-              </div>
-
-              <div className="flex gap-2 pt-2">
+              <div className="flex gap-2 pt-4">
                 <Button 
                   size="sm" 
                   className="flex-1"

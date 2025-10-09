@@ -116,6 +116,7 @@ export const CaseTable = ({ hideUnassigned = false }: { hideUnassigned?: boolean
                 <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Analyst</th>
                 <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground">Case Title</th>
                 <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Status</th>
+                <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Analyst Status</th>
                 <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Priority</th>
                 <th className="text-left py-3 px-3 text-xs font-medium text-muted-foreground whitespace-nowrap">Actions</th>
               </tr>
@@ -123,7 +124,7 @@ export const CaseTable = ({ hideUnassigned = false }: { hideUnassigned?: boolean
             <tbody>
               {cases.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <td colSpan={7} className="text-center py-8 text-muted-foreground">
                     No cases found. <br />
                     <span className="text-sm">Create some cases to get started.</span>
                   </td>
@@ -144,6 +145,19 @@ export const CaseTable = ({ hideUnassigned = false }: { hideUnassigned?: boolean
                     </td>
                     <td className="py-3 px-3">
                       <CaseStatusBadge status={(caseItem.status as CaseStatus) || 'open'} />
+                    </td>
+                    <td className="py-3 px-3">
+                      {caseItem.analyst_status ? (
+                        caseItem.analyst_status === 'pending' ? (
+                          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 text-xs whitespace-nowrap">Pending</Badge>
+                        ) : caseItem.analyst_status === 'in_analysis' ? (
+                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs whitespace-nowrap">In Analysis</Badge>
+                        ) : (
+                          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs whitespace-nowrap">Complete</Badge>
+                        )
+                      ) : (
+                        <Badge variant="outline" className="text-xs whitespace-nowrap">Not Set</Badge>
+                      )}
                     </td>
                     <td className="py-3 px-3">
                       <Badge variant={getPriorityVariant(caseItem.priority || 'medium')} className="text-xs whitespace-nowrap">

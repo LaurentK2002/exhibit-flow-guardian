@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { FileText, Clock, AlertCircle, Play } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { AnalystCaseDetailDialog } from './AnalystCaseDetailDialog';
 
 interface AssignedCase {
   id: string;
@@ -13,6 +14,7 @@ interface AssignedCase {
   title: string;
   status: string;
   priority: string;
+  analyst_status: string;
   created_at: string;
   progress: number;
 }
@@ -20,6 +22,8 @@ interface AssignedCase {
 export const MyAssignedCases = () => {
   const [cases, setCases] = useState<AssignedCase[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
+  const [showDetailDialog, setShowDetailDialog] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -69,6 +73,24 @@ export const MyAssignedCases = () => {
       case 'closed': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
+  };
+
+  const getAnalystStatusBadge = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Pending</Badge>;
+      case 'in_analysis':
+        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">In Analysis</Badge>;
+      case 'complete':
+        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Complete</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+  const handleOpenCase = (caseId: string) => {
+    setSelectedCaseId(caseId);
+    setShowDetailDialog(true);
   };
 
   if (loading) {
@@ -132,9 +154,12 @@ export const MyAssignedCases = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <Badge className={getStatusColor(caseItem.status)}>
-                  {caseItem.status.replace('_', ' ')}
-                </Badge>
+                <div className="flex gap-2">
+                  <Badge className={getStatusColor(caseItem.status)}>
+                    {caseItem.status.replace('_', ' ')}
+                  </Badge>
+                  {getAnalystStatusBadge(caseItem.analyst_status)}
+                </div>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
                   <Clock className="h-3 w-3" />
                   {new Date(caseItem.created_at).toLocaleDateString()}
@@ -150,13 +175,13 @@ export const MyAssignedCases = () => {
               </div>
 
               <div className="flex gap-2 pt-2">
-                <Button size="sm" className="flex-1">
-                  <Play className="h-3 w-3 mr-1" />
-                  Continue Analysis
-                </Button>
-                <Button size="sm" variant="outline">
+                <Button 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => handleOpenCase(caseItem.id)}
+                >
                   <FileText className="h-3 w-3 mr-1" />
-                  Report
+                  View & Update
                 </Button>
               </div>
 
@@ -182,6 +207,13 @@ export const MyAssignedCases = () => {
           </CardContent>
         </Card>
       )}
+
+      <AnalystCaseDetailDialog
+        caseId={selectedCaseId}
+        open={showDetailDialog}
+        onOpenChange={setShowDetailDialog}
+        onStatusUpdate={fetchAssignedCases}
+      />
     </div>
   );
 };

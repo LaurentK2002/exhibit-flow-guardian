@@ -94,6 +94,7 @@ export type Database = {
       cases: {
         Row: {
           analyst_id: string | null
+          analyst_status: string | null
           assigned_to: string | null
           case_notes: string | null
           case_number: string
@@ -117,6 +118,7 @@ export type Database = {
         }
         Insert: {
           analyst_id?: string | null
+          analyst_status?: string | null
           assigned_to?: string | null
           case_notes?: string | null
           case_number: string
@@ -140,6 +142,7 @@ export type Database = {
         }
         Update: {
           analyst_id?: string | null
+          analyst_status?: string | null
           assigned_to?: string | null
           case_notes?: string | null
           case_number?: string

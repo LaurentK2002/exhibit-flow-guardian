@@ -69,22 +69,70 @@ export const AnalystCaseDetailDialog = ({
     
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // 1) Fetch the base case row
+      const { data: caseRow, error: caseError } = await supabase
         .from('cases')
-        .select(`
-          *,
-          assigned_to_profile:profiles!assigned_to(full_name, badge_number),
-          analyst_profile:profiles!analyst_id(full_name, badge_number),
-          exhibits(id, exhibit_number, device_name, exhibit_type, status)
-        `)
+        .select('*')
         .eq('id', caseId)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (caseError) throw caseError;
+      if (!caseRow) {
+        toast.error('Case not found');
+        setCaseDetails(null);
+        return;
+      }
 
-      setCaseDetails(data as any);
-      setAnalystStatus(data.analyst_status || 'pending');
-      setAnalysisNotes(data.case_notes || '');
+      // 2) Fetch exhibits for the case
+      const { data: exhibits, error: exhibitsError } = await supabase
+        .from('exhibits')
+        .select('id, exhibit_number, device_name, exhibit_type, status')
+        .eq('case_id', caseId);
+
+      if (exhibitsError) throw exhibitsError;
+
+      // 3) Fetch assigned and analyst profiles if present
+      let assignedProfile: any = null;
+      let analystProfile: any = null;
+      const profileIds: string[] = [];
+      if (caseRow.assigned_to) profileIds.push(caseRow.assigned_to);
+      if (caseRow.analyst_id) profileIds.push(caseRow.analyst_id);
+
+      if (profileIds.length > 0) {
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name, badge_number')
+          .in('id', profileIds);
+
+        if (profilesError) throw profilesError;
+
+        assignedProfile = profilesData?.find((p: any) => p.id === caseRow.assigned_to) || null;
+        analystProfile = profilesData?.find((p: any) => p.id === caseRow.analyst_id) || null;
+      }
+
+      const details: CaseDetails = {
+        id: caseRow.id,
+        case_number: caseRow.case_number,
+        lab_number: caseRow.lab_number,
+        title: caseRow.title,
+        description: caseRow.description,
+        status: caseRow.status,
+        priority: caseRow.priority,
+        analyst_status: caseRow.analyst_status,
+        location: caseRow.location,
+        victim_name: caseRow.victim_name,
+        suspect_name: caseRow.suspect_name,
+        case_notes: caseRow.case_notes,
+        opened_date: caseRow.opened_date,
+        incident_date: caseRow.incident_date,
+        assigned_to_profile: assignedProfile ? { full_name: assignedProfile.full_name, badge_number: assignedProfile.badge_number } : undefined,
+        analyst_profile: analystProfile ? { full_name: analystProfile.full_name, badge_number: analystProfile.badge_number } : undefined,
+        exhibits: exhibits || []
+      };
+
+      setCaseDetails(details);
+      setAnalystStatus(caseRow.analyst_status || 'pending');
+      setAnalysisNotes(caseRow.case_notes || '');
     } catch (error) {
       console.error('Error fetching case details:', error);
       toast.error('Failed to load case details');

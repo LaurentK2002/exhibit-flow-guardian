@@ -34,8 +34,8 @@ interface CaseDetails {
   case_notes: string;
   opened_date: string;
   incident_date: string;
-  assigned_to?: { full_name: string; badge_number: string };
-  analyst_id?: { full_name: string; badge_number: string };
+  assigned_to_profile?: { full_name: string; badge_number: string };
+  analyst_profile?: { full_name: string; badge_number: string };
   exhibits: Array<{
     id: string;
     exhibit_number: string;
@@ -73,8 +73,8 @@ export const AnalystCaseDetailDialog = ({
         .from('cases')
         .select(`
           *,
-          assigned_to:profiles!cases_assigned_to_fkey(full_name, badge_number),
-          analyst_id:profiles!cases_analyst_id_fkey(full_name, badge_number),
+          assigned_to_profile:profiles!assigned_to(full_name, badge_number),
+          analyst_profile:profiles!analyst_id(full_name, badge_number),
           exhibits(id, exhibit_number, device_name, exhibit_type, status)
         `)
         .eq('id', caseId)
@@ -213,25 +213,25 @@ export const AnalystCaseDetailDialog = ({
                       </div>
                     </div>
 
-                    {caseDetails.assigned_to && (
+                    {caseDetails.assigned_to_profile && (
                       <div className="flex items-start gap-2">
                         <User className="h-4 w-4 mt-1 text-muted-foreground" />
                         <div>
                           <p className="text-sm font-medium">Investigator</p>
                           <p className="text-sm text-muted-foreground">
-                            {caseDetails.assigned_to.full_name} ({caseDetails.assigned_to.badge_number})
+                            {caseDetails.assigned_to_profile.full_name} ({caseDetails.assigned_to_profile.badge_number})
                           </p>
                         </div>
                       </div>
                     )}
 
-                    {caseDetails.analyst_id && (
+                    {caseDetails.analyst_profile && (
                       <div className="flex items-start gap-2">
                         <User className="h-4 w-4 mt-1 text-muted-foreground" />
                         <div>
                           <p className="text-sm font-medium">Assigned Analyst</p>
                           <p className="text-sm text-muted-foreground">
-                            {caseDetails.analyst_id.full_name} ({caseDetails.analyst_id.badge_number})
+                            {caseDetails.analyst_profile.full_name} ({caseDetails.analyst_profile.badge_number})
                           </p>
                         </div>
                       </div>

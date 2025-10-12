@@ -63,7 +63,7 @@ export const CaseSearch = () => {
         .select(
           "id, case_number, lab_number, title, status, priority, analyst_id"
         )
-        .ilike('lab_number', `%${searchQuery}%`);
+        .or(`lab_number.ilike.%${searchQuery}%,case_number.ilike.%${searchQuery}%,title.ilike.%${searchQuery}%`);
 
       // If user is an analyst, only show their assigned cases
       if (profile?.role === "forensic_analyst") {
@@ -132,10 +132,10 @@ export const CaseSearch = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-placeholder={
+                placeholder={
                   profile?.role === "forensic_analyst"
-                    ? "Search your assigned cases by lab number..."
-                    : "Search cases by lab number..."
+                    ? "Search your assigned cases by lab number, case number, or title..."
+                    : "Search cases by lab number, case number, or title..."
                 }
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}

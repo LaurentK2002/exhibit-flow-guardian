@@ -38,7 +38,7 @@ export const UpdateCasePriorityDialog = ({
   // Get available priorities based on role
   const getAvailablePriorities = (): CasePriority[] => {
     if (userRole === 'commanding_officer') {
-      // CO can set any priority including critical
+      // CO can set any priority including critical (urgent)
       return ['low', 'medium', 'high', 'critical'];
     } else if (userRole === 'officer_commanding_unit') {
       // OCU can set up to high priority but not critical
@@ -104,7 +104,7 @@ export const UpdateCasePriorityDialog = ({
       low: 'Low',
       medium: 'Medium',
       high: 'High',
-      critical: 'Critical'
+      critical: 'Critical/Urgent'
     };
     return labels[priority] || priority;
   };
@@ -114,7 +114,7 @@ export const UpdateCasePriorityDialog = ({
       low: 'Normal processing time',
       medium: 'Standard attention required',
       high: 'Requires prompt attention',
-      critical: 'Immediate action required - highest priority'
+      critical: 'Immediate action required - highest priority (urgent)'
     };
     return descriptions[priority] || '';
   };
@@ -187,7 +187,7 @@ export const UpdateCasePriorityDialog = ({
 
           {userRole === 'officer_commanding_unit' && (
             <div className="text-xs text-muted-foreground p-2 bg-muted/30 rounded">
-              Note: Only Commanding Officers can set cases to Critical priority
+              Note: Only Commanding Officers can set cases to Critical/Urgent priority
             </div>
           )}
 

@@ -76,13 +76,13 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
   const getAvailablePriorities = () => {
     const userRole = profile?.role;
     
-    // CO can set all priorities including urgent
+    // CO can set all priorities including critical (urgent)
     if (userRole === 'commanding_officer') {
       return [
         { value: 'low', label: 'Low' },
         { value: 'medium', label: 'Medium' },
         { value: 'high', label: 'High' },
-        { value: 'urgent', label: 'Urgent' },
+        { value: 'critical', label: 'Critical/Urgent' },
       ];
     }
     

@@ -42,13 +42,13 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
   const getAvailablePriorities = () => {
     const userRole = profile?.role;
     
-    // CO can set all priorities including urgent
+    // CO can set all priorities including critical (urgent)
     if (userRole === 'commanding_officer') {
       return [
         { value: 'low', label: 'Low' },
         { value: 'medium', label: 'Medium' },
         { value: 'high', label: 'High' },
-        { value: 'urgent', label: 'Urgent' },
+        { value: 'critical', label: 'Critical/Urgent' },
       ];
     }
     
@@ -321,7 +321,7 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
               </Select>
               {profile?.role === 'exhibit_officer' && (
                 <p className="text-xs text-muted-foreground">
-                  Note: Only Commanding Officers can set "Urgent" priority and Officer Commanding Units can set "High" priority.
+                  Note: Only Commanding Officers can set "Critical/Urgent" priority and Officer Commanding Units can set "High" priority.
                 </p>
               )}
             </div>

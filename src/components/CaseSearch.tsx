@@ -3,12 +3,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, X, Eye } from "lucide-react";
+import { Search, X, Eye, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { CaseStatusBadge, CaseStatus } from "./CaseStatusBadge";
 import { CaseDetailsDialog } from "./CaseDetailsDialog";
+import { UpdateCasePriorityDialog } from "./UpdateCasePriorityDialog";
 import { useToast } from "@/hooks/use-toast";
+import { Database } from "@/integrations/supabase/types";
 
 interface SearchResult {
   id: string;
@@ -26,19 +28,13 @@ export const CaseSearch = () => {
   const [loading, setLoading] = useState(false);
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [priorityDialogOpen, setPriorityDialogOpen] = useState(false);
+  const [selectedCase, setSelectedCase] = useState<SearchResult | null>(null);
   const { user, profile } = useAuth();
   const { toast } = useToast();
 
-  const canSearchAllCases = () => {
-    if (!profile?.role) return false;
-    const allowedRoles = [
-      "administrator",
-      "commanding_officer",
-      "officer_commanding_unit",
-      "exhibit_officer",
-      "supervisor",
-    ];
-    return allowedRoles.includes(profile.role);
+  const canUpgradePriority = () => {
+    return profile?.role === 'officer_commanding_unit' || profile?.role === 'commanding_officer';
   };
 
   const handleSearch = async () => {
@@ -204,18 +200,33 @@ export const CaseSearch = () => {
                           Analyst: {result.analyst.full_name}
                         </p>
                       )}
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setSelectedCaseId(result.id);
-                        setDetailsOpen(true);
-                      }}
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      View Details
-                    </Button>
+                     </div>
+                     <div className="flex gap-2">
+                       {canUpgradePriority() && (
+                         <Button
+                           size="sm"
+                           variant="outline"
+                           onClick={() => {
+                             setSelectedCase(result);
+                             setPriorityDialogOpen(true);
+                           }}
+                         >
+                           <TrendingUp className="h-4 w-4 mr-1" />
+                           Update Priority
+                         </Button>
+                       )}
+                       <Button
+                         size="sm"
+                         variant="outline"
+                         onClick={() => {
+                           setSelectedCaseId(result.id);
+                           setDetailsOpen(true);
+                         }}
+                       >
+                         <Eye className="h-4 w-4 mr-1" />
+                         View Details
+                       </Button>
+                     </div>
                   </div>
                 </div>
               ))}
@@ -229,6 +240,21 @@ export const CaseSearch = () => {
         open={detailsOpen}
         onOpenChange={setDetailsOpen}
       />
+      
+      {selectedCase && (
+        <UpdateCasePriorityDialog
+          caseId={selectedCase.id}
+          caseNumber={selectedCase.case_number}
+          caseTitle={selectedCase.title}
+          currentPriority={selectedCase.priority as Database['public']['Enums']['case_priority']}
+          userRole={profile?.role || ''}
+          open={priorityDialogOpen}
+          onOpenChange={setPriorityDialogOpen}
+          onUpdate={() => {
+            handleSearch();
+          }}
+        />
+      )}
     </div>
   );
 };

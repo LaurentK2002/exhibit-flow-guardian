@@ -32,9 +32,17 @@ export const Navigation = () => {
       case 'commanding_officer':
         return [
           { icon: BarChart3, label: 'Operations Overview', path: '/operations' },
+          { icon: FileText, label: 'Case Search', path: '/cases' },
           { icon: Users, label: 'Team Management', path: '/team' },
           { icon: AlertTriangle, label: 'Security Alerts', path: '/security' },
           { icon: FileText, label: 'Case Reports', path: '/reports' },
+        ];
+      case 'officer_commanding_unit':
+        return [
+          { icon: FileText, label: 'Case Search', path: '/cases' },
+          { icon: Users, label: 'Team Management', path: '/team' },
+          { icon: BarChart3, label: 'Operations', path: '/operations' },
+          { icon: FileText, label: 'Reports', path: '/reports' },
         ];
       case 'exhibit_officer':
         return [];

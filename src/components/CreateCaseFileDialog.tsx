@@ -26,6 +26,18 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const { toast } = useToast();
   const { profile } = useAuth();
+
+  // Check if user is exhibit officer
+  useEffect(() => {
+    if (open && profile?.role !== 'exhibit_officer') {
+      toast({
+        title: "Access Denied",
+        description: "Only Exhibit Officers can create case files.",
+        variant: "destructive",
+      });
+      onOpenChange(false);
+    }
+  }, [open, profile?.role, toast, onOpenChange]);
   
   const getAvailablePriorities = () => {
     const userRole = profile?.role;

@@ -25,6 +25,18 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { user, profile } = useAuth();
+
+  // Check if user is exhibit officer
+  useEffect(() => {
+    if (open && profile?.role !== 'exhibit_officer') {
+      toast({
+        title: "Access Denied",
+        description: "Only Exhibit Officers can create case files.",
+        variant: "destructive",
+      });
+      onOpenChange(false);
+    }
+  }, [open, profile?.role, toast, onOpenChange]);
   
   const [caseFormData, setCaseFormData] = useState({
     caseNumber: '',

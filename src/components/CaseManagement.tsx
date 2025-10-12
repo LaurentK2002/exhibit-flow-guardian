@@ -138,10 +138,12 @@ export const CaseManagement = () => {
           <h2 className="text-2xl font-bold text-foreground">Case Management</h2>
           <p className="text-muted-foreground">Manage and track investigation cases</p>
         </div>
-        <Button onClick={() => setShowOpenCaseDialog(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Open Case File
-        </Button>
+        {profile?.role === 'exhibit_officer' && (
+          <Button onClick={() => setShowOpenCaseDialog(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Open Case File
+          </Button>
+        )}
       </div>
 
       {/* Filters */}

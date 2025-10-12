@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,18 @@ export const AddCaseDialog = ({ open, onOpenChange, onSuccess }: AddCaseDialogPr
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { profile } = useAuth();
+
+  // Check if user is exhibit officer
+  useEffect(() => {
+    if (open && profile?.role !== 'exhibit_officer') {
+      toast({
+        title: "Access Denied",
+        description: "Only Exhibit Officers can create case files.",
+        variant: "destructive",
+      });
+      onOpenChange(false);
+    }
+  }, [open, profile?.role, toast, onOpenChange]);
   
   const getAvailablePriorities = () => {
     const userRole = profile?.role;

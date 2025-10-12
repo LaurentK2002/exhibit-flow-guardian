@@ -7,7 +7,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
 import { 
   Plus, 
   Search, 
@@ -27,6 +26,7 @@ import { Database } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtime } from "@/hooks/useRealtime";
 import { AddExhibitDialog } from "./AddExhibitDialog";
+import { CaseStatusBadge, CaseStatus } from "./CaseStatusBadge";
 
 type Case = Database['public']['Tables']['cases']['Row'] & {
   profiles?: {
@@ -96,14 +96,16 @@ export const CaseManagement = () => {
     }
   };
 
-  const getProgressValue = (status: string) => {
+  const getAnalystStatusBadge = (status: string | null | undefined) => {
     switch (status) {
-      case 'open': return 10;
-      case 'under_investigation': return 50;
-      case 'pending_review': return 80;
-      case 'closed': return 100;
-      case 'archived': return 100;
-      default: return 0;
+      case 'pending':
+        return <Badge variant="secondary">Pending Assignment</Badge>;
+      case 'in_analysis':
+        return <Badge className="bg-blue-500 text-white">In Analysis</Badge>;
+      case 'completed':
+        return <Badge className="bg-green-500 text-white">Analysis Complete</Badge>;
+      default:
+        return <Badge variant="outline">Not Assigned</Badge>;
     }
   };
 
@@ -217,11 +219,8 @@ export const CaseManagement = () => {
                 </p>
 
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Progress</span>
-                    <span className="font-medium">{getProgressValue(caseItem.status || 'open')}%</span>
-                  </div>
-                  <Progress value={getProgressValue(caseItem.status || 'open')} className="h-2" />
+                  <div className="text-sm text-muted-foreground">Analysis Status</div>
+                  {getAnalystStatusBadge(caseItem.analyst_status)}
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
@@ -236,10 +235,7 @@ export const CaseManagement = () => {
                     </div>
                   </div>
                   
-                  <div className={`flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(caseItem.status || 'open')} text-white`}>
-                    <Circle className="h-2 w-2 mr-1" />
-                    {caseItem.status?.replace('_', ' ')}
-                  </div>
+                  <CaseStatusBadge status={(caseItem.status as CaseStatus) || "open"} />
                 </div>
 
                 <div className="flex items-center justify-between pt-2 border-t">

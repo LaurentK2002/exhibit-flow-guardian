@@ -1,7 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Microscope, 
@@ -25,7 +24,7 @@ export const AnalysisWorkbench = () => {
       device: "iPhone 13 Pro",
       caseNumber: "CC2024-015",
       tool: "Cellebrite UFED",
-      progress: 75,
+      analysisStatus: "in_analysis",
       status: "running",
       timeRemaining: "45 minutes",
       startTime: "2 hours ago"
@@ -36,7 +35,7 @@ export const AnalysisWorkbench = () => {
       device: "Router Logs",
       caseNumber: "CC2024-012",
       tool: "Wireshark",
-      progress: 30,
+      analysisStatus: "pending",
       status: "paused",
       timeRemaining: "2 hours",
       startTime: "4 hours ago"
@@ -72,6 +71,19 @@ export const AnalysisWorkbench = () => {
       timestamp: "1 day ago"
     }
   ];
+
+  const getAnalysisStatusBadge = (analysisStatus: string) => {
+    switch (analysisStatus) {
+      case 'pending':
+        return <Badge variant="secondary">Pending</Badge>;
+      case 'in_analysis':
+        return <Badge className="bg-blue-500 text-white">In Analysis</Badge>;
+      case 'completed':
+        return <Badge className="bg-green-500 text-white">Completed</Badge>;
+      default:
+        return <Badge variant="outline">Unknown</Badge>;
+    }
+  };
 
   const getToolStatusColor = (status: string) => {
     switch (status) {
@@ -137,11 +149,8 @@ export const AnalysisWorkbench = () => {
                     
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div>
-                        <p className="text-sm font-medium mb-1">Progress</p>
-                        <div className="flex items-center gap-2">
-                          <Progress value={analysis.progress} className="flex-1" />
-                          <span className="text-sm">{analysis.progress}%</span>
-                        </div>
+                        <p className="text-sm font-medium mb-1">Analysis Status</p>
+                        {getAnalysisStatusBadge(analysis.analysisStatus)}
                       </div>
                       <div>
                         <p className="text-sm font-medium mb-1">Time Remaining</p>

@@ -1,7 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Package, Clock, CheckCircle, AlertCircle, Smartphone, Laptop, HardDrive } from "lucide-react";
 
 export const EvidenceQueue = () => {
@@ -88,11 +87,12 @@ export const EvidenceQueue = () => {
                     <p className="text-sm text-muted-foreground">{item.estimatedCompletion}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium mb-1">Progress</p>
-                    <div className="flex items-center gap-2">
-                      <Progress value={item.progress} className="flex-1" />
-                      <span className="text-sm">{item.progress}%</span>
-                    </div>
+                    <p className="text-sm font-medium mb-1">Analysis Status</p>
+                    <Badge variant={item.status === 'ready' ? 'default' : 'secondary'}>
+                      {item.status === 'queued' && 'Pending'}
+                      {item.status === 'processing' && 'In Analysis'}
+                      {item.status === 'ready' && 'Completed'}
+                    </Badge>
                   </div>
                   <div className="flex items-center gap-2">
                     {item.status === 'queued' && (

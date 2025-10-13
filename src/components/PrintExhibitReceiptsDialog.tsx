@@ -19,6 +19,8 @@ type Exhibit = Database['public']['Tables']['exhibits']['Row'] & {
     description: string;
     victim_name: string;
     suspect_name: string;
+    region: string;
+    district: string;
   } | null;
   received_profile?: {
     full_name: string;
@@ -101,7 +103,9 @@ export function PrintExhibitReceiptsDialog({ open, onOpenChange }: PrintExhibitR
             status,
             description,
             victim_name,
-            suspect_name
+            suspect_name,
+            region,
+            district
           )
         `)
         .eq('case_id', caseId)
@@ -211,11 +215,13 @@ export function PrintExhibitReceiptsDialog({ open, onOpenChange }: PrintExhibitR
                   <p><span className="font-semibold">Case Number:</span> {caseInfo?.case_number || 'N/A'}</p>
                   <p><span className="font-semibold">Case Title:</span> {caseInfo?.title || 'N/A'}</p>
                   <p><span className="font-semibold">Priority:</span> {caseInfo?.priority ? priorityMap[caseInfo.priority] : 'N/A'}</p>
+                  <p><span className="font-semibold">Region:</span> {caseInfo?.region || 'N/A'}</p>
                 </div>
                 <div>
                   <p><span className="font-semibold">Status:</span> {caseInfo?.status ? caseInfo.status.toUpperCase() : 'N/A'}</p>
                   <p><span className="font-semibold">Location:</span> {caseInfo?.location || 'N/A'}</p>
                   <p><span className="font-semibold">Incident Date:</span> {caseInfo?.incident_date ? formatDate(caseInfo.incident_date) : 'N/A'}</p>
+                  <p><span className="font-semibold">District:</span> {caseInfo?.district || 'N/A'}</p>
                 </div>
               </div>
               {caseInfo?.description && (

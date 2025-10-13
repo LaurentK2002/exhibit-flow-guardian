@@ -151,6 +151,7 @@ export type Database = {
           closed_date: string | null
           created_at: string | null
           description: string | null
+          district: string | null
           exhibit_officer_id: string | null
           id: string
           incident_date: string | null
@@ -159,6 +160,7 @@ export type Database = {
           location: string | null
           opened_date: string | null
           priority: Database["public"]["Enums"]["case_priority"] | null
+          region: string | null
           status: Database["public"]["Enums"]["case_status"] | null
           supervisor_id: string | null
           suspect_name: string | null
@@ -175,6 +177,7 @@ export type Database = {
           closed_date?: string | null
           created_at?: string | null
           description?: string | null
+          district?: string | null
           exhibit_officer_id?: string | null
           id?: string
           incident_date?: string | null
@@ -183,6 +186,7 @@ export type Database = {
           location?: string | null
           opened_date?: string | null
           priority?: Database["public"]["Enums"]["case_priority"] | null
+          region?: string | null
           status?: Database["public"]["Enums"]["case_status"] | null
           supervisor_id?: string | null
           suspect_name?: string | null
@@ -199,6 +203,7 @@ export type Database = {
           closed_date?: string | null
           created_at?: string | null
           description?: string | null
+          district?: string | null
           exhibit_officer_id?: string | null
           id?: string
           incident_date?: string | null
@@ -207,6 +212,7 @@ export type Database = {
           location?: string | null
           opened_date?: string | null
           priority?: Database["public"]["Enums"]["case_priority"] | null
+          region?: string | null
           status?: Database["public"]["Enums"]["case_status"] | null
           supervisor_id?: string | null
           suspect_name?: string | null

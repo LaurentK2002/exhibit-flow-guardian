@@ -255,6 +255,8 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
           status: caseFormData.caseStatus,
           priority: caseFormData.casePriority,
           exhibit_officer_id: user?.id,
+          region: caseFormData.region,
+          district: caseFormData.district,
         })
         .select()
         .single();

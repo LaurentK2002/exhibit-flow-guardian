@@ -16,6 +16,8 @@ type Exhibit = Database['public']['Tables']['exhibits']['Row'] & {
     victim_name: string;
     suspect_name: string;
     status: Database['public']['Enums']['case_status'];
+    region: string;
+    district: string;
   } | null;
   received_profile?: {
     full_name: string;
@@ -157,6 +159,14 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
               <div className="flex">
                 <span className="font-semibold w-32">Location:</span>
                 <span>{exhibit.cases?.location || 'N/A'}</span>
+              </div>
+              <div className="flex">
+                <span className="font-semibold w-32">Region:</span>
+                <span>{exhibit.cases?.region || 'N/A'}</span>
+              </div>
+              <div className="flex">
+                <span className="font-semibold w-32">District:</span>
+                <span>{exhibit.cases?.district || 'N/A'}</span>
               </div>
             </div>
           </div>

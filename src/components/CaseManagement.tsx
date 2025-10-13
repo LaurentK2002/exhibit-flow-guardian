@@ -55,12 +55,35 @@ export const CaseManagement = () => {
     try {
       const { data, error } = await supabase
         .from('cases')
-        .select('*')
+        .select(`
+          *,
+          assigned_analyst:profiles!cases_analyst_id_fkey(full_name, role),
+          supervisor:profiles!cases_supervisor_id_fkey(full_name)
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      setCases((data || []) as any);
+      // Get counts for exhibits and activities
+      const casesWithCounts = await Promise.all(
+        (data || []).map(async (caseItem) => {
+          const [exhibitsCount, activitiesCount] = await Promise.all([
+            supabase.from('exhibits').select('id', { count: 'exact', head: true }).eq('case_id', caseItem.id),
+            supabase.from('case_activities').select('id', { count: 'exact', head: true }).eq('case_id', caseItem.id)
+          ]);
+
+          return {
+            ...caseItem,
+            profiles: caseItem.assigned_analyst,
+            _count: {
+              exhibits: exhibitsCount.count || 0,
+              activities: activitiesCount.count || 0
+            }
+          };
+        })
+      );
+
+      setCases(casesWithCounts as any);
     } catch (error) {
       console.error('Error fetching cases:', error);
     } finally {

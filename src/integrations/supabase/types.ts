@@ -91,6 +91,56 @@ export type Database = {
           },
         ]
       }
+      case_approvals: {
+        Row: {
+          approval_status: Database["public"]["Enums"]["approval_status"]
+          approval_type: Database["public"]["Enums"]["approval_type"]
+          approved_at: string | null
+          approved_by: string | null
+          case_id: string
+          comments: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          submitted_by: string
+          updated_at: string
+        }
+        Insert: {
+          approval_status?: Database["public"]["Enums"]["approval_status"]
+          approval_type: Database["public"]["Enums"]["approval_type"]
+          approved_at?: string | null
+          approved_by?: string | null
+          case_id: string
+          comments?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          submitted_by: string
+          updated_at?: string
+        }
+        Update: {
+          approval_status?: Database["public"]["Enums"]["approval_status"]
+          approval_type?: Database["public"]["Enums"]["approval_type"]
+          approved_at?: string | null
+          approved_by?: string | null
+          case_id?: string
+          comments?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          submitted_by?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_approvals_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cases: {
         Row: {
           analyst_id: string | null
@@ -494,6 +544,16 @@ export type Database = {
       }
     }
     Enums: {
+      approval_status:
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "revision_requested"
+      approval_type:
+        | "report_submission"
+        | "report_approval"
+        | "evidence_return"
+        | "final_closure"
       case_priority: "low" | "medium" | "high" | "critical"
       case_status:
         | "open"
@@ -501,6 +561,10 @@ export type Database = {
         | "pending_review"
         | "closed"
         | "archived"
+        | "analysis_complete"
+        | "report_submitted"
+        | "report_approved"
+        | "evidence_returned"
       exhibit_status:
         | "received"
         | "in_analysis"
@@ -652,6 +716,18 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      approval_status: [
+        "pending",
+        "approved",
+        "rejected",
+        "revision_requested",
+      ],
+      approval_type: [
+        "report_submission",
+        "report_approval",
+        "evidence_return",
+        "final_closure",
+      ],
       case_priority: ["low", "medium", "high", "critical"],
       case_status: [
         "open",
@@ -659,6 +735,10 @@ export const Constants = {
         "pending_review",
         "closed",
         "archived",
+        "analysis_complete",
+        "report_submitted",
+        "report_approved",
+        "evidence_returned",
       ],
       exhibit_status: [
         "received",

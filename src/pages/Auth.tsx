@@ -33,19 +33,10 @@ const Auth = () => {
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
-        password,
+        password
       });
 
-      if (error) {
-        // Provide more user-friendly error messages
-        const errorMessage = error.message.includes('Invalid login credentials')
-          ? 'Invalid email or password. Please check your credentials and try again.'
-          : error.message.includes('Email not confirmed')
-          ? 'Please confirm your email address before signing in.'
-          : error.message;
-        
-        throw new Error(errorMessage);
-      }
+      if (error) throw error;
 
       toast({
         title: "Welcome back!",

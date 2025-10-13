@@ -5,34 +5,57 @@ import { supabase } from '@/integrations/supabase/client';
 export const usePermissions = () => {
   const { user, profile } = useAuth();
   const [permissions, setPermissions] = useState<string[]>([]);
+  const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPermissions = async () => {
-      if (!user || !profile?.role) {
+    const fetchRoleAndPermissions = async () => {
+      if (!user) {
         setPermissions([]);
+        setRole(null);
         setLoading(false);
         return;
       }
 
       try {
-        const { data, error } = await supabase
-          .from('role_permissions')
-          .select('permission')
-          .eq('role', profile.role);
+        // Fetch user's role from user_roles table (primary source)
+        const { data: roleData, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: true })
+          .limit(1)
+          .maybeSingle();
 
-        if (error) throw error;
+        if (roleError) {
+          console.error('Error fetching role:', roleError);
+        }
         
-        setPermissions(data?.map(p => p.permission) || []);
+        // Use user_roles table as primary source, fall back to profile.role
+        const userRole = roleData?.role || profile?.role;
+        setRole(userRole);
+
+        if (userRole) {
+          // Fetch permissions for the role
+          const { data: permData, error: permError } = await supabase
+            .from('role_permissions')
+            .select('permission')
+            .eq('role', userRole);
+
+          if (permError) throw permError;
+          
+          setPermissions(permData?.map(p => p.permission) || []);
+        }
       } catch (error) {
         console.error('Error fetching permissions:', error);
         setPermissions([]);
+        setRole(profile?.role || null);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPermissions();
+    fetchRoleAndPermissions();
   }, [user, profile?.role]);
 
   const hasPermission = (permission: string) => {
@@ -53,6 +76,6 @@ export const usePermissions = () => {
     hasPermission,
     hasAnyPermission,
     hasAllPermissions,
-    role: profile?.role,
+    role: role || profile?.role,
   };
 };

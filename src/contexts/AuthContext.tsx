@@ -33,26 +33,38 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     let isMounted = true;
     console.log('AuthContext: Starting initialization');
     
-    // Set up auth state listener
+    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('AuthContext: Auth state change:', event, !!session);
         if (!isMounted) return;
         
+        // Only update session and user synchronously
         setSession(session);
         setUser(session?.user ?? null);
         
+        // Defer profile fetching to avoid blocking auth state changes
         if (session?.user) {
           console.log('AuthContext: User found, fetching profile');
-          // Defer profile fetch to avoid deadlock in onAuthStateChange
           setTimeout(() => {
+            if (!isMounted) return;
+            
             const fetchProfile = async () => {
               try {
-                const { data: profileData, error } = await supabase
+                const profilePromise = supabase
                   .from('profiles')
                   .select('*')
                   .eq('id', session.user.id)
                   .maybeSingle();
+                
+                const timeoutPromise = new Promise((_, reject) => 
+                  setTimeout(() => reject(new Error('Profile fetch timeout')), 5000)
+                );
+                
+                const { data: profileData, error } = await Promise.race([
+                  profilePromise,
+                  timeoutPromise
+                ]) as any;
                 
                 console.log('AuthContext: Profile fetch result:', { profileData, error });
                 
@@ -74,9 +86,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               }
             };
             
-            if (isMounted) {
-              fetchProfile();
-            }
+            fetchProfile();
           }, 0);
         } else {
           console.log('AuthContext: No user, setting loading to false');
@@ -88,7 +98,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     );
 
-    // Check for existing session
+    // THEN check for existing session
     const initializeAuth = async () => {
       console.log('AuthContext: Checking existing session');
       try {

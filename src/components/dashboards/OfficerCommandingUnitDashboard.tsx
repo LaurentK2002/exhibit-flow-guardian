@@ -14,6 +14,7 @@ import { FileText } from "lucide-react";
 import { ReportReviewPanel } from "@/components/ReportReviewPanel";
 import { ProfessionalReportReview } from "@/components/ProfessionalReportReview";
 import { UnassignedCasesForOCU } from "@/components/UnassignedCasesForOCU";
+import { PendingApprovals } from "@/components/approvals/PendingApprovals";
 
 export const OfficerCommandingUnitDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -33,8 +34,9 @@ export const OfficerCommandingUnitDashboard = () => {
 
       {/* Main Dashboard */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="approvals">Approvals</TabsTrigger>
           <TabsTrigger value="cases">Cases</TabsTrigger>
           <TabsTrigger value="assignments">Assignments</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
@@ -44,6 +46,20 @@ export const OfficerCommandingUnitDashboard = () => {
 
         <TabsContent value="overview" className="space-y-6">
           <DashboardStats />
+        </TabsContent>
+
+        <TabsContent value="approvals" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Pending Approvals</CardTitle>
+              <CardDescription>
+                Review and approve case phase-out requests and status transitions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PendingApprovals />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="cases" className="space-y-6">

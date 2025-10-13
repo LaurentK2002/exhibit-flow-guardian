@@ -48,7 +48,11 @@ const statusMap: Record<Database['public']['Enums']['case_status'], string> = {
   under_investigation: "Under Investigation",
   pending_review: "Pending Review",
   closed: "Closed",
-  archived: "Archived"
+  archived: "Archived",
+  analysis_complete: "Analysis Complete",
+  report_submitted: "Report Submitted",
+  report_approved: "Report Approved",
+  evidence_returned: "Evidence Returned"
 };
 
 export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhibitReceiptProps>(

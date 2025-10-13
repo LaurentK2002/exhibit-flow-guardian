@@ -27,6 +27,8 @@ import {
 import { CaseStatusBadge, CaseStatus } from "./CaseStatusBadge";
 import { useToast } from "@/hooks/use-toast";
 import { formatExhibitNumber } from "@/lib/exhibitNumber";
+import { CasePhaseOutPanel } from "./approvals/CasePhaseOutPanel";
+import { ApprovalHistoryTimeline } from "./approvals/ApprovalHistoryTimeline";
 
 interface CaseDetailsDialogProps {
   caseId: string | null;
@@ -698,6 +700,18 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
                 </CardContent>
               </Card>
             )}
+          </TabsContent>
+
+          <TabsContent value="phaseout" className="space-y-4">
+            <CasePhaseOutPanel 
+              caseId={caseDetails.id} 
+              caseStatus={caseDetails.status}
+              onStatusChange={fetchCaseDetails}
+            />
+          </TabsContent>
+
+          <TabsContent value="approvals" className="space-y-4">
+            <ApprovalHistoryTimeline caseId={caseDetails.id} />
           </TabsContent>
         </Tabs>
       </DialogContent>

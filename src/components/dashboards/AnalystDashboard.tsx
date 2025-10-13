@@ -7,6 +7,7 @@ import { Microscope, FileText, CheckCircle, AlertCircle } from "lucide-react";
 import { MyAssignedCases } from "@/components/MyAssignedCases";
 import { CaseSearch } from "@/components/CaseSearch";
 import { AnalystReportSubmissions } from "@/components/AnalystReportSubmissions";
+import { CasePhaseOutPanel } from "@/components/approvals/CasePhaseOutPanel";
 
 export const AnalystDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -25,7 +26,7 @@ export const AnalystDashboard = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <Microscope className="h-4 w-4" />
             Overview
@@ -37,6 +38,10 @@ export const AnalystDashboard = () => {
           <TabsTrigger value="reports" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
             Reports
+          </TabsTrigger>
+          <TabsTrigger value="phaseout" className="flex items-center gap-2">
+            <CheckCircle className="h-4 w-4" />
+            Phase-Out
           </TabsTrigger>
         </TabsList>
 
@@ -85,6 +90,14 @@ export const AnalystDashboard = () => {
 
         <TabsContent value="reports">
           <AnalystReportSubmissions />
+        </TabsContent>
+
+        <TabsContent value="phaseout" className="space-y-4">
+          <div className="space-y-4">
+            <p className="text-muted-foreground text-sm">
+              Select a case from "My Cases" to manage phase-out procedures and status transitions.
+            </p>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

@@ -34,18 +34,31 @@ export const PendingApprovals = () => {
 
   const fetchPendingApprovals = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: approvalsData, error } = await supabase
         .from('case_approvals')
         .select(`
           *,
-          case:cases(case_number, title, lab_number, status),
-          submitter:profiles!case_approvals_submitted_by_fkey(full_name, role)
+          case:cases(case_number, title, lab_number, status)
         `)
         .eq('approval_status', 'pending')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setApprovals(data as unknown as PendingApproval[]);
+
+      // Fetch submitter profiles separately
+      const submitterIds = [...new Set(approvalsData?.map(a => a.submitted_by) || [])];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, role')
+        .in('id', submitterIds);
+
+      // Combine the data
+      const enrichedApprovals = approvalsData?.map(approval => ({
+        ...approval,
+        submitter: profiles?.find(p => p.id === approval.submitted_by) || { full_name: 'Unknown', role: 'unknown' }
+      }));
+
+      setApprovals(enrichedApprovals as unknown as PendingApproval[]);
     } catch (error) {
       console.error('Error fetching pending approvals:', error);
     } finally {

@@ -203,9 +203,18 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
         return labSeq && fileName.startsWith(labSeq + '-');
       });
 
-      const refFilesToShow = matchedRefFiles;
+      // Keep only the most recent file per case (filter out older duplicates)
+      const mostRecentRef = matchedRefFiles.length > 0 
+        ? matchedRefFiles.reduce((latest, current) => {
+            const latestDate = new Date(latest.created_at || 0);
+            const currentDate = new Date(current.created_at || 0);
+            return currentDate > latestDate ? current : latest;
+          })
+        : null;
 
-      // Merge and de-duplicate by base filename (prefer case uploads over reference letters)
+      const refFilesToShow = mostRecentRef ? [mostRecentRef] : [];
+
+      // Merge case documents with the most recent reference letter
       const caseDocs = (caseDocuments || []).map((doc) => ({
         id: doc.id,
         file_path: `${caseId}/${doc.name}`,
@@ -218,13 +227,7 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
         created_at: doc.created_at || new Date().toISOString(),
       }));
 
-      const combined = [...caseDocs, ...refDocs];
-      const uniqueByName = new Map<string, { id: string; file_path: string; created_at: string }>();
-      for (const d of combined) {
-        const base = d.file_path.split('/').pop()?.toLowerCase() || d.file_path.toLowerCase();
-        if (!uniqueByName.has(base)) uniqueByName.set(base, d);
-      }
-      const allDocuments = Array.from(uniqueByName.values());
+      const allDocuments = [...caseDocs, ...refDocs];
 
       setCaseDetails({
         ...caseData,

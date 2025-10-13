@@ -245,7 +245,7 @@ export function PrintExhibitReceiptsDialog({ open, onOpenChange }: PrintExhibitR
                   <p><span className="font-semibold">Received By:</span> {receivedProfile?.full_name || 'System User'}</p>
                 </div>
                 <div>
-                  <p><span className="font-semibold">Badge Number:</span> {receivedProfile?.badge_number || 'N/A'}</p>
+                  <p><span className="font-semibold">Force Number:</span> {receivedProfile?.badge_number || 'N/A'}</p>
                   <p><span className="font-semibold">Department:</span> {receivedProfile?.department || 'Cyber Crimes Unit'}</p>
                 </div>
               </div>

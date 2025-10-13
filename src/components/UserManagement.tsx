@@ -191,7 +191,7 @@ export const UserManagement = () => {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Badge Number</TableHead>
+                <TableHead>Force Number</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>

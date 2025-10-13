@@ -97,7 +97,7 @@ export const UserProfile = () => {
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Hash className="h-4 w-4" />
-                Badge Number
+                Force Number
               </Label>
               <Input value={profile?.badge_number || ""} disabled />
             </div>

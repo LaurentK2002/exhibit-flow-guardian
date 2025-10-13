@@ -117,7 +117,7 @@ export const AddUserDialog = ({ open, onOpenChange, onUserAdded }: AddUserDialog
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="badgeNumber">Badge Number</Label>
+              <Label htmlFor="badgeNumber">Force Number</Label>
               <Input
                 id="badgeNumber"
                 value={formData.badgeNumber}

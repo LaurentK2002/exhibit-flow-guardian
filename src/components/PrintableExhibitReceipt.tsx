@@ -186,7 +186,7 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
                 <span>{exhibit.received_profile?.full_name || 'System User'}</span>
               </div>
               <div className="flex">
-                <span className="font-semibold w-32">Badge Number:</span>
+                <span className="font-semibold w-32">Force Number:</span>
                 <span>{exhibit.received_profile?.badge_number || 'N/A'}</span>
               </div>
               <div className="flex">

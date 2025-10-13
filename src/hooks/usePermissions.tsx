@@ -8,31 +8,32 @@ export const usePermissions = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user && profile?.role) {
-      fetchPermissions();
-    } else {
-      setPermissions([]);
-      setLoading(false);
-    }
+    const fetchPermissions = async () => {
+      if (!user || !profile?.role) {
+        setPermissions([]);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('role_permissions')
+          .select('permission')
+          .eq('role', profile.role);
+
+        if (error) throw error;
+        
+        setPermissions(data?.map(p => p.permission) || []);
+      } catch (error) {
+        console.error('Error fetching permissions:', error);
+        setPermissions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPermissions();
   }, [user, profile?.role]);
-
-  const fetchPermissions = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('role_permissions')
-        .select('permission')
-        .eq('role', profile?.role);
-
-      if (error) throw error;
-      
-      setPermissions(data?.map(p => p.permission) || []);
-    } catch (error) {
-      console.error('Error fetching permissions:', error);
-      setPermissions([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const hasPermission = (permission: string) => {
     return permissions.includes(permission);

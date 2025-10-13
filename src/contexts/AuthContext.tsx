@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         console.log('AuthContext: Auth state change:', event, !!session);
         if (!isMounted) return;
         
@@ -44,49 +44,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (session?.user) {
           console.log('AuthContext: User found, fetching profile');
-          // Fetch user profile with timeout to prevent hanging due to RLS circular dependency
-          const fetchProfile = async () => {
-            try {
-              // Use Promise.race to add a timeout
-              const profilePromise = supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .maybeSingle();
-              
-              const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Profile fetch timeout')), 5000)
-              );
-              
-              const { data: profileData, error } = await Promise.race([
-                profilePromise,
-                timeoutPromise
-              ]) as any;
-              
-              console.log('AuthContext: Profile fetch result:', { profileData, error });
-              
-              if (isMounted) {
-                if (error) {
-                  console.error('Profile fetch error:', error);
+          // Defer profile fetch to avoid deadlock in onAuthStateChange
+          setTimeout(() => {
+            const fetchProfile = async () => {
+              try {
+                const { data: profileData, error } = await supabase
+                  .from('profiles')
+                  .select('*')
+                  .eq('id', session.user.id)
+                  .maybeSingle();
+                
+                console.log('AuthContext: Profile fetch result:', { profileData, error });
+                
+                if (isMounted) {
+                  if (error) {
+                    console.error('Profile fetch error:', error);
+                    setProfile(null);
+                  } else {
+                    setProfile(profileData);
+                  }
+                  setLoading(false);
+                }
+              } catch (error) {
+                console.error('Error fetching profile:', error);
+                if (isMounted) {
                   setProfile(null);
-                } else {
-                  setProfile(profileData);
+                  setLoading(false);
                 }
               }
-            } catch (error) {
-              console.error('Error fetching profile:', error);
-              if (isMounted) {
-                setProfile(null);
-              }
-            } finally {
-              if (isMounted) {
-                console.log('AuthContext: Setting loading to false');
-                setLoading(false);
-              }
+            };
+            
+            if (isMounted) {
+              fetchProfile();
             }
-          };
-          
-          fetchProfile();
+          }, 0);
         } else {
           console.log('AuthContext: No user, setting loading to false');
           if (isMounted) {

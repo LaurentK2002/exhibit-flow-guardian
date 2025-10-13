@@ -43,6 +43,8 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
     caseTitle: '',
     fromDesignation: 'DCI',
     customDesignation: '',
+    region: '',
+    district: '',
     caseStatus: 'open' as CaseStatus,
     casePriority: 'medium' as CasePriority,
     irNumber: '',
@@ -348,6 +350,8 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
         caseTitle: '',
         fromDesignation: 'DCI',
         customDesignation: '',
+        region: '',
+        district: '',
         caseStatus: 'open',
         casePriority: 'medium',
         irNumber: '',
@@ -476,33 +480,57 @@ export const AddExhibitDialog = ({ open, onOpenChange, onSuccess }: AddExhibitDi
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="fromDesignation">From *</Label>
-              <Select 
-                value={caseFormData.fromDesignation} 
-                onValueChange={(value) => setCaseFormData({ ...caseFormData, fromDesignation: value, customDesignation: '' })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="DCI">DCI</SelectItem>
-                  <SelectItem value="ZCO">ZCO</SelectItem>
-                  <SelectItem value="RCO">RCO</SelectItem>
-                  <SelectItem value="OC-CID">OC-CID</SelectItem>
-                  <SelectItem value="DCEA">DCEA</SelectItem>
-                  <SelectItem value="DCO">DCO</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-              {caseFormData.fromDesignation === 'Other' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="fromDesignation">From *</Label>
+                <Select 
+                  value={caseFormData.fromDesignation} 
+                  onValueChange={(value) => setCaseFormData({ ...caseFormData, fromDesignation: value, customDesignation: '' })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="DCI">DCI</SelectItem>
+                    <SelectItem value="ZCO">ZCO</SelectItem>
+                    <SelectItem value="RCO">RCO</SelectItem>
+                    <SelectItem value="OC-CID">OC-CID</SelectItem>
+                    <SelectItem value="DCEA">DCEA</SelectItem>
+                    <SelectItem value="DCO">DCO</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+                {caseFormData.fromDesignation === 'Other' && (
+                  <Input
+                    placeholder="Enter designation"
+                    value={caseFormData.customDesignation}
+                    onChange={(e) => setCaseFormData({ ...caseFormData, customDesignation: e.target.value })}
+                    required
+                  />
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="region">Region *</Label>
                 <Input
-                  placeholder="Enter designation"
-                  value={caseFormData.customDesignation}
-                  onChange={(e) => setCaseFormData({ ...caseFormData, customDesignation: e.target.value })}
+                  id="region"
+                  value={caseFormData.region}
+                  onChange={(e) => setCaseFormData({ ...caseFormData, region: e.target.value })}
+                  placeholder="Enter region"
                   required
                 />
-              )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="district">District *</Label>
+                <Input
+                  id="district"
+                  value={caseFormData.district}
+                  onChange={(e) => setCaseFormData({ ...caseFormData, district: e.target.value })}
+                  placeholder="Enter district"
+                  required
+                />
+              </div>
             </div>
 
             <div className="space-y-2">

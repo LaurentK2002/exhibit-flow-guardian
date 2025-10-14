@@ -39,8 +39,11 @@ export const CaseTable = ({ hideUnassigned = false }: { hideUnassigned?: boolean
 
       const casesData = data || [];
       
-      // Fetch assigned user profiles separately
-      const assignedUserIds = [...new Set(casesData.map((c: any) => c.assigned_to).filter(Boolean))];
+      // Fetch assigned user profiles separately (check both assigned_to and analyst_id)
+      const assignedUserIds = [...new Set([
+        ...casesData.map((c: any) => c.assigned_to).filter(Boolean),
+        ...casesData.map((c: any) => c.analyst_id).filter(Boolean)
+      ])];
       let profilesMap = new Map<string, any>();
       
       if (assignedUserIds.length > 0) {
@@ -53,7 +56,7 @@ export const CaseTable = ({ hideUnassigned = false }: { hideUnassigned?: boolean
 
       const enriched = casesData.map((c: any) => ({
         ...c,
-        profiles: c.assigned_to ? profilesMap.get(c.assigned_to) : null,
+        profiles: c.analyst_id ? profilesMap.get(c.analyst_id) : (c.assigned_to ? profilesMap.get(c.assigned_to) : null),
       }));
 
       setCases(enriched as any);

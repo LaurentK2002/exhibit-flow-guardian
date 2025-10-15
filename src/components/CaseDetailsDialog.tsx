@@ -169,15 +169,16 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
         prefix: string
       ): Promise<{ id: string; name: string; created_at: string | null; path: string }[]> => {
         const results: { id: string; name: string; created_at: string | null; path: string }[] = [];
+        const listPrefix = prefix && !prefix.endsWith('/') ? `${prefix}/` : prefix;
         const { data: items, error: listError } = await supabase.storage
           .from("case-documents")
-          .list(prefix);
+          .list(listPrefix);
         if (listError) {
           console.error("Error listing storage items:", listError);
           return results;
         }
         for (const item of items || []) {
-          const currentPath = prefix ? `${prefix}/${item.name}` : item.name;
+          const currentPath = prefix ? `${prefix}/${item.name}`.replace(/\/+/g, '/') : item.name;
           // Folders in Supabase Storage have null id; files have an id
           if (!item.id) {
             const children = await listAll(currentPath);
@@ -311,11 +312,12 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
 
       if (error) throw error;
       window.open(data.signedUrl, "_blank");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error previewing document:", error);
+      const notFound = (error?.statusCode === '404' || error?.status === 404 || /not[_ ]?found/i.test(error?.message || ''));
       toast({
-        title: "Error",
-        description: "Failed to preview document",
+        title: notFound ? "Document not found" : "Error",
+        description: notFound ? `Missing from storage: ${fileName}` : "Failed to preview document",
         variant: "destructive",
       });
     }

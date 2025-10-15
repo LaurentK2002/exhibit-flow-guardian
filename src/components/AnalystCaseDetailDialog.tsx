@@ -182,6 +182,42 @@ export const AnalystCaseDetailDialog = ({
         exhibits: exhibits || [],
         referenceLetters: refFilesToShow
       };
+      // Fallback: check activities metadata for a stored reference letter path
+      if ((!details.referenceLetters || details.referenceLetters.length === 0)) {
+        const { data: refFromActivity } = await supabase
+          .from('case_activities')
+          .select('metadata, created_at, id')
+          .eq('case_id', caseRow.id)
+          .not('metadata->>reference_letter_path', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(1);
+        if (refFromActivity && refFromActivity.length > 0) {
+          const path = (refFromActivity[0] as any).metadata?.reference_letter_path as string | null;
+          if (path) {
+            const name = path.split('/').pop() || 'reference-letter';
+            details.referenceLetters = [{ id: (refFromActivity[0] as any).id, name, path, created_at: (refFromActivity[0] as any).created_at }];
+          }
+        }
+      }
+
+      // Fallback 2: scan case folder for any file that looks like a reference letter
+      if ((!details.referenceLetters || details.referenceLetters.length === 0)) {
+        const { data: caseFolderItems } = await supabase.storage
+          .from('case-documents')
+          .list(caseRow.id);
+        const candidate = (caseFolderItems || []).find((it: any) => {
+          const n = (it.name || '').toLowerCase();
+          return n.includes('reference') || n.includes('barua') || n.includes('letter');
+        });
+        if (candidate) {
+          details.referenceLetters = [{
+            id: candidate.id,
+            name: candidate.name,
+            path: `${caseRow.id}/${candidate.name}`,
+            created_at: candidate.created_at || null,
+          }];
+        }
+      }
 
       setCaseDetails(details);
       setAnalystStatus(caseRow.analyst_status || 'pending');

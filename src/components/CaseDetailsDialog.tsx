@@ -223,11 +223,32 @@ export const CaseDetailsDialog = ({ caseId, open, onOpenChange }: CaseDetailsDia
         created_at: doc.created_at,
       }));
 
-      const refDocs = refFilesToShow.map((doc) => ({
+      const refDocs = [...refFilesToShow.map((doc) => ({
         id: doc.id,
         file_path: doc.path,
         created_at: doc.created_at || new Date().toISOString(),
-      }));
+      }))];
+
+      // Fallback: if nothing found in reference-letters/, look for path saved in activities metadata
+      if (refDocs.length === 0) {
+        const { data: refFromActivity } = await supabase
+          .from('case_activities')
+          .select('metadata, created_at, id')
+          .eq('case_id', caseId)
+          .not('metadata->>reference_letter_path', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(1);
+        if (refFromActivity && refFromActivity.length > 0) {
+          const path = (refFromActivity[0] as any).metadata?.reference_letter_path as string | null;
+          if (path) {
+            refDocs.push({
+              id: (refFromActivity[0] as any).id,
+              file_path: path,
+              created_at: (refFromActivity[0] as any).created_at || new Date().toISOString(),
+            });
+          }
+        }
+      }
 
       const allDocuments = [...caseDocs, ...refDocs];
 

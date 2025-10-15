@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { FileText, Clock, User, MapPin, AlertCircle, Package } from "lucide-react";
+import { FileText, Clock, User, MapPin, AlertCircle, Package, Download, Eye } from "lucide-react";
 
 interface AnalystCaseDetailDialogProps {
   caseId: string | null;
@@ -42,6 +42,12 @@ interface CaseDetails {
     device_name: string;
     exhibit_type: string;
     status: string;
+  }>;
+  referenceLetters?: Array<{
+    id: string;
+    name: string;
+    path: string;
+    created_at: string | null;
   }>;
 }
 
@@ -91,6 +97,52 @@ export const AnalystCaseDetailDialog = ({
 
       if (exhibitsError) throw exhibitsError;
 
+      // 2b) Fetch reference letters from storage
+      const listAll = async (
+        prefix: string
+      ): Promise<{ id: string; name: string; created_at: string | null; path: string }[]> => {
+        const results: { id: string; name: string; created_at: string | null; path: string }[] = [];
+        const { data: items, error: listError } = await supabase.storage
+          .from("case-documents")
+          .list(prefix);
+        if (listError) {
+          console.error("Error listing storage items:", listError);
+          return results;
+        }
+        for (const item of items || []) {
+          const currentPath = prefix ? `${prefix}/${item.name}` : item.name;
+          if (!item.id) {
+            const children = await listAll(currentPath);
+            results.push(...children);
+          } else {
+            results.push({
+              id: item.id,
+              name: item.name,
+              created_at: item.created_at || null,
+              path: currentPath,
+            });
+          }
+        }
+        return results;
+      };
+
+      const allRefFiles = await listAll("reference-letters");
+      const labSeq = caseRow.lab_number?.split('/').pop() || caseRow.case_number?.split('/').pop();
+      const matchedRefFiles = allRefFiles.filter((f) => {
+        const fileName = f.name;
+        return labSeq && fileName.startsWith(labSeq + '-');
+      });
+
+      const mostRecentRef = matchedRefFiles.length > 0 
+        ? matchedRefFiles.reduce((latest, current) => {
+            const latestDate = new Date(latest.created_at || 0);
+            const currentDate = new Date(current.created_at || 0);
+            return currentDate > latestDate ? current : latest;
+          })
+        : null;
+
+      const refFilesToShow = mostRecentRef ? [mostRecentRef] : [];
+
       // 3) Fetch assigned and analyst profiles if present
       let assignedProfile: any = null;
       let analystProfile: any = null;
@@ -127,7 +179,8 @@ export const AnalystCaseDetailDialog = ({
         incident_date: caseRow.incident_date,
         assigned_to_profile: assignedProfile ? { full_name: assignedProfile.full_name, badge_number: assignedProfile.badge_number } : undefined,
         analyst_profile: analystProfile ? { full_name: analystProfile.full_name, badge_number: analystProfile.badge_number } : undefined,
-        exhibits: exhibits || []
+        exhibits: exhibits || [],
+        referenceLetters: refFilesToShow
       };
 
       setCaseDetails(details);
@@ -176,6 +229,42 @@ export const AnalystCaseDetailDialog = ({
     }
   };
 
+  const downloadDocument = async (fileName: string) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from("case-documents")
+        .download(fileName);
+
+      if (error) throw error;
+
+      const url = URL.createObjectURL(data);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName.split('/').pop() || fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      toast.success("Document downloaded successfully");
+    } catch (error) {
+      console.error("Error downloading document:", error);
+      toast.error("Failed to download document");
+    }
+  };
+
+  const previewDocument = async (fileName: string) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from("case-documents")
+        .createSignedUrl(fileName, 60);
+
+      if (error) throw error;
+      window.open(data.signedUrl, "_blank");
+    } catch (error) {
+      console.error("Error previewing document:", error);
+      toast.error("Failed to preview document");
+    }
+  };
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high': return 'destructive';
@@ -214,8 +303,14 @@ export const AnalystCaseDetailDialog = ({
           <div className="py-8 text-center text-muted-foreground">Loading case details...</div>
         ) : caseDetails ? (
           <Tabs defaultValue="details" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="details">Case Details</TabsTrigger>
+              <TabsTrigger value="reference">
+                Reference Letter
+                {caseDetails.referenceLetters && caseDetails.referenceLetters.length > 0 && (
+                  <Badge variant="secondary" className="ml-2">{caseDetails.referenceLetters.length}</Badge>
+                )}
+              </TabsTrigger>
               <TabsTrigger value="exhibits">Exhibits</TabsTrigger>
               <TabsTrigger value="analysis">Analysis Status</TabsTrigger>
             </TabsList>
@@ -290,6 +385,72 @@ export const AnalystCaseDetailDialog = ({
                     <div>
                       <h4 className="font-semibold mb-2">Case Notes</h4>
                       <p className="text-sm text-muted-foreground whitespace-pre-wrap">{caseDetails.case_notes}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="reference" className="space-y-4 mt-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Reference Letter from Station
+                  </CardTitle>
+                  <CardDescription>
+                    Instructions from the station regarding what needs to be analyzed
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {caseDetails.referenceLetters && caseDetails.referenceLetters.length > 0 ? (
+                    <div className="space-y-3">
+                      {caseDetails.referenceLetters.map((doc) => (
+                        <div key={doc.id} className="flex items-center justify-between p-4 border rounded-lg bg-muted/50">
+                          <div className="flex items-center gap-3">
+                            <FileText className="h-8 w-8 text-primary" />
+                            <div>
+                              <p className="font-medium">{doc.name}</p>
+                              {doc.created_at && (
+                                <p className="text-sm text-muted-foreground">
+                                  Uploaded: {new Date(doc.created_at).toLocaleDateString()}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => previewDocument(doc.path)}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              View
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => downloadDocument(doc.path)}
+                            >
+                              <Download className="h-4 w-4 mr-1" />
+                              Download
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <p className="text-sm text-blue-800 dark:text-blue-200">
+                          <strong>Note:</strong> This reference letter contains instructions from the station specifying what needs to be analyzed in the exhibits for this case. Please review it carefully before beginning your analysis.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                      <p className="text-muted-foreground mb-2">No reference letter found for this case</p>
+                      <p className="text-sm text-muted-foreground">
+                        The reference letter should be uploaded by the exhibit officer or case coordinator.
+                      </p>
                     </div>
                   )}
                 </CardContent>

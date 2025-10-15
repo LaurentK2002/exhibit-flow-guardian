@@ -113,7 +113,23 @@ VALUES (
 
 ## 🔒 Security Hardening
 
-### 1. Network Security
+### 1. Storage Policies
+The system implements Row-Level Security (RLS) policies for document storage:
+
+**Reference Letter Access**:
+- **Analysts**: Can view reference letters only for cases they are assigned to
+- **Exhibit Officers**: Can upload, update, and delete reference letters
+- **Naming Convention**: Reference letters must follow the format `reference-letters/<lab-sequence>-<timestamp>-reference-letter.<ext>`
+  - Example: `reference-letters/0001-1704067200000-reference-letter.pdf`
+- **File Path**: All reference letters stored in `case-documents` bucket under `reference-letters/` folder
+
+**Case Document Access**:
+- **Case Participants**: Users assigned to a case (as assigned_to, supervisor_id, analyst_id, or exhibit_officer_id) can view all documents in their case folder
+- **Folder Structure**: Documents organized by case ID (`case-documents/<case-id>/`)
+
+These policies are automatically applied during database initialization and ensure secure access control at the storage layer.
+
+### 2. Network Security
 ```bash
 # Configure firewall (Ubuntu/Debian)
 sudo ufw allow 22/tcp     # SSH (change default port)
@@ -127,7 +143,7 @@ sudo firewall-cmd --permanent --remove-service=http
 sudo firewall-cmd --reload
 ```
 
-### 2. System Hardening
+### 3. System Hardening
 ```bash
 # Disable SSH root login
 sudo sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
@@ -143,7 +159,7 @@ sudo apt install unattended-upgrades
 sudo dpkg-reconfigure -plow unattended-upgrades
 ```
 
-### 3. Database Security
+### 4. Database Security
 ```bash
 # Backup encryption
 gpg --gen-key  # Generate GPG key for backup encryption

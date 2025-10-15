@@ -133,3 +133,83 @@ INSERT INTO role_permissions (role, permission) VALUES
 ('exhibit_officer', 'manage_exhibits'),
 ('investigator', 'view_cases'),
 ('commanding_officer', 'view_all');
+
+-- Storage bucket setup for case documents
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('case-documents', 'case-documents', false);
+
+-- Storage policies for reference letters and case documents
+-- Allow analysts to view reference letters for their assigned cases
+CREATE POLICY "Analysts can view reference letters for assigned cases"
+ON storage.objects FOR SELECT
+TO authenticated
+USING (
+  bucket_id = 'case-documents' 
+  AND (name LIKE 'reference-letters/%')
+  AND EXISTS (
+    SELECT 1 FROM cases
+    WHERE analyst_id = auth.uid()
+    AND (
+      name LIKE 'reference-letters/' || SPLIT_PART(lab_number, '/', 5) || '-%'
+      OR name LIKE 'reference-letters/' || SPLIT_PART(case_number, '/', 4) || '-%'
+    )
+  )
+);
+
+-- Allow exhibit officers to manage reference letters
+CREATE POLICY "Exhibit officers can upload reference letters"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'case-documents'
+  AND (name LIKE 'reference-letters/%')
+  AND EXISTS (
+    SELECT 1 FROM profiles
+    WHERE id = auth.uid()
+    AND role = 'exhibit_officer'
+  )
+);
+
+CREATE POLICY "Exhibit officers can delete reference letters"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'case-documents'
+  AND (name LIKE 'reference-letters/%')
+  AND EXISTS (
+    SELECT 1 FROM profiles
+    WHERE id = auth.uid()
+    AND role = 'exhibit_officer'
+  )
+);
+
+CREATE POLICY "Exhibit officers can update reference letters"
+ON storage.objects FOR UPDATE
+TO authenticated
+USING (
+  bucket_id = 'case-documents'
+  AND (name LIKE 'reference-letters/%')
+  AND EXISTS (
+    SELECT 1 FROM profiles
+    WHERE id = auth.uid()
+    AND role = 'exhibit_officer'
+  )
+);
+
+-- Allow case participants to view their case documents
+CREATE POLICY "Case participants can view their case documents"
+ON storage.objects FOR SELECT
+TO authenticated
+USING (
+  bucket_id = 'case-documents'
+  AND EXISTS (
+    SELECT 1 FROM cases
+    WHERE cases.id::text = SPLIT_PART(name, '/', 1)
+    AND (
+      cases.assigned_to = auth.uid()
+      OR cases.supervisor_id = auth.uid()
+      OR cases.analyst_id = auth.uid()
+      OR cases.exhibit_officer_id = auth.uid()
+    )
+  )
+);

@@ -369,3 +369,9 @@ Write-Host "  Stop system: docker-compose down" -ForegroundColor White
 Write-Host "  Restart: docker-compose restart" -ForegroundColor White
 Write-Host "  Backup: .\backup.ps1" -ForegroundColor White
 Write-Host ""
+Write-Host "Storage Security:" -ForegroundColor Cyan
+Write-Host "  • Reference letters must be named: reference-letters/<lab-sequence>-<timestamp>-reference-letter.<ext>" -ForegroundColor White
+Write-Host "  • Analysts can only view reference letters for their assigned cases" -ForegroundColor White
+Write-Host "  • Exhibit officers can upload, update, and delete reference letters" -ForegroundColor White
+Write-Host "  • Case participants can view documents in their case folders" -ForegroundColor White
+Write-Host ""

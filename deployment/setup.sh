@@ -182,6 +182,12 @@ echo "• Change default admin password immediately"
 echo "• Update SSL certificates before expiry"
 echo "• Regular backups are scheduled at 2 AM daily"
 echo "• Monitor system logs regularly"
+echo ""
+echo "📁 Storage Security:"
+echo "• Reference letters must be named: reference-letters/<lab-sequence>-<timestamp>-reference-letter.<ext>"
+echo "• Analysts can only view reference letters for their assigned cases"
+echo "• Exhibit officers can upload, update, and delete reference letters"
+echo "• Case participants can view documents in their case folders"
 EOF
 
 chmod +x deployment/setup.sh

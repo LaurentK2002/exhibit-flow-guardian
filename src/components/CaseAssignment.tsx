@@ -96,13 +96,14 @@ export const CaseAssignment = () => {
         .limit(1)
         .single();
 
-      // Update case with analyst and exhibit officer
+      // Update case with analyst, exhibit officer, and set status to in_progress
       const { error } = await supabase
         .from('cases')
         .update({ 
           analyst_id: analystId,
           assigned_to: analystId,
-          exhibit_officer_id: exhibitOfficer?.id || null
+          exhibit_officer_id: exhibitOfficer?.id || null,
+          status: 'in_progress'
         })
         .eq('id', caseId);
 

@@ -117,6 +117,24 @@ export const ExhibitAssignment = () => {
 
       if (updateError) throw updateError;
 
+      // Also update the related case status to in_progress if it's not already in a later stage
+      const exhibit = exhibits.find(e => e.id === exhibitId);
+      if (exhibit?.case_id) {
+        const { data: caseData } = await supabase
+          .from('cases')
+          .select('status')
+          .eq('id', exhibit.case_id)
+          .single();
+
+        // Only update to in_progress if case is in open or under_investigation status
+        if (caseData && (caseData.status === 'open' || caseData.status === 'under_investigation')) {
+          await supabase
+            .from('cases')
+            .update({ status: 'in_progress' })
+            .eq('id', exhibit.case_id);
+        }
+      }
+
       // Log the assignment activity
       const exhibit = exhibits.find(e => e.id === exhibitId);
       const analyst = analysts.find(a => a.id === analystId);

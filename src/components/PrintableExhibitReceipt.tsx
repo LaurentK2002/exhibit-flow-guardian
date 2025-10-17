@@ -48,6 +48,7 @@ const priorityMap: Record<Database['public']['Enums']['case_priority'], string> 
 const statusMap: Record<Database['public']['Enums']['case_status'], string> = {
   open: "Open",
   under_investigation: "Under Investigation",
+  in_progress: "In Analysis",
   pending_review: "Pending Review",
   closed: "Closed",
   archived: "Archived",

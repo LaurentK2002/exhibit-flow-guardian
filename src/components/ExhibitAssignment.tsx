@@ -118,12 +118,12 @@ export const ExhibitAssignment = () => {
       if (updateError) throw updateError;
 
       // Also update the related case status to in_progress if it's not already in a later stage
-      const exhibit = exhibits.find(e => e.id === exhibitId);
-      if (exhibit?.case_id) {
+      const currentExhibit = exhibits.find(e => e.id === exhibitId);
+      if (currentExhibit?.case_id) {
         const { data: caseData } = await supabase
           .from('cases')
           .select('status')
-          .eq('id', exhibit.case_id)
+          .eq('id', currentExhibit.case_id)
           .single();
 
         // Only update to in_progress if case is in open or under_investigation status
@@ -131,24 +131,23 @@ export const ExhibitAssignment = () => {
           await supabase
             .from('cases')
             .update({ status: 'in_progress' })
-            .eq('id', exhibit.case_id);
+            .eq('id', currentExhibit.case_id);
         }
       }
 
       // Log the assignment activity
-      const exhibit = exhibits.find(e => e.id === exhibitId);
       const analyst = analysts.find(a => a.id === analystId);
       
       const { error: activityError } = await supabase
         .from('case_activities')
         .insert({
-          case_id: exhibit?.case_id,
+          case_id: currentExhibit?.case_id,
           user_id: (await supabase.auth.getUser()).data.user?.id,
           activity_type: isReassignment ? 'exhibit_reassigned' : 'exhibit_assigned',
-          description: `Exhibit ${exhibit?.exhibit_number} ${isReassignment ? 'reassigned to' : 'assigned to'} ${analyst?.full_name}`,
+          description: `Exhibit ${currentExhibit?.exhibit_number} ${isReassignment ? 'reassigned to' : 'assigned to'} ${analyst?.full_name}`,
           metadata: {
             exhibit_id: exhibitId,
-            exhibit_number: exhibit?.exhibit_number,
+            exhibit_number: currentExhibit?.exhibit_number,
             analyst_id: analystId,
             analyst_name: analyst?.full_name,
             timestamp: new Date().toISOString()

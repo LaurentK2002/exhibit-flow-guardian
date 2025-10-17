@@ -616,6 +616,7 @@ export type Database = {
         | "report_submitted"
         | "report_approved"
         | "evidence_returned"
+        | "in_progress"
       exhibit_status:
         | "received"
         | "in_analysis"
@@ -801,6 +802,7 @@ export const Constants = {
         "report_submitted",
         "report_approved",
         "evidence_returned",
+        "in_progress",
       ],
       exhibit_status: [
         "received",

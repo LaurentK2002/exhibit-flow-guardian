@@ -66,24 +66,145 @@ export const AnalyticsDashboard = () => {
     fetchAnalytics();
   }, []);
 
+  // Add real-time updates
+  useEffect(() => {
+    const casesChannel = supabase
+      .channel('cases-analytics-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'cases' }, fetchAnalytics)
+      .subscribe();
+
+    const exhibitsChannel = supabase
+      .channel('exhibits-analytics-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'exhibits' }, fetchAnalytics)
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(casesChannel);
+      supabase.removeChannel(exhibitsChannel);
+    };
+  }, []);
+
   const fetchAnalytics = async () => {
     try {
       // Fetch real data from database
       const { data: cases } = await supabase
         .from('cases')
-        .select('created_at, status, priority');
+        .select('id, created_at, status, priority, closed_date, opened_date, assigned_to');
 
       const { data: exhibits } = await supabase
         .from('exhibits')
-        .select('exhibit_type, status');
+        .select('exhibit_type, status, case_id, assigned_analyst');
 
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('full_name, role, is_active')
-        .eq('is_active', true);
+        .select('id, full_name, role, is_active')
+        .eq('is_active', true)
+        .in('role', ['analyst', 'forensic_analyst']);
 
-      // Process the data for analytics (simplified for demo)
-      // In production, you'd want more sophisticated analytics processing
+      // Process cases trend by month (last 6 months)
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const now = new Date();
+      const casesTrend = [];
+      
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+        const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+        
+        const monthCases = cases?.filter(c => {
+          const caseDate = new Date(c.created_at);
+          return caseDate >= monthStart && caseDate <= monthEnd;
+        }).length || 0;
+        
+        const solvedCases = cases?.filter(c => {
+          const closedDate = c.closed_date ? new Date(c.closed_date) : null;
+          return closedDate && closedDate >= monthStart && closedDate <= monthEnd;
+        }).length || 0;
+        
+        casesTrend.push({
+          month: monthNames[date.getMonth()],
+          cases: monthCases,
+          solved: solvedCases
+        });
+      }
+
+      // Process exhibits by type
+      const typeColors: Record<string, string> = {
+        'mobile_device': '#3b82f6',
+        'computer': '#10b981',
+        'storage_media': '#f59e0b',
+        'network_device': '#ef4444',
+        'other': '#8b5cf6'
+      };
+      
+      const exhibitTypeMap: Record<string, number> = {};
+      exhibits?.forEach(e => {
+        const type = e.exhibit_type || 'other';
+        exhibitTypeMap[type] = (exhibitTypeMap[type] || 0) + 1;
+      });
+      
+      const exhibitsByType = Object.entries(exhibitTypeMap).map(([type, count]) => ({
+        name: type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+        value: count,
+        color: typeColors[type] || '#8b5cf6'
+      }));
+
+      // Calculate performance metrics
+      const closedCases = cases?.filter(c => c.status === 'closed' || c.status === 'archived') || [];
+      const avgResolution = closedCases.length > 0
+        ? closedCases.reduce((acc, c) => {
+            if (c.opened_date && c.closed_date) {
+              const days = Math.floor((new Date(c.closed_date).getTime() - new Date(c.opened_date).getTime()) / (1000 * 60 * 60 * 24));
+              return acc + days;
+            }
+            return acc;
+          }, 0) / closedCases.length
+        : 0;
+
+      const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const casesSolvedThisMonth = cases?.filter(c => {
+        const closedDate = c.closed_date ? new Date(c.closed_date) : null;
+        return closedDate && closedDate >= thisMonthStart;
+      }).length || 0;
+
+      const activeAnalysts = profiles?.length || 0;
+      const priorityCaseBacklog = cases?.filter(c => 
+        c.priority === 'critical' && c.status !== 'closed' && c.status !== 'archived'
+      ).length || 0;
+
+      // Calculate analyst workload
+      const workloadData = profiles?.map(analyst => {
+        const analystCases = cases?.filter(c => 
+          c.assigned_to === analyst.id || 
+          (exhibits?.some(e => e.assigned_analyst === analyst.id && e.case_id === c.id))
+        ) || [];
+        
+        const active = analystCases.filter(c => 
+          c.status !== 'closed' && c.status !== 'archived'
+        ).length;
+        
+        const completed = analystCases.filter(c => 
+          c.status === 'closed' || c.status === 'archived'
+        ).length;
+        
+        return {
+          analyst: analyst.full_name,
+          active,
+          completed
+        };
+      }) || [];
+
+      setAnalytics({
+        casesTrend,
+        exhibitsByType,
+        performanceMetrics: {
+          avgCaseResolution: Math.round(avgResolution * 10) / 10,
+          casesSolvedThisMonth,
+          activeAnalysts,
+          priorityCaseBacklog
+        },
+        workloadData
+      });
       
       setLoading(false);
     } catch (error) {

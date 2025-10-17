@@ -160,6 +160,16 @@ export const UploadAnalysisReportDialog = ({ children, onSuccess }: UploadAnalys
 
       if (insertError) throw insertError;
 
+      // Update case status to "report_submitted"
+      const { error: statusError } = await supabase
+        .from("cases")
+        .update({ status: "report_submitted" })
+        .eq("id", selectedCase);
+
+      if (statusError) {
+        console.error("Error updating case status:", statusError);
+      }
+
       // Log activity
       await supabase.from("case_activities").insert({
         case_id: selectedCase,

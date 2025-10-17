@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
-export type CaseStatus = "open" | "under_investigation" | "pending_review" | "closed" | "archived";
+export type CaseStatus = "open" | "under_investigation" | "pending_review" | "closed" | "archived" | "in_progress" | "analysis_complete" | "report_submitted" | "report_approved" | "evidence_returned";
 
 interface CaseStatusBadgeProps {
   status: CaseStatus;
@@ -16,6 +16,26 @@ const statusConfig = {
   under_investigation: { 
     label: "Under Investigation", 
     className: "bg-case-investigation text-white" 
+  },
+  in_progress: { 
+    label: "In Analysis", 
+    className: "bg-blue-500 text-white" 
+  },
+  analysis_complete: { 
+    label: "Analysis Complete", 
+    className: "bg-purple-500 text-white" 
+  },
+  report_submitted: { 
+    label: "Submitted for Review", 
+    className: "bg-amber-500 text-white" 
+  },
+  report_approved: { 
+    label: "Report Approved", 
+    className: "bg-green-500 text-white" 
+  },
+  evidence_returned: { 
+    label: "Evidence Returned", 
+    className: "bg-indigo-500 text-white" 
   },
   pending_review: { 
     label: "Pending Review", 

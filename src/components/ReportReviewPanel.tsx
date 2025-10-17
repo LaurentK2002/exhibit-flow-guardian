@@ -179,6 +179,18 @@ export const ReportReviewPanel = () => {
 
       if (error) throw error;
 
+      // Update case status when report is approved
+      if (reviewAction === "approved" && selectedReport.case?.id) {
+        const { error: statusError } = await supabase
+          .from("cases")
+          .update({ status: "analysis_complete" })
+          .eq("id", selectedReport.case.id);
+
+        if (statusError) {
+          console.error("Error updating case status:", statusError);
+        }
+      }
+
       // Log activity
       if (selectedReport.case?.id) {
         await supabase.from("case_activities").insert({

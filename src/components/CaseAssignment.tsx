@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,12 +33,7 @@ export const CaseAssignment = () => {
   const [selectedAnalysts, setSelectedAnalysts] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchCases();
-    fetchAnalysts();
-  }, []);
-
-  const fetchCases = async () => {
+  const fetchCases = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('cases')
@@ -57,12 +52,9 @@ export const CaseAssignment = () => {
       console.error('Error fetching cases:', error);
       setCases([]);
     }
-  };
+  }, []);
 
-  // Real-time refresh when cases table changes
-  useRealtime('cases', fetchCases);
-
-  const fetchAnalysts = async () => {
+  const fetchAnalysts = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -83,7 +75,16 @@ export const CaseAssignment = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchCases();
+    fetchAnalysts();
+  }, [fetchCases, fetchAnalysts]);
+
+  // Real-time refresh when cases or profiles table changes
+  useRealtime('cases', fetchCases);
+  useRealtime('profiles', fetchAnalysts);
 
   const assignCase = async (caseId: string, analystId: string) => {
     try {

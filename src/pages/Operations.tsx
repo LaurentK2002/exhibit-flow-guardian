@@ -1,8 +1,12 @@
 import { useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { CommandingOfficerDashboard } from "@/components/dashboards/CommandingOfficerDashboard";
+import { OfficerCommandingUnitDashboard } from "@/components/dashboards/OfficerCommandingUnitDashboard";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Operations() {
+  const { profile } = useAuth();
+
   useEffect(() => {
     document.title = "Operations Overview";
     const meta = document.querySelector('meta[name="description"]');
@@ -20,7 +24,11 @@ export default function Operations() {
       <Navigation />
       <main className="container mx-auto px-4 md:px-6 py-8 max-w-7xl">
         <h1 className="sr-only">Operations Overview</h1>
-        <CommandingOfficerDashboard />
+        {profile?.role === 'officer_commanding_unit' ? (
+          <OfficerCommandingUnitDashboard />
+        ) : (
+          <CommandingOfficerDashboard />
+        )}
       </main>
     </div>
   );

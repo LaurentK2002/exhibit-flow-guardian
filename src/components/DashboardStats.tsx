@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Database, Clock, CheckCircle, AlertTriangle, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRealtime } from "@/hooks/useRealtime";
 
 interface DashboardStats {
@@ -24,7 +24,7 @@ export const DashboardStats = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const { data: exhibits, error: exhibitsError } = await supabase
         .from('exhibits')
@@ -65,7 +65,7 @@ export const DashboardStats = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchStats();

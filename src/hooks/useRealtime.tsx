@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useRealtime = (
@@ -6,10 +6,17 @@ export const useRealtime = (
   onUpdate: () => void,
   filter?: { column: string; value: any }
 ) => {
+  const callbackRef = useRef(onUpdate);
+  
   useEffect(() => {
-    if (!onUpdate) return;
+    callbackRef.current = onUpdate;
+  }, [onUpdate]);
+
+  useEffect(() => {
+    const channelName = `${table}-${Math.random().toString(36).substring(7)}-changes`;
+    
     const channel = supabase
-      .channel(`${table}-changes`)
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -19,7 +26,7 @@ export const useRealtime = (
           ...(filter && { filter: `${filter.column}=eq.${filter.value}` })
         },
         () => {
-          onUpdate();
+          callbackRef.current();
         }
       )
       .subscribe();
@@ -27,5 +34,5 @@ export const useRealtime = (
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [table, onUpdate, filter]);
+  }, [table, filter?.column, filter?.value]);
 };

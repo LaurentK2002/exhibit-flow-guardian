@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Users, UserCheck, Clock, Award } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
+import { useRealtime } from '@/hooks/useRealtime';
 
 interface TeamMember {
   id: string;
@@ -20,27 +21,40 @@ export const TeamManagement = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchTeamMembers();
-  }, []);
-
-  const fetchTeamMembers = async () => {
+  const fetchTeamMembers = useCallback(async () => {
     try {
       // Fetch team members (analysts and exhibit officers)
       const { data: profiles, error } = await supabase
         .from('profiles')
         .select('*')
-        .in('role', ['analyst', 'exhibit_officer'])
+        .in('role', ['analyst', 'exhibit_officer', 'forensic_analyst'])
         .eq('is_active', true);
 
       if (error) throw error;
 
-      // Mock data for active and completed cases (in real app, this would be calculated)
-      const membersWithStats = profiles?.map(profile => ({
-        ...profile,
-        activeCases: Math.floor(Math.random() * 10) + 1,
-        completedCases: Math.floor(Math.random() * 50) + 10,
-      })) || [];
+      // Fetch all cases to calculate stats
+      const { data: cases, error: casesError } = await supabase
+        .from('cases')
+        .select('analyst_id, status');
+
+      if (casesError) throw casesError;
+
+      // Calculate real stats for each member
+      const membersWithStats = profiles?.map(profile => {
+        const memberCases = cases?.filter(c => c.analyst_id === profile.id) || [];
+        const activeCases = memberCases.filter(c => 
+          !['closed', 'archived', 'evidence_returned'].includes(c.status)
+        ).length;
+        const completedCases = memberCases.filter(c => 
+          ['closed', 'archived', 'analysis_complete', 'report_approved', 'evidence_returned'].includes(c.status)
+        ).length;
+
+        return {
+          ...profile,
+          activeCases,
+          completedCases,
+        };
+      }) || [];
 
       setTeamMembers(membersWithStats);
     } catch (error) {
@@ -48,7 +62,15 @@ export const TeamManagement = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchTeamMembers();
+  }, [fetchTeamMembers]);
+
+  // Realtime sync for cases and profiles
+  useRealtime('cases', fetchTeamMembers);
+  useRealtime('profiles', fetchTeamMembers);
 
   const getRoleColor = (role: string) => {
     switch (role) {

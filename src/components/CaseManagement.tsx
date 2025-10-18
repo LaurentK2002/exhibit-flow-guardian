@@ -213,7 +213,7 @@ export const CaseManagement = () => {
                   ? "Try adjusting your search or filters" 
                   : "Create your first case to get started"}
               </p>
-              {!searchQuery && statusFilter === 'all' && (
+              {!searchQuery && statusFilter === 'all' && profile?.role === 'exhibit_officer' && (
                 <Button onClick={() => setShowOpenCaseDialog(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   Create First Case

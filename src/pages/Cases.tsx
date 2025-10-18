@@ -3,8 +3,11 @@ import { Navigation } from "@/components/Navigation";
 import { CaseManagement } from "@/components/CaseManagement";
 import { CaseSearch } from "@/components/CaseSearch";
 import { CaseTable } from "@/components/CaseTable";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Cases() {
+  const { profile } = useAuth();
+
   useEffect(() => {
     document.title = "Cases - Case Management";
     const meta = document.querySelector('meta[name="description"]');
@@ -23,7 +26,9 @@ export default function Cases() {
       <main className="container mx-auto px-4 md:px-6 py-8 space-y-6 max-w-7xl">
         <h1 className="sr-only">Case Management</h1>
         <CaseSearch />
-        <CaseManagement />
+        {profile?.role !== 'officer_commanding_unit' && profile?.role !== 'commanding_officer' && (
+          <CaseManagement />
+        )}
         <section>
           <CaseTable />
         </section>

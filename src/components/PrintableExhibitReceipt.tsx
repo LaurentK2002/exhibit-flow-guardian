@@ -73,8 +73,10 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
     };
 
     const chainOfCustodyEvents = Array.isArray(exhibit.chain_of_custody) 
-      ? exhibit.chain_of_custody as any[] 
+      ? (exhibit.chain_of_custody as any[])
       : [];
+
+    const firstEvent: any = chainOfCustodyEvents[0] || {};
 
     return (
       <div ref={ref} className="bg-white text-black p-8 max-w-4xl mx-auto print:p-6">
@@ -93,33 +95,37 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
             <div className="space-y-3">
               <div className="flex">
                 <span className="font-semibold w-40">Lab Number:</span>
-                <span className="font-mono">{exhibit.cases?.lab_number || 'N/A'}</span>
+                <span className="font-mono">{exhibit.cases?.lab_number || '-'}</span>
               </div>
               <div className="flex">
                 <span className="font-semibold w-40">IR Number:</span>
-                <span className="font-mono">{exhibit.cases?.ir_number || 'N/A'}</span>
+                <span className="font-mono">{exhibit.cases?.ir_number || '-'}</span>
               </div>
               <div className="flex">
                 <span className="font-semibold w-40">Date:</span>
-                <span>{exhibit.cases?.incident_date ? new Date(exhibit.cases.incident_date).toLocaleDateString('en-GB') : 'N/A'}</span>
+                <span>{exhibit.cases?.incident_date ? new Date(exhibit.cases.incident_date).toLocaleDateString('en-GB') : '-'}</span>
               </div>
             </div>
             <div className="space-y-3">
               <div className="flex">
                 <span className="font-semibold w-40">Crime:</span>
-                <span>{exhibit.cases?.title || 'N/A'}</span>
+                <span>{exhibit.cases?.title || '-'}</span>
+              </div>
+              <div className="flex">
+                <span className="font-semibold w-40">From (Designation):</span>
+                <span>{(firstEvent?.from_designation || firstEvent?.delivered_by_designation || firstEvent?.source_designation) ?? '-'}</span>
               </div>
               <div className="flex">
                 <span className="font-semibold w-40">Region:</span>
-                <span>{exhibit.cases?.region || 'N/A'}</span>
+                <span>{exhibit.cases?.region || '-'}</span>
               </div>
               <div className="flex">
                 <span className="font-semibold w-40">District:</span>
-                <span>{exhibit.cases?.district || 'N/A'}</span>
+                <span>{exhibit.cases?.district || '-'}</span>
               </div>
               <div className="flex">
                 <span className="font-semibold w-40">Station:</span>
-                <span>{exhibit.cases?.location || 'N/A'}</span>
+                <span>{exhibit.cases?.location || '-'}</span>
               </div>
             </div>
           </div>
@@ -140,21 +146,21 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
               </div>
               <div className="flex">
                 <span className="font-semibold w-40">Storage Location:</span>
-                <span>{exhibit.storage_location || 'Standard Evidence Room'}</span>
+                <span>{exhibit.storage_location || '-'}</span>
               </div>
             </div>
             <div className="space-y-3">
               <div className="flex">
                 <span className="font-semibold w-40">Received By:</span>
-                <span>{exhibit.received_profile?.full_name || 'System User'}</span>
+                <span>{exhibit.received_profile?.full_name || '-'}</span>
               </div>
               <div className="flex">
                 <span className="font-semibold w-40">Force Number:</span>
-                <span>{exhibit.received_profile?.badge_number || 'N/A'}</span>
+                <span>{exhibit.received_profile?.badge_number || '-'}</span>
               </div>
               <div className="flex">
                 <span className="font-semibold w-40">Department:</span>
-                <span>{exhibit.received_profile?.department || 'Cyber Crimes Unit'}</span>
+                <span>{exhibit.received_profile?.department || '-'}</span>
               </div>
             </div>
           </div>
@@ -180,17 +186,17 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
                 </div>
                 <div className="flex">
                   <span className="font-semibold w-40">Brand:</span>
-                  <span>{exhibit.brand || 'N/A'}</span>
+                  <span>{exhibit.brand || '-'}</span>
                 </div>
                 <div className="flex">
                   <span className="font-semibold w-40">Model:</span>
-                  <span>{exhibit.model || 'N/A'}</span>
+                  <span>{exhibit.model || '-'}</span>
                 </div>
               </div>
               <div className="space-y-3">
                 <div className="flex">
                   <span className="font-semibold w-40">Serial Number:</span>
-                  <span className="font-mono text-xs">{exhibit.serial_number || 'N/A'}</span>
+                  <span className="font-mono text-xs">{exhibit.serial_number || '-'}</span>
                 </div>
                 {exhibit.imei && (
                   <div className="flex">
@@ -206,7 +212,7 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
                 )}
                 <div className="flex">
                   <span className="font-semibold w-40">Storage Location:</span>
-                  <span>{exhibit.storage_location || 'Standard Evidence Room'}</span>
+                  <span>{exhibit.storage_location || '-'}</span>
                 </div>
               </div>
             </div>
@@ -256,17 +262,17 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
                       <td className="p-2 text-xs">{formatDate(event.timestamp)}</td>
                       <td className="p-2">
                         <span className="px-2 py-1 bg-gray-200 rounded text-xs">
-                          {event.event_type?.replace('_', ' ').toUpperCase() || 'N/A'}
+                          {event.event_type?.replace('_', ' ').toUpperCase() || '-'}
                         </span>
                       </td>
                       <td className="p-2">
                         <div className="text-xs">
-                          <p>{event.officer_name || 'N/A'}</p>
-                          <p className="text-gray-600">Badge: {event.officer_badge || 'N/A'}</p>
+                          <p>{event.officer_name || '-'}</p>
+                          <p className="text-gray-600">Badge: {event.officer_badge || '-'}</p>
                         </div>
                       </td>
                       <td className="p-2 text-xs">
-                        <p>{event.description || 'N/A'}</p>
+                        <p>{event.description || '-'}</p>
                         {event.location && <p className="text-gray-600 mt-1">📍 {event.location}</p>}
                         {event.notes && <p className="text-gray-600 mt-1 italic">Note: {event.notes}</p>}
                       </td>
@@ -329,19 +335,19 @@ export const PrintableExhibitReceipt = forwardRef<HTMLDivElement, PrintableExhib
               <div className="space-y-2 text-sm mb-6">
                 <div className="flex">
                   <span className="font-semibold w-32">Name:</span>
-                  <span>{exhibit.received_profile?.full_name || 'System User'}</span>
+                  <span>{exhibit.received_profile?.full_name || '-'}</span>
                 </div>
                 <div className="flex">
                   <span className="font-semibold w-32">Force Number:</span>
-                  <span>{exhibit.received_profile?.badge_number || 'N/A'}</span>
+                  <span>{exhibit.received_profile?.badge_number || '-'}</span>
                 </div>
                 <div className="flex">
                   <span className="font-semibold w-32">Designation:</span>
-                  <span>Exhibit Officer</span>
+                  <span>-</span>
                 </div>
                 <div className="flex">
                   <span className="font-semibold w-32">Department:</span>
-                  <span>{exhibit.received_profile?.department || 'Cyber Crimes Unit'}</span>
+                  <span>{exhibit.received_profile?.department || '-'}</span>
                 </div>
               </div>
               <div className="border-b-2 border-black mb-2 h-16"></div>

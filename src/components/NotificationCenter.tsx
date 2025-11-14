@@ -7,15 +7,17 @@ import { Bell, BellRing, Check, X, AlertTriangle, Info, CheckCircle, Clock } fro
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface Notification {
   id: string;
   title: string;
   message: string;
   type: 'info' | 'warning' | 'success' | 'error';
-  timestamp: Date;
   read: boolean;
-  actionUrl?: string;
+  action_url?: string;
+  created_at: string;
 }
 
 export const NotificationCenter = () => {
@@ -23,129 +25,167 @@ export const NotificationCenter = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (user) {
-      // Set up real-time listeners for notifications
+      loadNotifications();
       setupRealtimeListeners();
-      loadInitialNotifications();
     }
   }, [user]);
 
+  useEffect(() => {
+    setUnreadCount(notifications.filter(n => !n.read).length);
+  }, [notifications]);
+
+  const loadNotifications = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+
+      if (data) {
+        setNotifications(data as Notification[]);
+      }
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load notifications",
+        variant: "destructive",
+      });
+    }
+  };
+
   const setupRealtimeListeners = () => {
-    // Listen for new case activities
-    const activityChannel = supabase
-      .channel('activity-notifications')
+    if (!user) return;
+
+    const channel = supabase
+      .channel('notifications-channel')
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'case_activities'
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`
         },
         (payload) => {
-          addNotification({
-            id: `activity-${payload.new.id}`,
-            title: 'New Activity',
-            message: `${payload.new.description}`,
-            type: 'info',
-            timestamp: new Date(),
-            read: false
+          const newNotification = payload.new as Notification;
+          setNotifications(prev => [newNotification, ...prev]);
+          
+          // Show toast for new notification
+          toast({
+            title: newNotification.title,
+            description: newNotification.message,
+            variant: newNotification.type === 'error' ? 'destructive' : 'default',
           });
         }
       )
-      .subscribe();
-
-    // Listen for exhibit status changes
-    const exhibitChannel = supabase
-      .channel('exhibit-notifications')
       .on(
         'postgres_changes',
         {
           event: 'UPDATE',
           schema: 'public',
-          table: 'exhibits'
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`
         },
         (payload) => {
-          if (payload.old.status !== payload.new.status) {
-            addNotification({
-              id: `exhibit-${payload.new.id}`,
-              title: 'Exhibit Status Updated',
-              message: `Exhibit ${payload.new.exhibit_number} status changed to ${payload.new.status}`,
-              type: payload.new.status === 'analysis_complete' ? 'success' : 'info',
-              timestamp: new Date(),
-              read: false
-            });
-          }
+          const updatedNotification = payload.new as Notification;
+          setNotifications(prev => 
+            prev.map(n => n.id === updatedNotification.id ? updatedNotification : n)
+          );
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(activityChannel);
-      supabase.removeChannel(exhibitChannel);
+      supabase.removeChannel(channel);
     };
   };
 
-  const loadInitialNotifications = () => {
-    // Add some sample notifications based on recent data
-    const sampleNotifications: Notification[] = [
-      {
-        id: '1',
-        title: 'Case Assignment',
-        message: 'You have been assigned to case CYB-2024-001',
-        type: 'info',
-        timestamp: new Date(Date.now() - 5 * 60000),
-        read: false
-      },
-      {
-        id: '2',
-        title: 'Analysis Complete',
-        message: 'Forensic analysis completed for exhibit EXH-2024-003',
-        type: 'success',
-        timestamp: new Date(Date.now() - 15 * 60000),
-        read: false
-      },
-      {
-        id: '3',
-        title: 'Critical Case Alert',
-        message: 'High priority case requires immediate attention',
-        type: 'warning',
-        timestamp: new Date(Date.now() - 30 * 60000),
-        read: true
-      }
-    ];
-    
-    setNotifications(sampleNotifications);
-    setUnreadCount(sampleNotifications.filter(n => !n.read).length);
-  };
+  const markAsRead = async (notificationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('id', notificationId);
 
-  const addNotification = (notification: Notification) => {
-    setNotifications(prev => [notification, ...prev].slice(0, 50)); // Keep only last 50
-    setUnreadCount(prev => prev + 1);
-  };
+      if (error) throw error;
 
-  const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(n => n.id === id ? { ...n, read: true } : n)
-    );
-    setUnreadCount(prev => Math.max(0, prev - 1));
-  };
-
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    setUnreadCount(0);
-  };
-
-  const removeNotification = (id: string) => {
-    const notification = notifications.find(n => n.id === id);
-    if (notification && !notification.read) {
+      setNotifications(prev =>
+        prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
+      );
       setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
     }
-    setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
-  const getNotificationIcon = (type: Notification['type']) => {
+  const markAllAsRead = async () => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('user_id', user.id)
+        .eq('read', false);
+
+      if (error) throw error;
+
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      
+      toast({
+        title: "Success",
+        description: "All notifications marked as read",
+      });
+    } catch (error) {
+      console.error('Error marking all as read:', error);
+      toast({
+        title: "Error",
+        description: "Failed to mark notifications as read",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleNotificationClick = (notification: Notification) => {
+    markAsRead(notification.id);
+    if (notification.action_url) {
+      navigate(notification.action_url);
+      setIsOpen(false);
+    }
+  };
+
+  const removeNotification = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      const notification = notifications.find(n => n.id === id);
+      if (notification && !notification.read) {
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    } catch (error) {
+      console.error('Error removing notification:', error);
+    }
+  };
+
+  const getIcon = (type: Notification['type']) => {
     switch (type) {
       case 'success': return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'warning': return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
@@ -154,14 +194,21 @@ export const NotificationCenter = () => {
     }
   };
 
-  const formatTimeAgo = (date: Date) => {
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
+
     if (diffInMinutes < 1) return 'Just now';
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
-    return `${Math.floor(diffInMinutes / 1440)}d ago`;
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays}d ago`;
+    
+    return date.toLocaleDateString();
   };
 
   return (
@@ -217,7 +264,7 @@ export const NotificationCenter = () => {
                     >
                       <div className="flex items-start gap-3">
                         <div className="mt-1">
-                          {getNotificationIcon(notification.type)}
+                          {getIcon(notification.type)}
                         </div>
                         
                         <div className="flex-1 min-w-0">
@@ -253,7 +300,7 @@ export const NotificationCenter = () => {
                           
                           <div className="flex items-center justify-between mt-2">
                             <span className="text-xs text-muted-foreground">
-                              {formatTimeAgo(notification.timestamp)}
+                              {formatTimestamp(notification.created_at)}
                             </span>
                             {!notification.read && (
                               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>

@@ -1,1 +1,4 @@
 project_id = "aizcvlggbqflxmkyuoho"
+
+[functions.ai-case-assistant]
+verify_jwt = true

@@ -1,4 +1,4 @@
-import { Shield, Database, FileText, Settings, Users, BarChart3, LogOut, User, Activity, AlertTriangle, Home } from "lucide-react";
+import { Shield, Database, FileText, Settings, Users, BarChart3, LogOut, User, Activity, AlertTriangle, Home, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { NotificationCenter } from "./NotificationCenter";
@@ -25,6 +25,7 @@ export const Navigation = () => {
         return [
           { icon: Database, label: 'Digital Exhibits', path: '/exhibits' },
           { icon: FileText, label: 'Case Management', path: '/cases' },
+          { icon: Brain, label: 'AI Assistant', path: '/ai-assistant' },
           { icon: BarChart3, label: 'System Analytics', path: '/analytics' },
           { icon: Users, label: 'User Management', path: '/users' },
           { icon: Settings, label: 'System Config', path: '/settings' },
@@ -33,6 +34,7 @@ export const Navigation = () => {
         return [
           { icon: BarChart3, label: 'Operations Overview', path: '/operations' },
           { icon: FileText, label: 'Case Search', path: '/cases' },
+          { icon: Brain, label: 'AI Assistant', path: '/ai-assistant' },
           { icon: Users, label: 'Team Management', path: '/team' },
           { icon: AlertTriangle, label: 'Security Alerts', path: '/security' },
           { icon: FileText, label: 'Case Reports', path: '/reports' },
@@ -40,6 +42,7 @@ export const Navigation = () => {
       case 'officer_commanding_unit':
         return [
           { icon: FileText, label: 'Case Search', path: '/cases' },
+          { icon: Brain, label: 'AI Assistant', path: '/ai-assistant' },
           { icon: Users, label: 'Team Management', path: '/team' },
           { icon: BarChart3, label: 'Operations', path: '/operations' },
           { icon: FileText, label: 'Reports', path: '/reports' },
@@ -49,6 +52,7 @@ export const Navigation = () => {
       case 'analyst':
         return [
           { icon: FileText, label: 'My Cases', path: '/cases' },
+          { icon: Brain, label: 'AI Assistant', path: '/ai-assistant' },
           { icon: FileText, label: 'Investigation Reports', path: '/reports' },
           { icon: BarChart3, label: 'Case Analytics', path: '/analytics' },
         ];

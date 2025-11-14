@@ -20,6 +20,7 @@ import ChainOfCustodyPage from "./pages/ChainOfCustodyPage";
 import SearchPage from "./pages/Search";
 import Workbench from "./pages/Workbench";
 import DataSources from "./pages/DataSources";
+import AIAssistantPage from "./pages/AIAssistant";
 import Operations from "./pages/Operations";
 
 // Create QueryClient outside component to avoid re-creation
@@ -92,6 +93,9 @@ const AppRoutes = () => {
       } />
       <Route path="/data-sources" element={
         user ? <DataSources /> : <Navigate to="/auth" replace />
+      } />
+      <Route path="/ai-assistant" element={
+        user ? <AIAssistantPage /> : <Navigate to="/auth" replace />
       } />
       <Route path="/operations" element={
         user ? <Operations /> : <Navigate to="/auth" replace />

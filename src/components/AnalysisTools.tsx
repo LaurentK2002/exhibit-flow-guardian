@@ -12,56 +12,8 @@ interface Tool {
   status: 'available' | 'in_use' | 'maintenance';
 }
 
-const analysisTools: Tool[] = [
-  {
-    id: '1',
-    name: 'Mobile Device Extractor',
-    description: 'Extract data from smartphones and tablets',
-    category: 'Mobile Forensics',
-    icon: Smartphone,
-    status: 'available'
-  },
-  {
-    id: '2',
-    name: 'Computer Imaging Suite',
-    description: 'Create forensic images of computer systems',
-    category: 'Computer Forensics',
-    icon: Laptop,
-    status: 'available'
-  },
-  {
-    id: '3',
-    name: 'Hard Drive Analyzer',
-    description: 'Deep analysis of storage devices',
-    category: 'Storage Analysis',
-    icon: HardDrive,
-    status: 'in_use'
-  },
-  {
-    id: '4',
-    name: 'Network Traffic Analyzer',
-    description: 'Monitor and analyze network communications',
-    category: 'Network Forensics',
-    icon: Wifi,
-    status: 'available'
-  },
-  {
-    id: '5',
-    name: 'Digital Media Recovery',
-    description: 'Recover deleted photos, videos, and documents',
-    category: 'Media Recovery',
-    icon: Camera,
-    status: 'available'
-  },
-  {
-    id: '6',
-    name: 'Database Forensics Tool',
-    description: 'Analyze database structures and recover data',
-    category: 'Database Analysis',
-    icon: Database,
-    status: 'maintenance'
-  }
-];
+// No mock data - tools should be managed through the database
+const analysisTools: Tool[] = [];
 
 export const AnalysisTools = () => {
   const getStatusColor = (status: string) => {

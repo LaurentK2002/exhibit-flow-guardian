@@ -44,7 +44,7 @@ export const NotificationCenter = () => {
 
     try {
       const { data, error } = await supabase
-        .from('notifications')
+        .from('notifications' as any)
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
@@ -53,7 +53,7 @@ export const NotificationCenter = () => {
       if (error) throw error;
 
       if (data) {
-        setNotifications(data as Notification[]);
+        setNotifications(data as any);
       }
     } catch (error) {
       console.error('Error loading notifications:', error);
@@ -115,7 +115,7 @@ export const NotificationCenter = () => {
   const markAsRead = async (notificationId: string) => {
     try {
       const { error } = await supabase
-        .from('notifications')
+        .from('notifications' as any)
         .update({ read: true })
         .eq('id', notificationId);
 
@@ -135,7 +135,7 @@ export const NotificationCenter = () => {
 
     try {
       const { error } = await supabase
-        .from('notifications')
+        .from('notifications' as any)
         .update({ read: true })
         .eq('user_id', user.id)
         .eq('read', false);
@@ -169,7 +169,7 @@ export const NotificationCenter = () => {
   const removeNotification = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('notifications')
+        .from('notifications' as any)
         .delete()
         .eq('id', id);
 

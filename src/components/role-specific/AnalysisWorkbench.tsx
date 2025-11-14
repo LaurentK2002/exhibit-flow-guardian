@@ -17,60 +17,10 @@ import {
 } from "lucide-react";
 
 export const AnalysisWorkbench = () => {
-  const activeAnalyses = [
-    {
-      id: "AN-2024-001",
-      type: "Mobile Device",
-      device: "iPhone 13 Pro",
-      caseNumber: "CC2024-015",
-      tool: "Cellebrite UFED",
-      analysisStatus: "in_analysis",
-      status: "running",
-      timeRemaining: "45 minutes",
-      startTime: "2 hours ago"
-    },
-    {
-      id: "AN-2024-002",
-      type: "Network Traffic",
-      device: "Router Logs",
-      caseNumber: "CC2024-012",
-      tool: "Wireshark",
-      analysisStatus: "pending",
-      status: "paused",
-      timeRemaining: "2 hours",
-      startTime: "4 hours ago"
-    }
-  ];
-
-  const availableTools = [
-    { name: "Cellebrite UFED", type: "Mobile Forensics", status: "available", icon: Smartphone },
-    { name: "FTK Imager", type: "Disk Imaging", status: "in_use", icon: HardDrive },
-    { name: "Autopsy", type: "Digital Forensics", status: "available", icon: Laptop },
-    { name: "Wireshark", type: "Network Analysis", status: "available", icon: Wifi },
-    { name: "Volatility", type: "Memory Analysis", status: "maintenance", icon: Microscope },
-    { name: "X-Ways Forensics", type: "File Recovery", status: "available", icon: FileText }
-  ];
-
-  const recentFindings = [
-    {
-      caseNumber: "CC2024-015",
-      finding: "Deleted WhatsApp messages recovered",
-      severity: "high",
-      timestamp: "30 minutes ago"
-    },
-    {
-      caseNumber: "CC2024-012",
-      finding: "Suspicious network connections identified",
-      severity: "medium", 
-      timestamp: "2 hours ago"
-    },
-    {
-      caseNumber: "CC2024-008",
-      finding: "Cryptocurrency wallet traces found",
-      severity: "high",
-      timestamp: "1 day ago"
-    }
-  ];
+  // No mock data - component shows empty states until real data is available
+  const activeAnalyses: any[] = [];
+  const availableTools: any[] = [];
+  const recentFindings: any[] = [];
 
   const getAnalysisStatusBadge = (analysisStatus: string) => {
     switch (analysisStatus) {

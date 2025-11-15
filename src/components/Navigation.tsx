@@ -104,7 +104,7 @@ export const Navigation = () => {
                 <div className="px-2 py-1.5">
                   <p className="text-sm font-medium">{profile?.full_name}</p>
                   <p className="text-xs text-muted-foreground">{profile?.badge_number && `Badge: ${profile.badge_number}`}</p>
-                  <p className="text-xs text-muted-foreground capitalize">{profile?.role || 'Officer'}</p>
+                  <p className="text-xs text-muted-foreground capitalize">{role || 'Officer'}</p>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>

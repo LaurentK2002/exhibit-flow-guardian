@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
 export const usePermissions = () => {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const [permissions, setPermissions] = useState<string[]>([]);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ export const usePermissions = () => {
       }
 
       try {
-        // Fetch user's role from user_roles table (single source of truth)
+        // Fetch user's role from user_roles table (ONLY source of truth now)
         const { data: roleData, error: roleError } = await supabase
           .from('user_roles')
           .select('role')

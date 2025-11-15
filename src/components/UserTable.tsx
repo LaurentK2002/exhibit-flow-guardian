@@ -8,7 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useRealtime } from "@/hooks/useRealtime";
 import { Database } from "@/integrations/supabase/types";
 
-type Profile = Database['public']['Tables']['profiles']['Row'];
+type Profile = Database['public']['Tables']['profiles']['Row'] & {
+  role?: string;
+};
 
 export const UserTable = () => {
   const [users, setUsers] = useState<Profile[]>([]);

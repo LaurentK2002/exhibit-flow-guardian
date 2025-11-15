@@ -51,6 +51,7 @@ export const CaseManagement = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [showOpenCaseDialog, setShowOpenCaseDialog] = useState(false);
   const { user, profile } = useAuth();
+  const { role } = usePermissions();
   const { toast } = useToast();
 
   const fetchCases = async () => {

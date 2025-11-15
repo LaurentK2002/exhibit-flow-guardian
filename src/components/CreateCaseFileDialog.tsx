@@ -321,7 +321,7 @@ export const CreateCaseFileDialog = ({ open, onOpenChange, onSuccess }: CreateCa
                   ))}
                 </SelectContent>
               </Select>
-              {profile?.role === 'exhibit_officer' && (
+              {role === 'exhibit_officer' && (
                 <p className="text-xs text-muted-foreground">
                   Note: Only Commanding Officers can set "Critical/Urgent" priority and Officer Commanding Units can set "High" priority.
                 </p>

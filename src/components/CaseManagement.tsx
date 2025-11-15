@@ -49,6 +49,7 @@ export const CaseManagement = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [showOpenCaseDialog, setShowOpenCaseDialog] = useState(false);
   const { user, profile } = useAuth();
+  const { role } = usePermissions();
   const { toast } = useToast();
 
   const fetchCases = async () => {
@@ -57,7 +58,7 @@ export const CaseManagement = () => {
         .from('cases')
         .select(`
           *,
-          assigned_analyst:profiles!cases_analyst_id_fkey(full_name, role),
+          assigned_analyst:profiles!cases_analyst_id_fkey(full_name),
           supervisor:profiles!cases_supervisor_id_fkey(full_name)
         `)
         .order('created_at', { ascending: false });

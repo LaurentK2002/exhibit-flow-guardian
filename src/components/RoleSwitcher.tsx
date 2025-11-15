@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Users, Package, Microscope, Settings } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { usePermissions } from "@/hooks/usePermissions";
 
 interface RoleSwitcherProps {
   currentViewRole: string;
@@ -12,10 +12,10 @@ interface RoleSwitcherProps {
 }
 
 export const RoleSwitcher = ({ currentViewRole, onRoleChange }: RoleSwitcherProps) => {
-  const { profile } = useAuth();
+  const { role } = usePermissions();
 
   // Only show for admin users
-  const showSwitcher = profile?.role === 'admin';
+  const showSwitcher = role === 'admin' || role === 'administrator';
 
   if (!showSwitcher) {
     return null;
@@ -70,7 +70,7 @@ export const RoleSwitcher = ({ currentViewRole, onRoleChange }: RoleSwitcherProp
           <Button 
             variant="outline" 
             size="sm"
-            onClick={() => onRoleChange(profile?.role || 'admin')}
+            onClick={() => onRoleChange(role || 'admin')}
             className="text-xs"
           >
             Reset to My Role
@@ -79,7 +79,7 @@ export const RoleSwitcher = ({ currentViewRole, onRoleChange }: RoleSwitcherProp
         
         <div className="text-xs text-orange-600 dark:text-orange-400 mt-2 space-y-1">
           <p>Dashboard Testing Mode: Switch between different role views to test all panels.</p>
-          <p>Your actual role: <strong>{profile?.role || 'Loading...'}</strong></p>
+          <p>Your actual role: <strong>{role || 'Loading...'}</strong></p>
         </div>
       </CardContent>
     </Card>

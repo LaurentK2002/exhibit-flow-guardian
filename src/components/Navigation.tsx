@@ -1,6 +1,7 @@
 import { Shield, Database, FileText, Settings, Users, BarChart3, LogOut, User, Activity, AlertTriangle, Home, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePermissions } from "@/hooks/usePermissions";
 import { NotificationCenter } from "./NotificationCenter";
 import {
   DropdownMenu,
@@ -13,6 +14,7 @@ import { Link } from "react-router-dom";
 
 export const Navigation = () => {
   const { profile, signOut } = useAuth();
+  const { role } = usePermissions();
 
   const handleSignOut = async () => {
     await signOut();
@@ -20,7 +22,7 @@ export const Navigation = () => {
 
   // Role-specific navigation items
   const getNavigationItems = () => {
-    switch (profile?.role) {
+    switch (role) {
       case 'admin':
         return [
           { icon: Database, label: 'Digital Exhibits', path: '/exhibits' },
@@ -102,7 +104,7 @@ export const Navigation = () => {
                 <div className="px-2 py-1.5">
                   <p className="text-sm font-medium">{profile?.full_name}</p>
                   <p className="text-xs text-muted-foreground">{profile?.badge_number && `Badge: ${profile.badge_number}`}</p>
-                  <p className="text-xs text-muted-foreground capitalize">{profile?.role || 'Officer'}</p>
+                  <p className="text-xs text-muted-foreground capitalize">{role || 'Officer'}</p>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>

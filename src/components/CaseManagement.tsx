@@ -22,11 +22,13 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Database } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
 import { useRealtime } from "@/hooks/useRealtime";
 import { AddExhibitDialog } from "./AddExhibitDialog";
 import { CaseStatusBadge, CaseStatus } from "./CaseStatusBadge";
+
 
 type Case = Database['public']['Tables']['cases']['Row'] & {
   profiles?: {

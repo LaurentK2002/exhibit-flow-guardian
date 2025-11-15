@@ -620,6 +620,7 @@ export type Database = {
         | "forensic_analyst"
         | "exhibit_officer"
         | "analyst"
+        | "chief_of_cyber"
       approval_status:
         | "pending"
         | "approved"
@@ -666,6 +667,7 @@ export type Database = {
         | "commanding_officer"
         | "analyst"
         | "officer_commanding_unit"
+        | "chief_of_cyber"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -803,6 +805,7 @@ export const Constants = {
         "forensic_analyst",
         "exhibit_officer",
         "analyst",
+        "chief_of_cyber",
       ],
       approval_status: [
         "pending",
@@ -855,6 +858,7 @@ export const Constants = {
         "commanding_officer",
         "analyst",
         "officer_commanding_unit",
+        "chief_of_cyber",
       ],
     },
   },

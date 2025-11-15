@@ -41,6 +41,16 @@ export const Navigation = () => {
           { icon: AlertTriangle, label: 'Security Alerts', path: '/security' },
           { icon: FileText, label: 'Case Reports', path: '/reports' },
         ];
+      case 'chief_of_cyber':
+        return [
+          { icon: Home, label: 'Command Center', path: '/' },
+          { icon: BarChart3, label: 'Strategic Analytics', path: '/analytics' },
+          { icon: FileText, label: 'Case Search', path: '/cases' },
+          { icon: Brain, label: 'AI Assistant', path: '/ai-assistant' },
+          { icon: Users, label: 'Department Team', path: '/team' },
+          { icon: Shield, label: 'Security Overview', path: '/security' },
+          { icon: FileText, label: 'Reports', path: '/reports' },
+        ];
       case 'officer_commanding_unit':
         return [
           { icon: FileText, label: 'Case Search', path: '/cases' },

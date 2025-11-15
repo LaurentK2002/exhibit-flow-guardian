@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePermissions } from "@/hooks/usePermissions";
 import { AdminDashboard } from "@/components/dashboards/AdminDashboard";
 import { CommandingOfficerDashboard } from "@/components/dashboards/CommandingOfficerDashboard";
+import { ChiefOfCyberDashboard } from "@/components/dashboards/ChiefOfCyberDashboard";
 import { OfficerCommandingUnitDashboard } from "@/components/dashboards/OfficerCommandingUnitDashboard";
 import { ExhibitOfficerDashboard } from "@/components/dashboards/ExhibitOfficerDashboard";
 import { AnalystDashboard } from "@/components/dashboards/AnalystDashboard";
@@ -40,6 +41,8 @@ const Index = () => {
         return <AdminDashboard />;
       case 'commanding_officer':
         return <CommandingOfficerDashboard />;
+      case 'chief_of_cyber':
+        return <ChiefOfCyberDashboard />;
       case 'officer_commanding_unit':
         return <OfficerCommandingUnitDashboard />;
       case 'exhibit_officer':

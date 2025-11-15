@@ -13,8 +13,11 @@ interface TeamMember {
   role: string;
   badge_number: string;
   is_active: boolean;
-  activeCases: number;
-  completedCases: number;
+  activeCases?: number;
+  completedCases?: number;
+  activeExhibits?: number;
+  completedExhibits?: number;
+  supervisedCases?: number;
 }
 
 export const TeamManagement = () => {
@@ -42,29 +45,63 @@ export const TeamManagement = () => {
 
       if (error) throw error;
 
-      // Fetch all cases to calculate stats
+      // Fetch all cases for stats
       const { data: cases, error: casesError } = await supabase
         .from('cases')
-        .select('analyst_id, status');
+        .select('analyst_id, supervisor_id, status');
 
       if (casesError) throw casesError;
 
-      // Calculate real stats for each member
+      // Fetch all exhibits for exhibit officers
+      const { data: exhibits, error: exhibitsError } = await supabase
+        .from('exhibits')
+        .select('received_by, assigned_analyst, status');
+
+      if (exhibitsError) throw exhibitsError;
+
+      // Calculate role-appropriate stats for each member
       const membersWithStats = profiles?.map(profile => {
         const userRole = userRoles?.find(r => r.user_id === profile.id);
-        const memberCases = cases?.filter(c => c.analyst_id === profile.id) || [];
-        const activeCases = memberCases.filter(c => 
-          !['closed', 'archived', 'evidence_returned'].includes(c.status)
-        ).length;
-        const completedCases = memberCases.filter(c => 
-          ['closed', 'archived', 'analysis_complete', 'report_approved', 'evidence_returned'].includes(c.status)
-        ).length;
+        const role = userRole?.role || 'analyst';
+
+        let stats: any = {};
+
+        // For analysts and investigators - show assigned cases
+        if (['analyst', 'forensic_analyst', 'investigator'].includes(role)) {
+          const memberCases = cases?.filter(c => c.analyst_id === profile.id) || [];
+          stats.activeCases = memberCases.filter(c => 
+            !['closed', 'archived', 'evidence_returned'].includes(c.status)
+          ).length;
+          stats.completedCases = memberCases.filter(c => 
+            ['closed', 'archived', 'analysis_complete', 'report_approved', 'evidence_returned'].includes(c.status)
+          ).length;
+        }
+
+        // For exhibit officers - show exhibits handled
+        if (role === 'exhibit_officer') {
+          const memberExhibits = exhibits?.filter(e => 
+            e.received_by === profile.id || e.assigned_analyst === profile.id
+          ) || [];
+          stats.activeExhibits = memberExhibits.filter(e => 
+            ['received', 'in_analysis'].includes(e.status || '')
+          ).length;
+          stats.completedExhibits = memberExhibits.filter(e => 
+            ['analysis_complete', 'released'].includes(e.status || '')
+          ).length;
+        }
+
+        // For supervisory roles - show supervised cases
+        if (['supervisor', 'commanding_officer', 'officer_commanding_unit', 'chief_of_cyber'].includes(role)) {
+          const supervisedCases = cases?.filter(c => c.supervisor_id === profile.id) || [];
+          stats.supervisedCases = supervisedCases.filter(c => 
+            !['closed', 'archived'].includes(c.status)
+          ).length;
+        }
 
         return {
           ...profile,
-          role: userRole?.role || 'analyst',
-          activeCases,
-          completedCases,
+          role,
+          ...stats,
         };
       }) || [];
 
@@ -80,9 +117,10 @@ export const TeamManagement = () => {
     fetchTeamMembers();
   }, [fetchTeamMembers]);
 
-  // Realtime sync for cases and profiles
+  // Realtime sync for cases, profiles, and exhibits
   useRealtime('cases', fetchTeamMembers);
   useRealtime('profiles', fetchTeamMembers);
+  useRealtime('exhibits', fetchTeamMembers);
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -129,13 +167,13 @@ export const TeamManagement = () => {
             </div>
             <div className="text-center p-4 bg-muted/50 rounded-lg">
               <div className="text-2xl font-bold text-orange-600">
-                {teamMembers.reduce((sum, member) => sum + member.activeCases, 0)}
+                {teamMembers.reduce((sum, member) => sum + (member.activeCases || 0), 0)}
               </div>
               <div className="text-sm text-muted-foreground">Total Active Cases</div>
             </div>
             <div className="text-center p-4 bg-muted/50 rounded-lg">
               <div className="text-2xl font-bold text-green-600">
-                {teamMembers.reduce((sum, member) => sum + member.completedCases, 0)}
+                {teamMembers.reduce((sum, member) => sum + (member.completedCases || 0), 0)}
               </div>
               <div className="text-sm text-muted-foreground">Cases Completed</div>
             </div>
@@ -167,24 +205,60 @@ export const TeamManagement = () => {
                   </div>
                   
                   <Badge className={`${getRoleColor(member.role)} mb-3`}>
-                    {member.role.replace('_', ' ')}
+                    {member.role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                   </Badge>
                   
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        Active Cases
-                      </span>
-                      <span className="font-medium">{member.activeCases}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="flex items-center gap-1">
-                        <Award className="h-3 w-3" />
-                        Completed
-                      </span>
-                      <span className="font-medium">{member.completedCases}</span>
-                    </div>
+                    {/* Analysts and Investigators - show case assignments */}
+                    {['analyst', 'forensic_analyst', 'investigator'].includes(member.role) && (
+                      <>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            Active Cases
+                          </span>
+                          <span className="font-medium">{member.activeCases || 0}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="flex items-center gap-1">
+                            <Award className="h-3 w-3" />
+                            Completed
+                          </span>
+                          <span className="font-medium">{member.completedCases || 0}</span>
+                        </div>
+                      </>
+                    )}
+                    
+                    {/* Exhibit Officers - show exhibits handled */}
+                    {member.role === 'exhibit_officer' && (
+                      <>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            Active Exhibits
+                          </span>
+                          <span className="font-medium">{member.activeExhibits || 0}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="flex items-center gap-1">
+                            <Award className="h-3 w-3" />
+                            Completed
+                          </span>
+                          <span className="font-medium">{member.completedExhibits || 0}</span>
+                        </div>
+                      </>
+                    )}
+                    
+                    {/* Supervisory roles - show supervised cases */}
+                    {['supervisor', 'commanding_officer', 'officer_commanding_unit', 'chief_of_cyber'].includes(member.role) && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="flex items-center gap-1">
+                          <Users className="h-3 w-3" />
+                          Supervising Cases
+                        </span>
+                        <span className="font-medium">{member.supervisedCases || 0}</span>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="mt-4 flex gap-2">

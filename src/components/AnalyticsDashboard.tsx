@@ -95,11 +95,22 @@ export const AnalyticsDashboard = () => {
         .from('exhibits')
         .select('exhibit_type, status, case_id, assigned_analyst');
 
+      // Get analyst user IDs from user_roles
+      const { data: userRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role')
+        .in('role', ['analyst', 'forensic_analyst']);
+
+      if (rolesError) throw rolesError;
+
+      const analystIds = userRoles?.map(r => r.user_id) || [];
+
+      // Fetch profiles for analysts
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('id, full_name, role, is_active')
-        .eq('is_active', true)
-        .in('role', ['analyst', 'forensic_analyst']);
+        .select('id, full_name, is_active')
+        .in('id', analystIds)
+        .eq('is_active', true);
 
       // Process cases trend by month (last 6 months)
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

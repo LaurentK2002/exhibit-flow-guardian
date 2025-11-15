@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Users, Circle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePermissions } from "@/hooks/usePermissions";
 
 interface UserPresence {
   user_id: string;
@@ -17,6 +18,7 @@ interface UserPresence {
 export const UserPresence = () => {
   const [users, setUsers] = useState<UserPresence[]>([]);
   const { user, profile } = useAuth();
+  const { role } = usePermissions();
 
   useEffect(() => {
     if (!user) return;
@@ -29,7 +31,7 @@ export const UserPresence = () => {
       channel.track({
         user_id: user.id,
         full_name: profile?.full_name || 'Unknown',
-        role: profile?.role || 'user',
+        role: role || 'user',
         last_seen: new Date().toISOString(),
         status: 'online'
       });
@@ -75,7 +77,7 @@ export const UserPresence = () => {
         channel.track({
           user_id: user.id,
           full_name: profile?.full_name || 'Unknown',
-          role: profile?.role || 'user',
+          role: role || 'user',
           last_seen: new Date().toISOString(),
           status: 'away'
         });
@@ -91,7 +93,7 @@ export const UserPresence = () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       supabase.removeChannel(channel);
     };
-  }, [user, profile]);
+  }, [user, profile, role]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

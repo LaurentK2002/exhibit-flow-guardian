@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePermissions } from "@/hooks/usePermissions";
 import { AdminDashboard } from "@/components/dashboards/AdminDashboard";
 import { CommandingOfficerDashboard } from "@/components/dashboards/CommandingOfficerDashboard";
 import { OfficerCommandingUnitDashboard } from "@/components/dashboards/OfficerCommandingUnitDashboard";
@@ -22,14 +23,15 @@ const DefaultDashboard = () => (
 
 const Index = () => {
   const { profile } = useAuth();
-  const [currentViewRole, setCurrentViewRole] = useState<string>(profile?.role || '');
+  const { role } = usePermissions();
+  const [currentViewRole, setCurrentViewRole] = useState<string>(role || '');
 
-  // Update currentViewRole when profile changes
+  // Update currentViewRole when role changes
   useEffect(() => {
-    if (profile?.role) {
-      setCurrentViewRole(profile.role);
+    if (role) {
+      setCurrentViewRole(role);
     }
-  }, [profile?.role]);
+  }, [role]);
 
   // Route users to their role-specific dashboard based on current view role
   const renderDashboard = (role: string = currentViewRole) => {

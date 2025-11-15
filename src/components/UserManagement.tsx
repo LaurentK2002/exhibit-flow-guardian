@@ -10,16 +10,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/components/ui/use-toast";
 import { AddUserDialog } from "@/components/AddUserDialog";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { usePermissions } from "@/hooks/usePermissions";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface Profile {
   id: string;
@@ -42,6 +34,7 @@ export const UserManagement = () => {
   const [deleting, setDeleting] = useState(false);
   const { toast } = useToast();
   const { profile } = useAuth();
+  const { role } = usePermissions();
 
   useEffect(() => {
     fetchUsers();
@@ -49,13 +42,31 @@ export const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
+      // Get user roles from user_roles table
+      const { data: userRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (rolesError) throw rolesError;
+
+      // Fetch profiles
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setUsers(data || []);
+
+      // Merge roles with profiles
+      const usersWithRoles = (data || []).map(profile => {
+        const userRole = userRoles?.find(r => r.user_id === profile.id);
+        return {
+          ...profile,
+          role: userRole?.role || 'analyst'
+        };
+      });
+
+      setUsers(usersWithRoles);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({
@@ -178,7 +189,7 @@ export const UserManagement = () => {
           </Select>
           <Button 
             onClick={() => setShowAddDialog(true)}
-            disabled={!profile || profile.role !== 'admin'}
+            disabled={!role || role !== 'admin'}
           >
             <UserPlus className="h-4 w-4 mr-2" />
             Add User
@@ -218,14 +229,14 @@ export const UserManagement = () => {
                       <Button 
                         size="sm" 
                         variant="outline"
-                        disabled={!profile || profile.role !== 'admin'}
+                        disabled={!role || role !== 'admin'}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button 
                         size="sm" 
                         variant="outline"
-                        disabled={!profile || profile.role !== 'admin' || user.id === profile.id}
+                        disabled={!role || role !== 'admin' || user.id === profile?.id}
                         onClick={() => {
                           setUserToDelete(user);
                           setDeleteDialogOpen(true);

@@ -11,7 +11,9 @@ import { StaffProductivity } from "@/components/role-specific/StaffProductivity"
 import { OfficialReportsTable } from "@/components/OfficialReportsTable";
 import { PendingApprovals } from "@/components/approvals/PendingApprovals";
 import { CaseSearch } from "@/components/CaseSearch";
-import { SensitiveAction } from "@/components/auth/ChiefOfCyberGuard";
+import { ProtectedAction } from "@/components/ProtectedAction";
+import { SENSITIVE_OPERATIONS } from "@/lib/permissions";
+import { Link } from "react-router-dom";
 
 export const ChiefOfCyberDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -92,32 +94,55 @@ export const ChiefOfCyberDashboard = () => {
                 <CardDescription>Strategic command tools</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <SensitiveAction action="department_performance_review">
-                  <Button className="w-full justify-start" variant="outline">
-                    <Users className="h-4 w-4 mr-2" />
-                    Department Performance Review
+                <ProtectedAction requiredOperation={SENSITIVE_OPERATIONS.MANAGE_ALL_USERS}>
+                  <Button className="w-full justify-start" variant="outline" asChild>
+                    <Link to="/team">
+                      <Users className="h-4 w-4 mr-2" />
+                      Department Performance Review
+                      <Badge variant="secondary" className="ml-auto text-xs">
+                        <Lock className="h-3 w-3 mr-1" />
+                        Restricted
+                      </Badge>
+                    </Link>
                   </Button>
-                </SensitiveAction>
+                </ProtectedAction>
                 
-                <SensitiveAction action="strategic_approvals">
+                <ProtectedAction requiredOperation={SENSITIVE_OPERATIONS.APPROVE_FINAL_REPORTS}>
                   <Button className="w-full justify-start" variant="outline">
                     <CheckCircle className="h-4 w-4 mr-2" />
                     Strategic Approvals
+                    <Badge variant="secondary" className="ml-auto text-xs">
+                      <Lock className="h-3 w-3 mr-1" />
+                      Restricted
+                    </Badge>
                   </Button>
-                </SensitiveAction>
+                </ProtectedAction>
                 
-                <Button className="w-full justify-start" variant="outline">
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  Executive Analytics
-                </Button>
-                
-                <SensitiveAction action="cyber_threat_assessment">
-                  <Button className="w-full justify-start" variant="outline">
-                    <Shield className="h-4 w-4 mr-2" />
-                    <Lock className="h-3 w-3 mr-1 opacity-70" />
-                    Cyber Threat Assessment
+                <ProtectedAction requiredOperation={SENSITIVE_OPERATIONS.VIEW_SYSTEM_ANALYTICS}>
+                  <Button className="w-full justify-start" variant="outline" asChild>
+                    <Link to="/analytics">
+                      <BarChart3 className="h-4 w-4 mr-2" />
+                      Executive Analytics
+                      <Badge variant="secondary" className="ml-auto text-xs">
+                        <Lock className="h-3 w-3 mr-1" />
+                        Restricted
+                      </Badge>
+                    </Link>
                   </Button>
-                </SensitiveAction>
+                </ProtectedAction>
+                
+                <ProtectedAction requiredOperation={SENSITIVE_OPERATIONS.EXECUTE_STRATEGIC_DECISIONS}>
+                  <Button className="w-full justify-start" variant="outline" asChild>
+                    <Link to="/security">
+                      <Shield className="h-4 w-4 mr-2" />
+                      Cyber Threat Assessment
+                      <Badge variant="secondary" className="ml-auto text-xs">
+                        <Lock className="h-3 w-3 mr-1" />
+                        Restricted
+                      </Badge>
+                    </Link>
+                  </Button>
+                </ProtectedAction>
               </CardContent>
             </Card>
           </div>

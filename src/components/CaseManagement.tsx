@@ -163,7 +163,7 @@ export const CaseManagement = () => {
           <h2 className="text-2xl font-bold text-foreground">Case Management</h2>
           <p className="text-muted-foreground">Manage and track investigation cases</p>
         </div>
-        {profile?.role === 'exhibit_officer' && (
+        {role === 'exhibit_officer' && (
           <Button onClick={() => setShowOpenCaseDialog(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Open Case File
@@ -213,7 +213,7 @@ export const CaseManagement = () => {
                   ? "Try adjusting your search or filters" 
                   : "Create your first case to get started"}
               </p>
-              {!searchQuery && statusFilter === 'all' && profile?.role === 'exhibit_officer' && (
+              {!searchQuery && statusFilter === 'all' && role === 'exhibit_officer' && (
                 <Button onClick={() => setShowOpenCaseDialog(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   Create First Case

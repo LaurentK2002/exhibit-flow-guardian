@@ -131,7 +131,7 @@ export const CaseSearch = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder={
-                  profile?.role === "forensic_analyst"
+                  role === "forensic_analyst"
                     ? "Search your assigned cases by lab number, case number, or title..."
                     : "Search cases by lab number, case number, or title..."
                 }
@@ -150,7 +150,7 @@ export const CaseSearch = () => {
               {loading ? "Searching..." : "Search"}
             </Button>
           </div>
-          {profile?.role === "forensic_analyst" && (
+          {role === "forensic_analyst" && (
             <p className="text-sm text-muted-foreground mt-2">
               You can only search cases assigned to you
             </p>
@@ -249,7 +249,7 @@ export const CaseSearch = () => {
           caseNumber={selectedCase.case_number}
           caseTitle={selectedCase.title}
           currentPriority={selectedCase.priority as Database['public']['Enums']['case_priority']}
-          userRole={profile?.role || ''}
+          userRole={role || ''}
           open={priorityDialogOpen}
           onOpenChange={setPriorityDialogOpen}
           onUpdate={() => {

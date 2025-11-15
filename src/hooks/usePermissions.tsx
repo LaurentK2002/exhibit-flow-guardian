@@ -18,7 +18,7 @@ export const usePermissions = () => {
       }
 
       try {
-        // Fetch user's role from user_roles table (primary source)
+        // Fetch user's role from user_roles table (single source of truth)
         const { data: roleData, error: roleError } = await supabase
           .from('user_roles')
           .select('role')
@@ -31,8 +31,7 @@ export const usePermissions = () => {
           console.error('Error fetching role:', roleError);
         }
         
-        // Use user_roles table as primary source, fall back to profile.role
-        const userRole = roleData?.role || profile?.role;
+        const userRole = roleData?.role;
         setRole(userRole);
 
         if (userRole) {
@@ -49,14 +48,14 @@ export const usePermissions = () => {
       } catch (error) {
         console.error('Error fetching permissions:', error);
         setPermissions([]);
-        setRole(profile?.role || null);
+        setRole(null);
       } finally {
         setLoading(false);
       }
     };
 
     fetchRoleAndPermissions();
-  }, [user, profile?.role]);
+  }, [user]);
 
   const hasPermission = (permission: string) => {
     return permissions.includes(permission);
@@ -76,6 +75,6 @@ export const usePermissions = () => {
     hasPermission,
     hasAnyPermission,
     hasAllPermissions,
-    role: role || profile?.role,
+    role,
   };
 };

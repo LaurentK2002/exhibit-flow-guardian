@@ -55,18 +55,18 @@ serve(async (req) => {
       throw new Error('Not authenticated');
     }
 
-    // Check if the requesting user is an admin
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from('profiles')
+    // Check if the requesting user is an admin using user_roles table
+    const { data: userRole, error: roleError } = await supabaseAdmin
+      .from('user_roles')
       .select('role')
-      .eq('id', user.id)
-      .single();
+      .eq('user_id', user.id)
+      .maybeSingle();
 
-    if (profileError || !profile) {
+    if (roleError || !userRole) {
       throw new Error('Could not verify user permissions');
     }
 
-    if (profile.role !== 'admin' && profile.role !== 'administrator') {
+    if (userRole.role !== 'admin' && userRole.role !== 'administrator') {
       throw new Error('Only administrators can delete users');
     }
 

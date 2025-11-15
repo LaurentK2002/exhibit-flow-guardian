@@ -51,23 +51,23 @@ serve(async (req) => {
       },
     });
 
-    // Check if user has admin role using service role
-    const { data: profile, error: profileError } = await adminClient
-      .from('profiles')
+    // Check if user has admin role using user_roles table
+    const { data: userRole, error: roleError } = await adminClient
+      .from('user_roles')
       .select('role')
-      .eq('id', user.id)
-      .single();
+      .eq('user_id', user.id)
+      .maybeSingle();
 
-    console.log('Profile data:', profile);
-    console.log('Profile error:', profileError);
+    console.log('User role data:', userRole);
+    console.log('Role error:', roleError);
 
-    if (profileError || !profile) {
+    if (roleError) {
       throw new Error('Unable to verify user permissions');
     }
 
     // Check for admin or administrator role
     const allowedRoles = ['admin', 'administrator'];
-    if (!allowedRoles.includes(profile.role)) {
+    if (!userRole || !allowedRoles.includes(userRole.role)) {
       throw new Error('Only administrators can create users');
     }
 
@@ -94,12 +94,12 @@ serve(async (req) => {
       throw createError;
     }
 
-    // Update the profile with additional information
+    // Update the profile with additional information and create user_roles entry
     if (newUser.user) {
+      // Update profile
       const { error: profileError } = await adminClient
         .from('profiles')
         .update({
-          role,
           department: department || 'Cyber Crimes Unit',
           phone: phone || null,
         })
@@ -107,6 +107,18 @@ serve(async (req) => {
 
       if (profileError) {
         console.error('Profile update error:', profileError);
+      }
+
+      // Insert role into user_roles table
+      const { error: roleError } = await adminClient
+        .from('user_roles')
+        .insert({
+          user_id: newUser.user.id,
+          role: role,
+        });
+
+      if (roleError) {
+        console.error('Role insert error:', roleError);
         // Don't throw here, user was created successfully
       }
     }

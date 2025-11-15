@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import { Database } from '@/integrations/supabase/types';
 
 type CasePriority = Database['public']['Enums']['case_priority'];
@@ -23,10 +24,11 @@ export const AddCaseDialog = ({ open, onOpenChange, onSuccess }: AddCaseDialogPr
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { profile } = useAuth();
+  const { role } = usePermissions();
 
   // Check if user is exhibit officer
   useEffect(() => {
-    if (open && profile?.role !== 'exhibit_officer') {
+    if (open && role !== 'exhibit_officer') {
       toast({
         title: "Access Denied",
         description: "Only Exhibit Officers can create case files.",
@@ -34,10 +36,10 @@ export const AddCaseDialog = ({ open, onOpenChange, onSuccess }: AddCaseDialogPr
       });
       onOpenChange(false);
     }
-  }, [open, profile?.role, toast, onOpenChange]);
+  }, [open, role, toast, onOpenChange]);
   
   const getAvailablePriorities = () => {
-    const userRole = profile?.role;
+    const userRole = role;
     
     // CO can set all priorities including critical (urgent)
     if (userRole === 'commanding_officer') {

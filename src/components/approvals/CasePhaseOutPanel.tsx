@@ -51,6 +51,14 @@ export const CasePhaseOutPanel = ({ caseId, caseStatus, onStatusChange }: CasePh
           description: 'Submit the final analysis report for review and approval',
         });
         break;
+      case 'report_submitted':
+        transitions.push({
+          status: 'report_approved',
+          label: 'Request Report Approval',
+          approvalType: 'report_approval',
+          description: 'Request approval of the submitted report from supervisor',
+        });
+        break;
       case 'report_approved':
         transitions.push({
           status: 'evidence_returned',

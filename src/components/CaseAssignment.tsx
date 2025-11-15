@@ -56,10 +56,21 @@ export const CaseAssignment = () => {
 
   const fetchAnalysts = useCallback(async () => {
     try {
+      // Get analyst user IDs from user_roles
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .in('role', ['analyst', 'forensic_analyst']);
+
+      if (roleError) throw roleError;
+
+      const analystIds = roleData?.map(r => r.user_id) || [];
+
+      // Fetch analyst profiles
       const { data, error } = await supabase
         .from('profiles')
         .select('id, full_name, badge_number')
-        .in('role', ['analyst', 'forensic_analyst'])
+        .in('id', analystIds)
         .eq('is_active', true)
         .order('full_name');
 
@@ -88,14 +99,23 @@ export const CaseAssignment = () => {
 
   const assignCase = async (caseId: string, analystId: string) => {
     try {
-      // Get an active exhibit officer to link to the case
+      // Get exhibit officer user IDs from user_roles
+      const { data: officerRoles } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'exhibit_officer')
+        .limit(1);
+
+      const officerId = officerRoles?.[0]?.user_id;
+
+      // Get an active exhibit officer profile
       const { data: exhibitOfficer } = await supabase
         .from('profiles')
         .select('id')
-        .eq('role', 'exhibit_officer')
+        .eq('id', officerId || '')
         .eq('is_active', true)
         .limit(1)
-        .single();
+        .maybeSingle();
 
       // Update case with analyst, exhibit officer, and set status to in_progress
       const { error } = await supabase

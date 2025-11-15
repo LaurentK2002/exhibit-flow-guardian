@@ -3,9 +3,11 @@ import { Navigation } from "@/components/Navigation";
 import { CommandingOfficerDashboard } from "@/components/dashboards/CommandingOfficerDashboard";
 import { OfficerCommandingUnitDashboard } from "@/components/dashboards/OfficerCommandingUnitDashboard";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePermissions } from "@/hooks/usePermissions";
 
 export default function Operations() {
   const { profile } = useAuth();
+  const { role } = usePermissions();
 
   useEffect(() => {
     document.title = "Operations Overview";
@@ -24,7 +26,7 @@ export default function Operations() {
       <Navigation />
       <main className="container mx-auto px-4 md:px-6 py-8 max-w-7xl">
         <h1 className="sr-only">Operations Overview</h1>
-        {profile?.role === 'officer_commanding_unit' ? (
+        {role === 'officer_commanding_unit' ? (
           <OfficerCommandingUnitDashboard />
         ) : (
           <CommandingOfficerDashboard />

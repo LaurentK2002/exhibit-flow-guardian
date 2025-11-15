@@ -23,11 +23,21 @@ export const TeamManagement = () => {
 
   const fetchTeamMembers = useCallback(async () => {
     try {
-      // Fetch team members (analysts and exhibit officers)
+      // Get user IDs with analyst/exhibit roles from user_roles table
+      const { data: userRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role')
+        .in('role', ['analyst', 'exhibit_officer', 'forensic_analyst']);
+
+      if (rolesError) throw rolesError;
+
+      const userIds = userRoles?.map(r => r.user_id) || [];
+      
+      // Fetch profiles for those users
       const { data: profiles, error } = await supabase
         .from('profiles')
         .select('*')
-        .in('role', ['analyst', 'exhibit_officer', 'forensic_analyst'])
+        .in('id', userIds)
         .eq('is_active', true);
 
       if (error) throw error;
@@ -41,6 +51,7 @@ export const TeamManagement = () => {
 
       // Calculate real stats for each member
       const membersWithStats = profiles?.map(profile => {
+        const userRole = userRoles?.find(r => r.user_id === profile.id);
         const memberCases = cases?.filter(c => c.analyst_id === profile.id) || [];
         const activeCases = memberCases.filter(c => 
           !['closed', 'archived', 'evidence_returned'].includes(c.status)
@@ -51,6 +62,7 @@ export const TeamManagement = () => {
 
         return {
           ...profile,
+          role: userRole?.role || 'analyst',
           activeCases,
           completedCases,
         };

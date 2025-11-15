@@ -16,15 +16,33 @@ export const UserTable = () => {
 
   const fetchUsers = async () => {
     try {
+      // Get user roles from user_roles table
+      const { data: userRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (rolesError) throw rolesError;
+
+      // Fetch profiles
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('is_active', true)
-        .limit(10)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(10);
 
       if (error) throw error;
-      setUsers(data || []);
+
+      // Merge roles with profiles
+      const usersWithRoles = (data || []).map(profile => {
+        const userRole = userRoles?.find(r => r.user_id === profile.id);
+        return {
+          ...profile,
+          role: userRole?.role || 'investigator'
+        };
+      });
+
+      setUsers(usersWithRoles as any);
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {

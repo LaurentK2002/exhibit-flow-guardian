@@ -67,10 +67,21 @@ export const UnassignedCasesForOCU = () => {
 
   const fetchAnalysts = async () => {
     try {
+      // Get analyst user IDs from user_roles
+      const { data: userRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role')
+        .eq('role', 'analyst');
+
+      if (rolesError) throw rolesError;
+
+      const analystIds = userRoles?.map(r => r.user_id) || [];
+
+      // Fetch profiles for analysts
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, full_name, role')
-        .eq('role', 'analyst')
+        .select('id, full_name')
+        .in('id', analystIds)
         .eq('is_active', true)
         .order('full_name');
 
@@ -78,7 +89,8 @@ export const UnassignedCasesForOCU = () => {
         console.error('Error fetching analysts:', error);
         setAnalysts([]);
       } else {
-        setAnalysts(data || []);
+        const analystsWithRole = (data || []).map(a => ({ ...a, role: 'analyst' as const }));
+        setAnalysts(analystsWithRole);
       }
     } catch (error) {
       console.error('Error fetching analysts:', error);

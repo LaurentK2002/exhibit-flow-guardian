@@ -49,14 +49,27 @@ export const PendingApprovals = () => {
       const submitterIds = [...new Set(approvalsData?.map(a => a.submitted_by) || [])];
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('id, full_name, role')
+        .select('id, full_name')
         .in('id', submitterIds);
 
+      // Fetch roles from user_roles table
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('user_id, role')
+        .in('user_id', submitterIds);
+
       // Combine the data
-      const enrichedApprovals = approvalsData?.map(approval => ({
-        ...approval,
-        submitter: profiles?.find(p => p.id === approval.submitted_by) || { full_name: 'Unknown', role: 'unknown' }
-      }));
+      const enrichedApprovals = approvalsData?.map(approval => {
+        const profile = profiles?.find(p => p.id === approval.submitted_by);
+        const role = roles?.find(r => r.user_id === approval.submitted_by)?.role || 'unknown';
+        return {
+          ...approval,
+          submitter: { 
+            full_name: profile?.full_name || 'Unknown', 
+            role 
+          }
+        };
+      });
 
       setApprovals(enrichedApprovals as unknown as PendingApproval[]);
     } catch (error) {

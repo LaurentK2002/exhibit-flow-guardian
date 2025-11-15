@@ -34,12 +34,22 @@ export const StaffProductivity = () => {
 
   const fetchProductivityData = async () => {
     try {
+      // Fetch analyst user IDs from user_roles
+      const { data: analystRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role')
+        .eq('role', 'forensic_analyst');
+
+      if (rolesError) throw rolesError;
+
+      const analystIds = analystRoles?.map(r => r.user_id) || [];
+
       // Fetch only active forensic analysts
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, full_name, role')
+        .select('id, full_name')
         .eq('is_active', true)
-        .eq('role', 'forensic_analyst');
+        .in('id', analystIds);
 
       if (profilesError) throw profilesError;
 
@@ -62,10 +72,12 @@ export const StaffProductivity = () => {
         if (efficiency >= 85) status = 'excellent';
         else if (efficiency >= 70) status = 'good';
 
+        const userRole = analystRoles?.find(r => r.user_id === profile.id)?.role || 'forensic_analyst';
+
         return {
           id: profile.id,
           name: profile.full_name,
-          role: profile.role,
+          role: userRole,
           casesCompleted: completedCases,
           efficiency,
           status

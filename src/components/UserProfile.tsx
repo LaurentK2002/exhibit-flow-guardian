@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePermissions } from "@/hooks/usePermissions";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { User, Lock, Mail, Phone, Shield, Hash } from "lucide-react";
 
 export const UserProfile = () => {
   const { user, profile } = useAuth();
+  const { role } = usePermissions();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [passwordData, setPasswordData] = useState({
@@ -106,7 +108,7 @@ export const UserProfile = () => {
                 <Shield className="h-4 w-4" />
                 Role
               </Label>
-              <Input value={profile?.role?.replace(/_/g, ' ').toUpperCase() || ""} disabled />
+              <Input value={role?.replace(/_/g, ' ').toUpperCase() || ""} disabled />
             </div>
             <div className="space-y-2">
               <Label className="flex items-center gap-2">

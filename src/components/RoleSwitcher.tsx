@@ -72,7 +72,7 @@ export const RoleSwitcher = ({ currentViewRole, onRoleChange }: RoleSwitcherProp
           <Button 
             variant="outline" 
             size="sm"
-            onClick={() => onRoleChange(profile?.role || 'admin')}
+            onClick={() => onRoleChange(role || 'admin')}
             className="text-xs"
           >
             Reset to My Role
@@ -81,7 +81,7 @@ export const RoleSwitcher = ({ currentViewRole, onRoleChange }: RoleSwitcherProp
         
         <div className="text-xs text-orange-600 dark:text-orange-400 mt-2 space-y-1">
           <p>Dashboard Testing Mode: Switch between different role views to test all panels.</p>
-          <p>Your actual role: <strong>{profile?.role || 'Loading...'}</strong></p>
+          <p>Your actual role: <strong>{role || 'Loading...'}</strong></p>
         </div>
       </CardContent>
     </Card>

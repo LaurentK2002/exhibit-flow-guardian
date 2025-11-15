@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Search, X, Eye, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePermissions } from "@/hooks/usePermissions";
 import { CaseStatusBadge, CaseStatus } from "./CaseStatusBadge";
 import { CaseDetailsDialog } from "./CaseDetailsDialog";
 import { UpdateCasePriorityDialog } from "./UpdateCasePriorityDialog";
@@ -31,10 +32,11 @@ export const CaseSearch = () => {
   const [priorityDialogOpen, setPriorityDialogOpen] = useState(false);
   const [selectedCase, setSelectedCase] = useState<SearchResult | null>(null);
   const { user, profile } = useAuth();
+  const { role } = usePermissions();
   const { toast } = useToast();
 
   const canUpgradePriority = () => {
-    return profile?.role === 'officer_commanding_unit' || profile?.role === 'commanding_officer';
+    return role === 'officer_commanding_unit' || role === 'commanding_officer';
   };
 
   const handleSearch = async () => {
@@ -62,7 +64,7 @@ export const CaseSearch = () => {
         .or(`lab_number.ilike.%${searchQuery}%,case_number.ilike.%${searchQuery}%,title.ilike.%${searchQuery}%`);
 
       // If user is an analyst, only show their assigned cases
-      if (profile?.role === "forensic_analyst") {
+      if (role === "forensic_analyst") {
         query = query.eq("analyst_id", user.id);
       }
 
@@ -75,7 +77,7 @@ export const CaseSearch = () => {
       if (!data || data.length === 0) {
         toast({
           title: "No Results",
-          description: profile?.role === "forensic_analyst" 
+          description: role === "forensic_analyst"
             ? "No assigned cases found matching your search"
             : "No cases found matching your search",
         });

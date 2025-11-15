@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Shield, Users, Package, Microscope, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePermissions } from "@/hooks/usePermissions";
 
 interface RoleSwitcherProps {
   currentViewRole: string;
@@ -13,9 +14,10 @@ interface RoleSwitcherProps {
 
 export const RoleSwitcher = ({ currentViewRole, onRoleChange }: RoleSwitcherProps) => {
   const { profile } = useAuth();
+  const { role } = usePermissions();
 
   // Only show for admin users
-  const showSwitcher = profile?.role === 'admin';
+  const showSwitcher = role === 'admin';
 
   if (!showSwitcher) {
     return null;

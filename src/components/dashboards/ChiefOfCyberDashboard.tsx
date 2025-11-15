@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Shield, BarChart3, Users, FileText, TrendingUp, Activity, CheckCircle, AlertTriangle } from "lucide-react";
+import { Shield, BarChart3, Users, FileText, TrendingUp, Activity, CheckCircle, AlertTriangle, Lock } from "lucide-react";
 import { DashboardStats } from "@/components/DashboardStats";
 import { TeamManagement } from "@/components/TeamManagement";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
@@ -11,6 +11,7 @@ import { StaffProductivity } from "@/components/role-specific/StaffProductivity"
 import { OfficialReportsTable } from "@/components/OfficialReportsTable";
 import { PendingApprovals } from "@/components/approvals/PendingApprovals";
 import { CaseSearch } from "@/components/CaseSearch";
+import { SensitiveAction } from "@/components/auth/ChiefOfCyberGuard";
 
 export const ChiefOfCyberDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -91,22 +92,32 @@ export const ChiefOfCyberDashboard = () => {
                 <CardDescription>Strategic command tools</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full justify-start" variant="outline">
-                  <Users className="h-4 w-4 mr-2" />
-                  Department Performance Review
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Strategic Approvals
-                </Button>
+                <SensitiveAction action="department_performance_review">
+                  <Button className="w-full justify-start" variant="outline">
+                    <Users className="h-4 w-4 mr-2" />
+                    Department Performance Review
+                  </Button>
+                </SensitiveAction>
+                
+                <SensitiveAction action="strategic_approvals">
+                  <Button className="w-full justify-start" variant="outline">
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Strategic Approvals
+                  </Button>
+                </SensitiveAction>
+                
                 <Button className="w-full justify-start" variant="outline">
                   <BarChart3 className="h-4 w-4 mr-2" />
                   Executive Analytics
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <Shield className="h-4 w-4 mr-2" />
-                  Cyber Threat Assessment
-                </Button>
+                
+                <SensitiveAction action="cyber_threat_assessment">
+                  <Button className="w-full justify-start" variant="outline">
+                    <Shield className="h-4 w-4 mr-2" />
+                    <Lock className="h-3 w-3 mr-1 opacity-70" />
+                    Cyber Threat Assessment
+                  </Button>
+                </SensitiveAction>
               </CardContent>
             </Card>
           </div>

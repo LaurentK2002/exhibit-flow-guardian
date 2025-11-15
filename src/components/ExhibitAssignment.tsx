@@ -88,10 +88,21 @@ export const ExhibitAssignment = () => {
 
   const fetchAnalysts = async () => {
     try {
+      // Get analyst user IDs from user_roles
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .in('role', ['analyst', 'forensic_analyst']);
+
+      if (roleError) throw roleError;
+
+      const analystIds = roleData?.map(r => r.user_id) || [];
+
+      // Fetch analyst profiles
       const { data, error } = await supabase
         .from('profiles')
         .select('id, full_name, badge_number')
-        .eq('role', 'forensic_analyst')
+        .in('id', analystIds)
         .eq('is_active', true);
 
       if (error) throw error;

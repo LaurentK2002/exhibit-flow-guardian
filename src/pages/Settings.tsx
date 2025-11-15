@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { SystemSettings } from "@/components/SystemSettings";
 import { UserProfile } from "@/components/UserProfile";
-import { useAuth } from "@/contexts/AuthContext";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Settings() {
-  const { profile } = useAuth();
-  const isAdmin = profile?.role === 'administrator';
+  const { role } = usePermissions();
+  const isAdmin = role === 'administrator' || role === 'admin';
 
   useEffect(() => {
     document.title = "Settings";

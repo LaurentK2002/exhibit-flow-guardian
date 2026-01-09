@@ -46,11 +46,11 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove, cas
   const isStorageMedia = exhibit.exhibitType === 'storage_media';
   const isNetworkDevice = exhibit.exhibitType === 'network_device';
 
-  // Extract #### from case lab number (format: FB/CYBER/YYYY/LAB/####)
+  // Extract ## from case lab number (format: FB/CYBER/YYYY/LAB/##)
   const extractLabSequence = (labNumber: string | undefined) => {
-    if (!labNumber) return '0000';
-    const match = labNumber.match(/LAB\/(\d{4})$/);
-    return match ? match[1] : '0000';
+    if (!labNumber) return '00';
+    const match = labNumber.match(/LAB\/(\d+)$/);
+    return match ? match[1] : '00';
   };
 
   const labSequence = extractLabSequence(caseLabNumber);

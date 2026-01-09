@@ -20,7 +20,6 @@ export interface ExhibitFormData {
   hasSim: string;
   simCards: Array<{ simCardName: string; iccid: string }>;
   description: string;
-  storageLocation: string;
   status: ExhibitStatus;
   computerType: string;
   internalStorageType: string;
@@ -504,15 +503,6 @@ export const ExhibitForm = ({ exhibit, index, onChange, onRemove, canRemove, cas
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor={`storageLocation-${index}`}>Storage Location</Label>
-            <Input
-              id={`storageLocation-${index}`}
-              value={exhibit.storageLocation}
-              onChange={(e) => onChange(index, 'storageLocation', e.target.value)}
-              placeholder="e.g., Vault A-201"
-            />
-          </div>
         </>
       )}
     </div>

@@ -11,8 +11,8 @@ import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import { CreateOfficialReportDialog } from "@/components/CreateOfficialReportDialog";
 import { OfficialReportsTable } from "@/components/OfficialReportsTable";
 import { FileText } from "lucide-react";
-import { ReportReviewPanel } from "@/components/ReportReviewPanel";
-import { ProfessionalReportReview } from "@/components/ProfessionalReportReview";
+import { EnhancedReportReviewPanel } from "@/components/reports/EnhancedReportReviewPanel";
+import { EnhancedProfessionalReportReview } from "@/components/reports/EnhancedProfessionalReportReview";
 import { UnassignedCasesForOCU } from "@/components/UnassignedCasesForOCU";
 import { PendingApprovals } from "@/components/approvals/PendingApprovals";
 
@@ -80,11 +80,11 @@ export const OfficerCommandingUnitDashboard = () => {
             </TabsList>
 
             <TabsContent value="analyst">
-              <ReportReviewPanel />
+              <EnhancedReportReviewPanel />
             </TabsContent>
 
             <TabsContent value="professional">
-              <ProfessionalReportReview />
+              <EnhancedProfessionalReportReview />
             </TabsContent>
 
             <TabsContent value="official">

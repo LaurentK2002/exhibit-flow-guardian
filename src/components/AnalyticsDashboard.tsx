@@ -103,89 +103,72 @@ export const AnalyticsDashboard = () => {
         console.error('Error fetching exhibits:', exhibitsError);
       }
 
-      // Get analyst user IDs from user_roles
-      const { data: userRoles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('user_id, role')
-        .in('role', ['analyst', 'forensic_analyst']);
+      // Build analyst list from cases/exhibits (avoids RLS restrictions on user_roles)
+      const analystIdSet = new Set<string>();
+      (cases || []).forEach((c: any) => {
+        if (c.analyst_id) analystIdSet.add(c.analyst_id);
+      });
+      (exhibits || []).forEach((e: any) => {
+        if (e.assigned_analyst) analystIdSet.add(e.assigned_analyst);
+      });
 
-      if (rolesError) {
-        console.error('Error fetching user roles:', rolesError);
-      }
+      const analystIds = Array.from(analystIdSet);
 
-      const analystIds = userRoles?.map(r => r.user_id) || [];
-
-      // Build workload data directly from user_roles and cases
-      // This avoids RLS issues with profiles table
-      const workloadMap = new Map<string, { name: string; active: number; completed: number }>();
-
-      // Initialize analysts from user_roles
-      for (const role of userRoles || []) {
-        workloadMap.set(role.user_id, {
-          name: role.user_id, // Will be updated with profile name if available
-          active: 0,
-          completed: 0
-        });
-      }
-
-      // Try to get profile names (may be limited by RLS)
+      // Try to resolve analyst names from profiles (may be blocked by RLS for some roles)
+      const nameById = new Map<string, string>();
       if (analystIds.length > 0) {
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('id, full_name')
-          .in('id', analystIds);
+        const { data: profiles, error: profilesError } = await supabase
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", analystIds);
 
-        // Update names for profiles we can access
-        for (const profile of profiles || []) {
-          const existing = workloadMap.get(profile.id);
-          if (existing) {
-            existing.name = profile.full_name;
-          }
+        if (profilesError) {
+          console.warn("Analytics: could not fetch profiles (RLS likely):", profilesError);
+        }
+
+        for (const p of profiles || []) {
+          if (p?.id && p?.full_name) nameById.set(p.id, p.full_name);
         }
       }
 
-      // Calculate workload based on analyst_id (primary) and assigned_analyst on exhibits
-      for (const c of cases || []) {
-        // Check analyst_id on case
-        if (c.analyst_id && workloadMap.has(c.analyst_id)) {
-          const analyst = workloadMap.get(c.analyst_id)!;
-          if (c.status === 'closed' || c.status === 'archived') {
-            analyst.completed++;
-          } else {
-            analyst.active++;
-          }
-        }
-      }
+      // Calculate analyst workload primarily from cases.analyst_id
+      // If a case has no analyst_id but exhibits are assigned, attribute that case to the exhibit analyst.
+      const workloadData = analystIds
+        .map((analystId) => {
+          const displayName = nameById.get(analystId) ?? `Analyst ${analystId.slice(0, 4).toUpperCase()}`;
 
-      // Also count by exhibit assignments
-      for (const e of exhibits || []) {
-        if (e.assigned_analyst && workloadMap.has(e.assigned_analyst)) {
-          const analyst = workloadMap.get(e.assigned_analyst)!;
-          // Find the case status
-          const relatedCase = cases?.find(c => c.id === e.case_id);
-          if (relatedCase) {
-            // Only count if not already counted via analyst_id
-            if (relatedCase.analyst_id !== e.assigned_analyst) {
-              if (relatedCase.status === 'closed' || relatedCase.status === 'archived') {
-                analyst.completed++;
-              } else {
-                analyst.active++;
-              }
+          const analystCases = (cases || []).filter((c: any) => c.analyst_id === analystId);
+          let active = analystCases.filter((c: any) => c.status !== "closed" && c.status !== "archived").length;
+          let completed = analystCases.filter((c: any) => c.status === "closed" || c.status === "archived").length;
+
+          // Add cases where analyst_id is empty but exhibits are assigned to this analyst
+          const caseIdsViaExhibits = new Set<string>();
+          (exhibits || []).forEach((e: any) => {
+            if (e.assigned_analyst === analystId && e.case_id) caseIdsViaExhibits.add(e.case_id);
+          });
+
+          for (const caseId of caseIdsViaExhibits) {
+            const relatedCase = (cases || []).find((c: any) => c.id === caseId);
+            if (!relatedCase) continue;
+            if (relatedCase.analyst_id) continue; // already counted by primary assignment
+
+            if (relatedCase.status === "closed" || relatedCase.status === "archived") {
+              completed++;
+            } else {
+              active++;
             }
           }
-        }
-      }
 
-      // Convert to array and filter out analysts with no data or unknown names
-      const workloadData = Array.from(workloadMap.values())
-        .filter(w => w.name && !w.name.includes('-')) // Filter out UUID names
-        .sort((a, b) => (b.active + b.completed) - (a.active + a.completed))
-        .slice(0, 10) // Limit to top 10
-        .map(w => ({
-          analyst: w.name.split(' ').slice(0, 2).join(' '), // Shorten long names
-          active: w.active,
-          completed: w.completed
-        }));
+          return {
+            analyst: displayName.split(" ").slice(0, 2).join(" "),
+            active,
+            completed,
+          };
+        })
+        .filter((w) => w.active + w.completed > 0)
+        .sort((a, b) => b.active + b.completed - (a.active + a.completed))
+        .slice(0, 12);
+
 
       // Process cases trend by month (last 6 months)
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

@@ -86,14 +86,22 @@ export const AnalyticsDashboard = () => {
 
   const fetchAnalytics = async () => {
     try {
-      // Fetch real data from database
-      const { data: cases } = await supabase
+      // Fetch real data from database - include analyst_id for workload calculation
+      const { data: cases, error: casesError } = await supabase
         .from('cases')
-        .select('id, created_at, status, priority, closed_date, opened_date, assigned_to');
+        .select('id, created_at, status, priority, closed_date, opened_date, assigned_to, analyst_id');
 
-      const { data: exhibits } = await supabase
+      if (casesError) {
+        console.error('Error fetching cases:', casesError);
+      }
+
+      const { data: exhibits, error: exhibitsError } = await supabase
         .from('exhibits')
         .select('exhibit_type, status, case_id, assigned_analyst');
+
+      if (exhibitsError) {
+        console.error('Error fetching exhibits:', exhibitsError);
+      }
 
       // Get analyst user IDs from user_roles
       const { data: userRoles, error: rolesError } = await supabase
@@ -101,16 +109,83 @@ export const AnalyticsDashboard = () => {
         .select('user_id, role')
         .in('role', ['analyst', 'forensic_analyst']);
 
-      if (rolesError) throw rolesError;
+      if (rolesError) {
+        console.error('Error fetching user roles:', rolesError);
+      }
 
       const analystIds = userRoles?.map(r => r.user_id) || [];
 
-      // Fetch profiles for analysts
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, full_name, is_active')
-        .in('id', analystIds)
-        .eq('is_active', true);
+      // Build workload data directly from user_roles and cases
+      // This avoids RLS issues with profiles table
+      const workloadMap = new Map<string, { name: string; active: number; completed: number }>();
+
+      // Initialize analysts from user_roles
+      for (const role of userRoles || []) {
+        workloadMap.set(role.user_id, {
+          name: role.user_id, // Will be updated with profile name if available
+          active: 0,
+          completed: 0
+        });
+      }
+
+      // Try to get profile names (may be limited by RLS)
+      if (analystIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, full_name')
+          .in('id', analystIds);
+
+        // Update names for profiles we can access
+        for (const profile of profiles || []) {
+          const existing = workloadMap.get(profile.id);
+          if (existing) {
+            existing.name = profile.full_name;
+          }
+        }
+      }
+
+      // Calculate workload based on analyst_id (primary) and assigned_analyst on exhibits
+      for (const c of cases || []) {
+        // Check analyst_id on case
+        if (c.analyst_id && workloadMap.has(c.analyst_id)) {
+          const analyst = workloadMap.get(c.analyst_id)!;
+          if (c.status === 'closed' || c.status === 'archived') {
+            analyst.completed++;
+          } else {
+            analyst.active++;
+          }
+        }
+      }
+
+      // Also count by exhibit assignments
+      for (const e of exhibits || []) {
+        if (e.assigned_analyst && workloadMap.has(e.assigned_analyst)) {
+          const analyst = workloadMap.get(e.assigned_analyst)!;
+          // Find the case status
+          const relatedCase = cases?.find(c => c.id === e.case_id);
+          if (relatedCase) {
+            // Only count if not already counted via analyst_id
+            if (relatedCase.analyst_id !== e.assigned_analyst) {
+              if (relatedCase.status === 'closed' || relatedCase.status === 'archived') {
+                analyst.completed++;
+              } else {
+                analyst.active++;
+              }
+            }
+          }
+        }
+      }
+
+      // Convert to array and filter out analysts with no data or unknown names
+      const workloadData = Array.from(workloadMap.values())
+        .filter(w => w.name && !w.name.includes('-')) // Filter out UUID names
+        .sort((a, b) => (b.active + b.completed) - (a.active + a.completed))
+        .slice(0, 10) // Limit to top 10
+        .map(w => ({
+          analyst: w.name.split(' ').slice(0, 2).join(' '), // Shorten long names
+          active: w.active,
+          completed: w.completed
+        }));
 
       // Process cases trend by month (last 6 months)
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -178,32 +253,10 @@ export const AnalyticsDashboard = () => {
         return closedDate && closedDate >= thisMonthStart;
       }).length || 0;
 
-      const activeAnalysts = profiles?.length || 0;
+      const activeAnalysts = workloadData.length;
       const priorityCaseBacklog = cases?.filter(c => 
         c.priority === 'critical' && c.status !== 'closed' && c.status !== 'archived'
       ).length || 0;
-
-      // Calculate analyst workload
-      const workloadData = profiles?.map(analyst => {
-        const analystCases = cases?.filter(c => 
-          c.assigned_to === analyst.id || 
-          (exhibits?.some(e => e.assigned_analyst === analyst.id && e.case_id === c.id))
-        ) || [];
-        
-        const active = analystCases.filter(c => 
-          c.status !== 'closed' && c.status !== 'archived'
-        ).length;
-        
-        const completed = analystCases.filter(c => 
-          c.status === 'closed' || c.status === 'archived'
-        ).length;
-        
-        return {
-          analyst: analyst.full_name,
-          active,
-          completed
-        };
-      }) || [];
 
       setAnalytics({
         casesTrend,
